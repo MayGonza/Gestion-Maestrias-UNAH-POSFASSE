@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal de Inscripción de Aspirantes | POSFACE · UNAH</title>
+  <meta name="description"
+    content="Portal oficial de inscripción y registro para aspirantes a maestrías y doctorados de la Facultad de Ciencias Económicas, Administrativas y Contables (POSFACE) de la UNAH.">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Cinzel:wght@600;700&display=swap"
+    rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    :root {
+      --portal-max-w: 860px;
+    }
+
+    body {
+      background-color: #f1f5f9;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(0, 43, 91, 0.05) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(212, 175, 55, 0.06) 0px, transparent 50%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      color: var(--text-dark);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .portal-header {
+      background: linear-gradient(135deg, #001f42 0%, #002B5B 60%, #083c74 100%);
+      color: #ffffff;
+      padding: 20px 0;
+      border-bottom: 4px solid var(--unah-gold);
+      box-shadow: var(--shadow-md);
+    }
+
+    .portal-header-container {
+      max-width: var(--portal-max-w);
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .portal-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .portal-logo-img {
+      width: 58px;
+      height: 58px;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3));
+    }
+
+    .portal-brand h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.25rem;
+      letter-spacing: 0.5px;
+      margin: 0;
+      color: #ffffff;
+    }
+
+    .portal-brand h1 span {
+      color: var(--unah-gold-light);
+    }
+
+    .portal-brand p {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.85);
+      margin: 2px 0 0 0;
+    }
+
+    .portal-nav-badge {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(4px);
+    }
+
+    .portal-nav-badge a {
+      color: var(--unah-gold-light);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .portal-nav-badge a:hover {
+      text-decoration: underline;
+    }
+
+    .portal-main {
+      flex: 1;
+      max-width: var(--portal-max-w);
+      width: 100%;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .portal-banner {
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+      border: 1px solid var(--border-color);
+      border-left: 6px solid var(--unah-navy);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .portal-banner h2 {
+      font-size: 1.35rem;
+      color: var(--unah-navy);
+      margin: 0 0 6px 0;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .portal-banner p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin: 0 0 14px 0;
+      line-height: 1.5;
+    }
+
+    .portal-banner-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .portal-tag {
+      background: #eff6ff;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+      font-size: 0.76rem;
+      padding: 4px 10px;
+      border-radius: 14px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .portal-tag.gold {
+      background: #fffbeb;
+      color: #b45309;
+      border-color: #fde68a;
+    }
+
+    /* Formulario contenedor */
+    .portal-form-card {
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+
+    .portal-card-header {
+      background: #fafbfc;
+      border-bottom: 1px solid var(--border-color);
+      padding: 18px 26px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .portal-card-header h3 {
+      font-size: 1.1rem;
+      color: var(--unah-navy);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .portal-card-header span {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .portal-card-body {
+      padding: 26px;
+    }
+
+    .form-section-divider {
+      margin: 24px 0 18px 0;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--unah-navy);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-section-divider svg {
+      width: 18px;
+      height: 18px;
+      color: var(--unah-gold);
+    }
+
+    .juramento-box {
+      background: #fffdf5;
+      border: 1px solid #fef3c7;
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-top: 24px;
+    }
+
+    .juramento-box label {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      cursor: pointer;
+      font-size: 0.84rem;
+      color: #78350f;
+      line-height: 1.45;
+    }
+
+    .juramento-box input[type="checkbox"] {
+      margin-top: 3px;
+      width: 17px;
+      height: 17px;
+      accent-color: var(--unah-navy);
+      cursor: pointer;
+    }
+
+    .portal-card-footer {
+      background: #fafbfc;
+      border-top: 1px solid var(--border-color);
+      padding: 20px 26px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    /* Comprobante de éxito */
+    .receipt-container {
+      display: none;
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-lg);
+      padding: 36px 30px;
+      text-align: center;
+    }
+
+    .receipt-icon-success {
+      width: 68px;
+      height: 68px;
+      background: #dcfce7;
+      color: #15803d;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px auto;
+    }
+
+    .receipt-icon-success svg {
+      width: 36px;
+      height: 36px;
+    }
+
+    .receipt-title {
+      font-size: 1.5rem;
+      color: var(--unah-navy);
+      font-weight: 800;
+      margin: 0 0 6px 0;
+    }
+
+    .receipt-subtitle {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      margin: 0 0 24px 0;
+    }
+
+    .receipt-card {
+      background: #fafbfc;
+      border: 1px dashed var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      margin: 0 auto 24px auto;
+      max-width: 620px;
+      text-align: left;
+    }
+
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #eef2f6;
+      font-size: 0.86rem;
+    }
+
+    .receipt-row:last-child {
+      border-bottom: none;
+    }
+
+    .receipt-lbl {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .receipt-val {
+      color: var(--unah-navy);
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .receipt-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .portal-footer {
+      background: #ffffff;
+      border-top: 1px solid var(--border-color);
+      padding: 20px 0;
+      margin-top: 40px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    @media print {
+      body {
+        background: #ffffff !important;
+      }
+      .portal-header, .portal-banner, .portal-form-card, .receipt-actions, .portal-footer, .portal-nav-badge {
+        display: none !important;
+      }
+      .receipt-container {
+        display: block !important;
+        box-shadow: none !important;
+        border: 1px solid #000 !important;
+        padding: 20px !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ENCABEZADO INSTITUCIONAL EXCLUSIVO ASPIRANTES -->
+  <header class="portal-header">
+    <div class="portal-header-container">
+      <div class="portal-brand">
+        <img src="logo-unah.png" alt="UNAH Logo" class="portal-logo-img">
+        <div>
+          <h1>UNAH <span>POSFACE</span></h1>
+          <p>Facultad de Ciencias Económicas, Administrativas y Contables</p>
+        </div>
+      </div>
+      <div class="portal-nav-badge">
+        <span>Portal Exclusivo de Aspirantes</span>
+        <span>·</span>
+        <a href="index.html">Acceso Administrativo ➔</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <main class="portal-main">
+
+    <!-- BANNER DE BIENVENIDA -->
+    <div class="portal-banner" id="portalBanner">
+      <h2>
+        <span>🎓</span> Solicitud de Inscripción a Programas de Posgrado
+      </h2>
+      <p>
+        Bienvenido al portal oficial de recepción de aspirantes a Maestrías y Doctorados de la Facultad de Ciencias
+        Económicas (POSFACE · UNAH). Por favor complete todos los datos requeridos para formalizar su expediente de ingreso.
+      </p>
+      <div class="portal-banner-tags">
+        <span class="portal-tag">🏛️ Ciudad Universitaria, Tegucigalpa</span>
+        <span class="portal-tag gold">✓ Requisito Normativo UNAH: Índice Pregrado &ge; 70.00%</span>
+        <span class="portal-tag">📜 Programas Acreditados por el CES</span>
+        <span class="portal-tag">📅 Período Académico 2026</span>
+      </div>
+    </div>
+
+    <!-- FORMULARIO DE INSCRIPCIÓN EXCLUSIVO -->
+    <div class="portal-form-card" id="formContainerCard">
+      <div class="portal-card-header">
+        <h3>
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          <span>Ficha de Registro del Aspirante</span>
+        </h3>
+        <span>Campos obligatorios marcados con *</span>
+      </div>
+
+      <form id="formInscripcionAspirante">
+        <div class="portal-card-body">
+
+          <!-- SECCIÓN 1: IDENTIFICACIÓN Y CONTACTO -->
+          <div class="form-section-divider">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>1. Datos Personales y de Identificación</span>
+          </div>
+
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label class="form-label" for="aspCuenta">
+                No. de Cuenta UNAH
+                <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">(Opcional si eres externo)</span>
+              </label>
+              <input type="text" class="form-input" id="aspCuenta" placeholder="ej. 20241004521 (dejar vacío si no procede de UNAH)">
+              <small style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-top: 3px;">
+                Si egresaste de otra universidad, se te asignará tu cuenta oficial UNAH al ser admitido.
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="aspDni">DNI / Documento de Identificación *</label>
+              <input type="text" class="form-input" id="aspDni" placeholder="ej. 0801-1996-01234" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="aspNombres">Nombres Completos *</label>
+              <input type="text" class="form-input" id="aspNombres" placeholder="Nombres del aspirante" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="aspApellidos">Apellidos Completos *</label>
+              <input type="text" class="form-input" id="aspApellidos" placeholder="Apellidos del aspirante" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="aspCorreo">Correo Electrónico de Contacto *</label>
+              <input type="email" class="form-input" id="aspCorreo" placeholder="ej. aspirante@gmail.com o institucional" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="aspTelefono">Teléfono Celular / WhatsApp *</label>
+              <input type="text" class="form-input" id="aspTelefono" placeholder="+504 9999-9999" required>
+            </div>
+
+            <!-- PROCEDENCIA GEOGRÁFICA -->
+            <div class="form-group">
+              <label class="form-label" for="aspDepartamento">Departamento de Procedencia *</label>
+              <select class="form-select" id="aspDepartamento" required>
+                <option value="">Seleccione su departamento...</option>
+                <option value="Francisco Morazán" selected>Francisco Morazán</option>
+                <option value="Cortés">Cortés</option>
+                <option value="Atlántida">Atlántida</option>
+                <option value="Choluteca">Choluteca</option>
+                <option value="Comayagua">Comayagua</option>
+                <option value="Copán">Copán</option>
+                <option value="El Paraíso">El Paraíso</option>
+                <option value="Intibucá">Intibucá</option>
+                <option value="Islas de la Bahía">Islas de la Bahía</option>
+                <option value="La Paz">La Paz</option>
+                <option value="Lempira">Lempira</option>
+                <option value="Ocotepeque">Ocotepeque</option>
+                <option value="Olancho">Olancho</option>
+                <option value="Santa Bárbara">Santa Bárbara</option>
+                <option value="Valle">Valle</option>
+                <option value="Yoro">Yoro</option>
+                <option value="Colón">Colón</option>
+                <option value="Gracias a Dios">Gracias a Dios</option>
+                <option value="Extranjero / Internacional">Extranjero / Internacional</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="aspCiudad">Ciudad / Municipio de Residencia *</label>
+              <input type="text" class="form-input" id="aspCiudad" placeholder="ej. Tegucigalpa, San Pedro Sula, Comayagua..." required>
+            </div>
+
+          </div>
+
+          <!-- SECCIÓN 2: ANTECEDENTES ACADÉMICOS -->
+          <div class="form-section-divider">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+              <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+            </svg>
+            <span>2. Antecedentes Académicos (Pregrado / Licenciatura)</span>
+          </div>
+
+          <div class="form-grid">
+
+            <div class="form-group col-span-2">
+              <label class="form-label" for="aspUniversidad">
+                Universidad de Egreso de Pregrado *
+                <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">— Centro donde obtuvo su licenciatura o título previo</span>
+              </label>
+              <select class="form-select" id="aspUniversidad" required>
+                <option value="">Seleccione su universidad de egreso...</option>
+                <option value="UNAH - Universidad Nacional Autónoma de Honduras">UNAH - Universidad Nacional Autónoma de Honduras</option>
+                <option value="UNITEC - Universidad Tecnológica Centroamericana">UNITEC - Universidad Tecnológica Centroamericana</option>
+                <option value="CEUTEC - Centro Universitario Tecnológico">CEUTEC - Centro Universitario Tecnológico</option>
+                <option value="UTH - Universidad Tecnológica de Honduras">UTH - Universidad Tecnológica de Honduras</option>
+                <option value="UPNFM - Univ. Pedagógica Nacional Francisco Morazán">UPNFM - Univ. Pedagógica Nacional Francisco Morazán</option>
+                <option value="UNICAH - Universidad Católica de Honduras">UNICAH - Universidad Católica de Honduras</option>
+                <option value="USAP - Universidad de San Pedro Sula">USAP - Universidad de San Pedro Sula</option>
+                <option value="UJCV - Universidad José Cecilio del Valle">UJCV - Universidad José Cecilio del Valle</option>
+                <option value="UNAG - Univ. Nacional de Agricultura">UNAG - Univ. Nacional de Agricultura</option>
+                <option value="Universidad Extranjera / Internacional">Universidad Extranjera / Internacional</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="aspIndicePregrado">
+                Índice Académico Global de Pregrado (%) *
+              </label>
+              <div style="position: relative;">
+                <input type="number" step="0.01" min="60" max="100" class="form-input" id="aspIndicePregrado"
+                  placeholder="ej. 85.50" required style="padding-right: 32px;">
+                <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-weight: 700; color: var(--text-muted);">%</span>
+              </div>
+              <div id="indiceFeedback" style="font-size: 0.72rem; margin-top: 4px; display: none;"></div>
+              <small style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-top: 3px;">
+                Normativa de Posgrados UNAH: Admisión directa con índice <strong>&ge; 70.00%</strong>.
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="aspCarreraPrevia">Título / Carrera de Pregrado Obtenido *</label>
+              <input type="text" class="form-input" id="aspCarreraPrevia"
+                placeholder="ej. Lic. en Administración, Economía, Contaduría..." required>
+            </div>
+
+          </div>
+
+          <!-- SECCIÓN 3: PROGRAMA DE POSGRADO SOLICITADO -->
+          <div class="form-section-divider">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
+            <span>3. Programa de Posgrado Solicitado y Modalidad</span>
+          </div>
+
+          <div class="form-grid">
+
+            <div class="form-group col-span-2">
+              <label class="form-label" for="aspMaestria">Programa de Posgrado POSFACE *</label>
+              <select class="form-select" id="aspMaestria" required>
+                <option value="">Seleccione el programa de posgrado al que aspira...</option>
+                <option value="M-MAE">POS-MAE-01 - Maestría en Administración de Empresas (MAE)</option>
+                <option value="M-MDNI">POS-MDNI-02 - Maestría en Dirección de Negocios Internacionales</option>
+                <option value="M-MDP">POS-MDP-03 - Maestría en Formulación, Gestión y Evaluación de Proyectos</option>
+                <option value="M-MAF">POS-MAF-04 - Maestría en Administración Financiera</option>
+                <option value="M-MGP">POS-MGP-05 - Maestría en Gestión Pública</option>
+                <option value="M-MME">POS-MME-06 - Maestría en Métodos Cuantitativos de Gestión</option>
+                <option value="M-MSIG">POS-SIG-07 - Maestría en Sistemas de Información Gerencial</option>
+                <option value="D-DCE">DOC-DCE-01 - Doctorado en Ciencias Económicas y Empresariales</option>
+                <option value="D-DAP">DOC-DAP-02 - Doctorado en Administración Pública</option>
+                <option value="BTC-01">BTC-FCE-01 - Programa Especializado en Finanzas Aplicadas</option>
+              </select>
+            </div>
+
+            <div class="form-group col-span-2">
+              <label class="form-label" for="aspModalidad">Modalidad de Estudio Preferida *</label>
+              <select class="form-select" id="aspModalidad" required>
+                <option value="Presencial">Presencial (Ciudad Universitaria, Tegucigalpa)</option>
+                <option value="Virtual">Virtual (Campus Virtual UNAH / En Línea)</option>
+              </select>
+            </div>
+
+          </div>
+
+          <!-- DECLARACIÓN JURADA -->
+          <div class="juramento-box">
+            <label for="aspConsentimiento">
+              <input type="checkbox" id="aspConsentimiento" required>
+              <span>
+                <strong>Declaración de Autenticidad:</strong> Declaro bajo juramento que los datos suministrados en este
+                formulario son fidedignos y comprobables mediante la documentación original que presentaré ante la Secretaría
+                Académica de la Dirección de Posgrados de la Facultad de Ciencias Económicas (POSFACE · UNAH).
+              </span>
+            </label>
+          </div>
+
+        </div>
+
+        <div class="portal-card-footer">
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 0.78rem; color: var(--text-muted);">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <span>Conexión cifrada y segura con el sistema POSFACE UNAH</span>
+          </div>
+
+          <button type="submit" class="btn btn-gold btn-lg" id="btnEnviarInscripcion" style="padding: 12px 28px; font-size: 0.95rem;">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+            <span>Enviar Solicitud de Inscripción</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- PANTALLA DE COMPROBANTE Y CONFIRMACIÓN (SE MUESTRA TRAS EL ENVÍO) -->
+    <div class="receipt-container" id="receiptContainer">
+      <div class="receipt-icon-success">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+
+      <h2 class="receipt-title">¡Inscripción Recibida Exitosamente!</h2>
+      <p class="receipt-subtitle">
+        Su solicitud ha sido ingresada formalmente en el Sistema de Control de Aspirantes de POSFACE · UNAH.
+      </p>
+
+      <div class="receipt-card">
+        <div style="text-align: center; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #e2e8f0;">
+          <div style="font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted);">
+            Comprobante Digital Oficial de Aspirante
+          </div>
+          <div style="font-size: 1.25rem; font-weight: 800; color: var(--unah-navy); margin-top: 3px;" id="recNumeroSolicitud">
+            ASP-2026-0000
+          </div>
+        </div>
+
+        <div class="receipt-row">
+          <span class="receipt-lbl">Aspirante:</span>
+          <span class="receipt-val" id="recNombreCompleto">--</span>
+        </div>
+        <div class="receipt-row">
+          <span class="receipt-lbl">DNI / Identidad:</span>
+          <span class="receipt-val" id="recDni">--</span>
+        </div>
+        <div class="receipt-row">
+          <span class="receipt-lbl">No. Cuenta UNAH:</span>
+          <span class="receipt-val" id="recCuenta">--</span>
+        </div>
+        <div class="receipt-row">
+          <span class="receipt-lbl">Programa Solicitado:</span>
+          <span class="receipt-val" id="recPrograma">--</span>
+        </div>
+        <div class="receipt-row">
+          <span class="receipt-lbl">Modalidad:</span>
+          <span class="receipt-val" id="recModalidad">--</span>
+        </div>
+        <div class="receipt-row">
+          <span class="receipt-lbl">Procedencia Geográfica:</span>
+          <span class="receipt-val" id="recProcedencia">--</span>
+        </div>
+        <div class="receipt-row">
+          <span class="receipt-lbl">Universidad de Origen:</span>
+          <span class="receipt-val" id="recUniversidad">--</span>
+        </div>
+        <div class="receipt-row">
+          <span class="receipt-lbl">Índice Pregrado:</span>
+          <span class="receipt-val" id="recIndice">--</span>
+        </div>
+        <div class="receipt-row">
+          <span class="receipt-lbl">Estado Normativo:</span>
+          <span class="receipt-val" id="recEstadoNormativo">--</span>
+        </div>
+        <div class="receipt-row">
+          <span class="receipt-lbl">Fecha y Hora de Registro:</span>
+          <span class="receipt-val" id="recFecha">--</span>
+        </div>
+      </div>
+
+      <div class="receipt-actions">
+        <button type="button" class="btn btn-gold" id="btnImprimirComprobante">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+            <rect x="6" y="14" width="12" height="8"></rect>
+          </svg>
+          <span>Imprimir Comprobante Oficial</span>
+        </button>
+
+        <button type="button" class="btn btn-outline" id="btnNuevaInscripcion">
+          <span>Realizar otra inscripción</span>
+        </button>
+
+        <a href="https://posface.unah.edu.hn/" target="_blank" class="btn btn-outline">
+          <span>Visitar Portal Oficial POSFACE ↗</span>
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- PIE DE PÁGINA INSTITUCIONAL -->
+  <footer class="portal-footer">
+    <div style="max-width: var(--portal-max-w); margin: 0 auto; padding: 0 20px;">
+      <p style="margin: 0 0 4px 0;">
+        <strong>Dirección del Sistema de Posgrados (POSFACE · UNAH)</strong>
+      </p>
+      <p style="margin: 0 0 8px 0;">
+        Facultad de Ciencias Económicas, Administrativas y Contables · Edificio C2, Ciudad Universitaria José Trinidad Reyes
+      </p>
+      <p style="font-size: 0.74rem; color: #94a3b8; margin: 0;">
+        Tegucigalpa, M.D.C., Honduras, C.A. · "Lucem Aspicio"
+      </p>
+    </div>
+  </footer>
+
+  <!-- CONTENEDOR PARA NOTIFICACIONES TOAST -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- SCRIPTS DE DATOS Y CONEXIÓN CON FIREBASE -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/firebase-service.js"></script>
+  <script src="js/mock-data.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('formInscripcionAspirante');
+      const inputIndice = document.getElementById('aspIndicePregrado');
+      const feedbackIndice = document.getElementById('indiceFeedback');
+      const selectMaestria = document.getElementById('aspMaestria');
+      const selectModalidad = document.getElementById('aspModalidad');
+      const formCard = document.getElementById('formContainerCard');
+      const portalBanner = document.getElementById('portalBanner');
+      const receiptContainer = document.getElementById('receiptContainer');
+      const btnImprimir = document.getElementById('btnImprimirComprobante');
+      const btnNuevaInscripcion = document.getElementById('btnNuevaInscripcion');
+
+      // Feedback en tiempo real del índice de pregrado
+      inputIndice.addEventListener('input', () => {
+        const val = parseFloat(inputIndice.value);
+        if (isNaN(val)) {
+          feedbackIndice.style.display = 'none';
+          return;
+        }
+        feedbackIndice.style.display = 'block';
+        if (val >= 70) {
+          feedbackIndice.style.color = '#15803d';
+          feedbackIndice.innerHTML = `✓ Cumple requisito de admisión normativa de posgrado UNAH (&ge; 70%)`;
+        } else {
+          feedbackIndice.style.color = '#b45309';
+          feedbackIndice.innerHTML = `⚠️ Índice inferior al 70% normativo. Su ingreso quedará sujeto a evaluación condicional de mérito por el Comité de Posgrados.`;
+        }
+      });
+
+      // Sincronización sugerida de modalidad al cambiar maestría
+      selectMaestria.addEventListener('change', () => {
+        if (typeof POSFASSE_DATA !== 'undefined' && POSFASSE_DATA.maestrias) {
+          const mae = POSFASSE_DATA.maestrias.find(m => m.id === selectMaestria.value);
+          if (mae && selectModalidad) {
+            if (mae.modalidad && mae.modalidad.toLowerCase().includes('virtual')) {
+              selectModalidad.value = 'Virtual';
+            } else {
+              selectModalidad.value = 'Presencial';
+            }
+          }
+        }
+      });
+
+      // Notificaciones Toast simples
+      function showPortalToast(msg, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-weight: 700; color: var(--unah-navy);">POSFACE UNAH:</span>
+            <span>${msg}</span>
+          </div>
+        `;
+        document.getElementById('toastContainer').appendChild(toast);
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateX(100%)';
+          toast.style.transition = 'all 0.3s ease';
+          setTimeout(() => toast.remove(), 300);
+        }, 3800);
+      }
+
+      // Manejador del envío del formulario
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const cuenta = (document.getElementById('aspCuenta')?.value || '').trim();
+        const dni = document.getElementById('aspDni').value.trim();
+        const nombres = document.getElementById('aspNombres').value.trim();
+        const apellidos = document.getElementById('aspApellidos').value.trim();
+        const correo = document.getElementById('aspCorreo').value.trim();
+        const telefono = document.getElementById('aspTelefono').value.trim();
+        const departamento = document.getElementById('aspDepartamento').value.trim();
+        const ciudad = document.getElementById('aspCiudad').value.trim();
+        const universidad = document.getElementById('aspUniversidad').value.trim();
+        const indiceRaw = document.getElementById('aspIndicePregrado').value.trim();
+        const carreraPrevia = document.getElementById('aspCarreraPrevia').value.trim();
+        const maestriaId = selectMaestria.value;
+        const modalidad = selectModalidad.value;
+        const indice = parseFloat(indiceRaw);
+
+        if (!dni || !nombres || !apellidos || !correo || !telefono || !departamento || !ciudad || !universidad || !maestriaId || isNaN(indice)) {
+          showPortalToast('Por favor completa todos los campos requeridos marcados con asterisco (*)', 'warning');
+          return;
+        }
+
+        if (indice < 0 || indice > 100) {
+          showPortalToast('El índice académico debe estar en un rango válido entre 0% y 100%', 'danger');
+          return;
+        }
+
+        // Obtener lista actual para generar ID y comprobar duplicados
+        let lista = [];
+        try {
+          const raw = localStorage.getItem('posface_estudiantes_data');
+          lista = raw ? JSON.parse(raw) : (typeof POSFASSE_DATA !== 'undefined' ? POSFASSE_DATA.estudiantes : []);
+        } catch (err) {
+          lista = [];
+        }
+
+        // Validar cuenta UNAH si fue provista
+        if (cuenta && lista.some(item => item.cuentaUNAH && item.cuentaUNAH.toLowerCase() === cuenta.toLowerCase())) {
+          showPortalToast('El Número de Cuenta UNAH ya se encuentra registrado en el sistema', 'danger');
+          return;
+        }
+
+        // Validar DNI duplicado
+        if (lista.some(item => item.dni && item.dni.replace(/\D/g, '') === dni.replace(/\D/g, ''))) {
+          showPortalToast('El DNI ingresado ya tiene una solicitud o inscripción activa en POSFACE', 'warning');
+          return;
+        }
+
+        const nuevoId = `EST-${String(lista.length + 1).padStart(2, '0')}`;
+        const folioSolicitud = `ASP-2026-${String(Math.floor(1000 + Math.random() * 9000))}`;
+        const fechaActual = new Date().toLocaleDateString('es-HN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+
+        const nuevoEstudiante = {
+          id: nuevoId,
+          folio: folioSolicitud,
+          cuentaUNAH: cuenta || 'Pendiente',
+          dni: dni,
+          nombres: nombres,
+          apellidos: apellidos,
+          correoInstitucional: correo,
+          telefono: telefono,
+          departamento: departamento,
+          ciudad: ciudad,
+          universidadProcedencia: universidad,
+          indicePregrado: indice,
+          carreraPregrado: carreraPrevia,
+          maestriaId: maestriaId,
+          modalidad: modalidad,
+          estado: 'Activo',
+          fechaIngreso: fechaActual,
+          promedio: 0.0,
+          uvsAprobadas: 0,
+          totalUVs: 50,
+          tituloTesis: 'Tema en proceso de formulación',
+          tutorTesis: 'Pendiente de designación',
+          calificacionesRecientes: []
+        };
+
+        // Guardar con PosfaceDB (Firestore + LocalStorage)
+        if (window.PosfaceDB && typeof window.PosfaceDB.addEstudiante === 'function') {
+          await window.PosfaceDB.addEstudiante(nuevoEstudiante);
+        } else {
+          lista.unshift(nuevoEstudiante);
+          localStorage.setItem('posface_estudiantes_data', JSON.stringify(lista));
+        }
+
+        // Obtener nombre del programa
+        const optSeleccionada = selectMaestria.options[selectMaestria.selectedIndex]?.textContent || maestriaId;
+
+        // Llenar datos del comprobante
+        document.getElementById('recNumeroSolicitud').textContent = folioSolicitud;
+        document.getElementById('recNombreCompleto').textContent = `${nombres} ${apellidos}`;
+        document.getElementById('recDni').textContent = dni;
+        document.getElementById('recCuenta').textContent = cuenta || 'Pendiente (Graduado Externo / Asignación en Admisión)';
+        document.getElementById('recPrograma').textContent = optSeleccionada;
+        document.getElementById('recModalidad').textContent = modalidad;
+        document.getElementById('recProcedencia').textContent = `${ciudad}, ${departamento}`;
+        document.getElementById('recUniversidad').textContent = universidad;
+        document.getElementById('recIndice').textContent = `${indice.toFixed(2)}%`;
+        
+        const estNormativo = document.getElementById('recEstadoNormativo');
+        if (indice >= 70) {
+          estNormativo.innerHTML = `<span style="color: #15803d;">✓ Cumple requisito normativo (&ge; 70%)</span>`;
+        } else {
+          estNormativo.innerHTML = `<span style="color: #b45309;">⚠️ Sujeto a revisión de admisión (&lt; 70%)</span>`;
+        }
+        document.getElementById('recFecha').textContent = new Date().toLocaleString('es-HN');
+
+        // Mostrar pantalla de comprobante
+        formCard.style.display = 'none';
+        portalBanner.style.display = 'none';
+        receiptContainer.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        showPortalToast('¡Inscripción registrada con éxito en POSFACE!', 'success');
+      });
+
+      // Imprimir comprobante oficial
+      if (btnImprimir) {
+        btnImprimir.addEventListener('click', () => {
+          window.print();
+        });
+      }
+
+      // Reiniciar formulario para nueva inscripción
+      if (btnNuevaInscripcion) {
+        btnNuevaInscripcion.addEventListener('click', () => {
+          form.reset();
+          feedbackIndice.style.display = 'none';
+          receiptContainer.style.display = 'none';
+          portalBanner.style.display = 'block';
+          formCard.style.display = 'block';
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+    });
+  </script>
+</body>
+
+</html>
