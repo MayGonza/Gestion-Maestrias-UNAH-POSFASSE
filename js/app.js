@@ -31,12 +31,29 @@ document.addEventListener('DOMContentLoaded', () => {
         renderDashboard();
       }
     });
-  } else {
-    try {
-      const localEst = localStorage.getItem('posface_estudiantes_data');
-      if (localEst) estudiantesList = JSON.parse(localEst);
-    } catch (e) {}
-  }
+  // Escucha reactiva en tiempo real para nuevos estudiantes agregados (inscripción pública u otra pestaña)
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'posface_estudiantes_data' && e.newValue) {
+      try {
+        const updated = JSON.parse(e.newValue);
+        if (Array.isArray(updated) && updated.length > 0) {
+          estudiantesList = updated;
+          filtrarEstudiantes();
+          renderDashboard();
+        }
+      } catch (err) {}
+    }
+  });
+
+  window.addEventListener('posface_estudiante_agregado', (e) => {
+    if (e.detail) {
+      if (!estudiantesList.some(est => est.id === e.detail.id)) {
+        estudiantesList.unshift(e.detail);
+        filtrarEstudiantes();
+        renderDashboard();
+      }
+    }
+  });
 
   // Helper para clases visuales de estados de estudiantes
   function getBadgeClassForEstado(estado) {
