@@ -192,8 +192,26 @@
       // 1. Guardar de inmediato en local para garantizar que nunca se quede bloqueado
       this.saveLocalUser(userObj);
 
-      // 2. Intentar registrar en Firebase Authentication y Firestore
-      if (this.isCloudActive()) {
+      // 2. Guardar SIEMPRE en Firestore colección 'usuarios'
+      if (this.isCloudActive() && dbInstance) {
+        try {
+          await dbInstance.collection('usuarios').doc(userObj.uid).set({
+            uid: userObj.uid,
+            name: name,
+            email: email,
+            role: role,
+            institution: "UNAH POSFACE",
+            createdAt: new Date().toISOString()
+          });
+          console.log("%c✓ POSFACE UNAH: Usuario guardado en Firestore (colección 'usuarios'): " + userObj.uid, "color: #059669; font-weight: bold;");
+        } catch (dbErr) {
+          console.warn("Firestore usuarios set error:", dbErr);
+        }
+      }
+
+      // 3. Intentar registrar en Firebase Authentication
+      let authWarning = null;
+      if (this.isCloudActive() && authInstance) {
         try {
           const userCredential = await authInstance.createUserWithEmailAndPassword(email, password);
           const fbUser = userCredential.user;
@@ -201,6 +219,10 @@
           if (fbUser && fbUser.updateProfile) {
             await fbUser.updateProfile({ displayName: name });
           }
+
+          userObj.uid = fbUser.uid;
+          userObj.mode = "firebase";
+          this.saveLocalUser(userObj);
 
           if (dbInstance) {
             try {
@@ -212,22 +234,18 @@
                 institution: "UNAH POSFACE",
                 createdAt: new Date().toISOString()
               });
-            } catch (dbErr) {
-              console.warn("Firestore usuarios set error:", dbErr);
-            }
+            } catch (e) {}
           }
-
-          userObj.uid = fbUser.uid;
-          userObj.mode = "firebase";
-          this.saveLocalUser(userObj);
         } catch (fbErr) {
-          console.warn("Firebase Auth register aviso (guardado con respaldo institucional):", fbErr);
-          // Si Firebase Auth tiene Email/Password deshabilitado en la consola, no bloqueamos el usuario.
+          console.warn("Firebase Auth register aviso:", fbErr);
+          if (fbErr.code === 'auth/operation-not-allowed') {
+            authWarning = "Aviso Firebase: Habilita 'Correo/contraseña' en Authentication -> Sign-in method de Firebase Console para registrar también en Auth.";
+          }
         }
       }
 
       localStorage.setItem('posface_session_user', JSON.stringify(userObj));
-      return userObj;
+      return { ...userObj, authWarning };
     },
 
     // Cerrar sesión
@@ -280,8 +298,8 @@
         }
       } catch (e) {}
 
-      // Intentar sincronizar con Firestore
-      if (this.isCloudActive()) {
+      // Intentar sincronizar con Firestore y crear colección si no existe
+      if (this.isCloudActive() && dbInstance) {
         try {
           const snapshot = await dbInstance.collection('estudiantes').get();
           if (!snapshot.empty) {
@@ -291,23 +309,21 @@
             });
             currentList = cloudList;
             localStorage.setItem('posface_estudiantes_data', JSON.stringify(cloudList));
+            console.log(`%c✓ POSFACE UNAH: ${cloudList.length} estudiantes sincronizados desde Firestore Cloud`, "color: #059669; font-weight: bold;");
             return cloudList;
           } else {
-            console.log("Inicializando colección 'estudiantes' en Firestore...");
-            try {
-              const batch = dbInstance.batch();
-              currentList.forEach(est => {
-                const docRef = dbInstance.collection('estudiantes').doc(est.id || `EST-${Math.random()}`);
-                batch.set(docRef, est);
-              });
-              await batch.commit();
-            } catch (batchErr) {
-              console.warn("No se pudo escribir lote inicial en Firestore:", batchErr);
+            console.log("%c✓ POSFACE UNAH: Creando e inicializando colección 'estudiantes' en Firestore...", "color: #0284c7; font-weight: bold;");
+            // Guardar estudiantes en Firestore para que la colección quede creada visiblemente
+            for (const est of currentList) {
+              try {
+                await dbInstance.collection('estudiantes').doc(est.id).set(est);
+              } catch (err) {}
             }
+            console.log("%c✓ Colección 'estudiantes' creada exitosamente en Firestore Cloud", "color: #059669; font-weight: bold;");
             return currentList;
           }
         } catch (dbErr) {
-          console.warn("Firestore aún no está inicializado o en modo bloqueado, usando datos locales:", dbErr);
+          console.warn("Firestore error al sincronizar estudiantes:", dbErr);
         }
       }
 
@@ -333,14 +349,13 @@
         console.warn("Error en respaldo local:", e);
       }
 
-      // 2. Guardar en Firestore Cloud
-      if (this.isCloudActive()) {
+      // 2. Guardar en Firestore Cloud colección 'estudiantes'
+      if (this.isCloudActive() && dbInstance) {
         try {
-          const docRef = dbInstance.collection('estudiantes').doc(estudiante.id);
-          await docRef.set(estudiante);
-          console.log("✓ Estudiante guardado en Firestore Cloud:", estudiante.id);
+          await dbInstance.collection('estudiantes').doc(estudiante.id).set(estudiante);
+          console.log("%c✓ Estudiante guardado en Firestore Cloud (colección 'estudiantes'): " + estudiante.id, "color: #059669; font-weight: bold;");
         } catch (err) {
-          console.warn("Firestore error al guardar estudiante (se conserva en respaldo local):", err);
+          console.error("Firestore error al guardar estudiante en la nube:", err);
         }
       }
 

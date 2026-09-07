@@ -1097,6 +1097,11 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         const newUser = await window.PosfaceAuth.register(nombre, email, pwd, rol);
         showToast(`¡Cuenta creada exitosamente! Bienvenido(a) ${newUser.name}`, 'success');
+        if (newUser.authWarning) {
+          setTimeout(() => {
+            showToast(newUser.authWarning, 'warning');
+          }, 2500);
+        }
         checkAuthState();
         switchView('dashboard');
         formRegisterPosface.reset();

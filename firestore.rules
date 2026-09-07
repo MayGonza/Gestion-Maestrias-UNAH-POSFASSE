@@ -2,12 +2,10 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Colección de estudiantes / aspirantes:
-    // Cualquier aspirante puede enviar su inscripción (create)
-    // Lectura, actualización y eliminación exclusiva para personal autenticado
-    match /estudiantes/{estudianteId} {
-      allow create: if true;
-      allow read, update, delete: if request.auth != null || true; // Modo permisivo para pruebas iniciales
+    // Reglas permisivas para el sistema institucional POSFACE UNAH
+    // Permite lectura y escritura de colecciones 'estudiantes', 'usuarios', 'maestrias' y 'configuracion'
+    match /{document=**} {
+      allow read, write: if true;
     }
   }
 }
