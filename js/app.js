@@ -967,6 +967,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnSidebarLogout = document.getElementById('btnSidebarLogout');
   const fbStatusText = document.getElementById('fbStatusText');
   const loginCloudStatus = document.getElementById('loginCloudStatus');
+  const btnSoporteTecnico = document.getElementById('btnSoporteTecnico');
+  const modalSoporteTecnico = document.getElementById('modalSoporteTecnico');
+
+  // Soporte Técnico modal
+  if (btnSoporteTecnico && modalSoporteTecnico) {
+    btnSoporteTecnico.addEventListener('click', (e) => {
+      e.preventDefault();
+      openModal(modalSoporteTecnico);
+    });
+  }
 
   // Alternar entre pestaña de Iniciar Sesión y Registro
   function showLoginForm() {
