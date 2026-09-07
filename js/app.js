@@ -1141,11 +1141,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Botón de Cerrar Sesión en Sidebar
   if (btnSidebarLogout) {
     btnSidebarLogout.addEventListener('click', async () => {
-      if (confirm('¿Deseas cerrar tu sesión en el sistema administrativo POSFACE?')) {
-        await window.PosfaceAuth.logout();
-        showToast('Has cerrado sesión correctamente', 'info');
-        checkAuthState();
-      }
+      await window.PosfaceAuth.logout();
+      showToast('Has cerrado sesión correctamente', 'info');
+      checkAuthState();
     });
   }
 
