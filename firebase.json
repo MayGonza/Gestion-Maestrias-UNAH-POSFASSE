@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "maestrias-unah-posfasse",
+    "site": "gestion-maestrias-unah",
     "public": ".",
     "ignore": [
       "firebase.json",

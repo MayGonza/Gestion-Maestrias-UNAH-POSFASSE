@@ -14,13 +14,13 @@
 // =============================================================================
 
 window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyBH2TWUVZ-7dheOQYjE8pn4O8WEL5dtlCs",
-  authDomain: "maestrias-unah-posfasse.firebaseapp.com",
-  projectId: "maestrias-unah-posfasse",
-  storageBucket: "maestrias-unah-posfasse.firebasestorage.app",
-  messagingSenderId: "796291112561",
-  appId: "1:796291112561:web:5250c320c7529af52045d0",
-  measurementId: "G-VB2YYV4XEG"
+  apiKey: "AIzaSyDxaYLAKSmvldlyv03lrvTH78giPmVFUxQ",
+  authDomain: "gestion-maestrias-unah.firebaseapp.com",
+  projectId: "gestion-maestrias-unah",
+  storageBucket: "gestion-maestrias-unah.firebasestorage.app",
+  messagingSenderId: "416623257007",
+  appId: "1:416623257007:web:face0abc8f3765dac13b5a",
+  measurementId: "G-NWJ6Y1TC8Z"
 };
 
 // Función para comprobar si se han ingresado credenciales reales de Firebase
