@@ -31,6 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
         renderDashboard();
       }
     });
+  }
+
   // Escucha reactiva en tiempo real para nuevos estudiantes agregados (inscripción pública u otra pestaña)
   window.addEventListener('storage', (e) => {
     if (e.key === 'posface_estudiantes_data' && e.newValue) {
@@ -1008,9 +1010,14 @@ document.addEventListener('DOMContentLoaded', () => {
   function checkAuthState() {
     const user = window.PosfaceAuth ? window.PosfaceAuth.getCurrentUser() : null;
     const body = document.body;
+    const loginScreen = document.getElementById('loginScreen');
+    const appContainer = document.getElementById('appContainer');
+
     if (user) {
       body.classList.remove('not-logged-in');
       body.classList.add('logged-in');
+      if (loginScreen) loginScreen.style.display = 'none';
+      if (appContainer) appContainer.style.display = 'flex';
 
       // Actualizar perfil de usuario en el sidebar
       const avatarEl = document.getElementById('sidebarUserAvatar');
@@ -1026,6 +1033,8 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       body.classList.remove('logged-in');
       body.classList.add('not-logged-in');
+      if (loginScreen) loginScreen.style.display = 'flex';
+      if (appContainer) appContainer.style.display = 'none';
     }
   }
 
@@ -1103,10 +1112,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Botón de Acceso Rápido Demostración
   if (btnQuickLogin) {
-    btnQuickLogin.addEventListener('click', () => {
-      document.getElementById('loginEmail').value = 'secretaria.posface@unah.edu.hn';
-      document.getElementById('loginPassword').value = 'posface2026';
-      formLoginPosface.dispatchEvent(new Event('submit'));
+    btnQuickLogin.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const emailInput = document.getElementById('loginEmail');
+      const pwdInput = document.getElementById('loginPassword');
+      if (emailInput) emailInput.value = 'secretaria.posface@unah.edu.hn';
+      if (pwdInput) pwdInput.value = 'posface2026';
+
+      const btnSubmit = document.getElementById('btnLoginSubmit');
+      const btnText = document.getElementById('btnLoginText');
+      if (btnSubmit) btnSubmit.disabled = true;
+      if (btnText) btnText.textContent = 'Accediendo...';
+
+      try {
+        const user = await window.PosfaceAuth.login('secretaria.posface@unah.edu.hn', 'posface2026');
+        showToast(`Bienvenido(a) a POSFACE UNAH: ${user.name}`, 'success');
+        checkAuthState();
+        switchView('dashboard');
+      } catch (err) {
+        showToast(err.message || 'Error al acceder con cuenta demo', 'danger');
+      } finally {
+        if (btnSubmit) btnSubmit.disabled = false;
+        if (btnText) btnText.textContent = 'Ingresar al Sistema POSFACE';
+      }
     });
   }
 

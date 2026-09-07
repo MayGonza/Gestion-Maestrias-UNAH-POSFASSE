@@ -122,7 +122,17 @@
         return demoUser;
       }
 
-      // 2. Intentar autenticar con Firebase Authentication si está disponible
+      // 2. Verificar primero si es un usuario registrado en el sistema local
+      const localMatch = this.checkLocalUser(email, password);
+      if (localMatch) {
+        localStorage.setItem('posface_session_user', JSON.stringify(localMatch));
+        if (this.isCloudActive()) {
+          authInstance.signInWithEmailAndPassword(email, password).catch(() => {});
+        }
+        return localMatch;
+      }
+
+      // 3. Intentar autenticar con Firebase Authentication si está disponible
       if (this.isCloudActive()) {
         try {
           const userCredential = await authInstance.signInWithEmailAndPassword(email, password);
@@ -134,18 +144,11 @@
             role: "Secretaría Académica POSFACE",
             mode: "firebase"
           };
+          this.saveLocalUser({ ...userObj, password });
           localStorage.setItem('posface_session_user', JSON.stringify(userObj));
           return userObj;
         } catch (fbErr) {
-          console.warn("Firebase Auth no autenticó, comprobando usuarios registrados en sistema:", fbErr);
-          
-          // Si falla en Firebase, buscar si fue un usuario creado localmente
-          const localMatch = this.checkLocalUser(email, password);
-          if (localMatch) {
-            localStorage.setItem('posface_session_user', JSON.stringify(localMatch));
-            return localMatch;
-          }
-
+          console.warn("Firebase Auth error:", fbErr);
           throw new Error(this.friendlyAuthError(fbErr));
         }
       }
