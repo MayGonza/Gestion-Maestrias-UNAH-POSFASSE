@@ -587,12 +587,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Tesis
-    document.getElementById('expTesisTitulo').textContent = est.tituloTesis || 'Tema en proceso de formulación';
-    document.getElementById('expTesisTutor').textContent = est.tutorTesis || 'Pendiente de designación';
-
-
-
     openModal(modalExpediente);
   }
 
