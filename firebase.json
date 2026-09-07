@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "maestrias-unah-posfasse",
     "public": ".",
     "ignore": [
       "firebase.json",
