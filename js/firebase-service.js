@@ -437,18 +437,20 @@
 
     // Obtener lista completa de estudiantes
     fetchEstudiantes: async function (fallbackList) {
-      let currentList = fallbackList || [];
+      let currentList = [];
       try {
         const local = localStorage.getItem('posface_estudiantes_data');
-        if (local) {
+        if (local !== null) {
           const parsed = JSON.parse(local);
-          if (Array.isArray(parsed) && parsed.length > 0) {
+          if (Array.isArray(parsed)) {
             currentList = parsed;
           }
+        } else if (Array.isArray(fallbackList) && fallbackList.length > 0) {
+          currentList = fallbackList;
         }
       } catch (e) {}
 
-      // Intentar sincronizar con Firestore y crear colección si no existe
+      // Intentar sincronizar con Firestore si está activo
       if (this.isCloudActive() && dbInstance) {
         try {
           const snapshot = await dbInstance.collection('estudiantes').get();
@@ -462,14 +464,10 @@
             console.log(`%c✓ POSFACE UNAH: ${cloudList.length} estudiantes sincronizados desde Firestore Cloud`, "color: #059669; font-weight: bold;");
             return cloudList;
           } else {
-            console.log("%c✓ POSFACE UNAH: Creando e inicializando colección 'estudiantes' en Firestore...", "color: #0284c7; font-weight: bold;");
-            // Guardar estudiantes en Firestore para que la colección quede creada visiblemente
-            for (const est of currentList) {
-              try {
-                await dbInstance.collection('estudiantes').doc(est.id).set(est);
-              } catch (err) {}
+            // Si la colección está vacía o el usuario borró todo, NO insertar datos falsos
+            if (localStorage.getItem('posface_estudiantes_data') === null) {
+              localStorage.setItem('posface_estudiantes_data', JSON.stringify([]));
             }
-            console.log("%c✓ Colección 'estudiantes' creada exitosamente en Firestore Cloud", "color: #059669; font-weight: bold;");
             return currentList;
           }
         } catch (dbErr) {
@@ -485,7 +483,8 @@
       // 1. Guardar siempre en LocalStorage asegurando no perder la lista base
       try {
         const local = localStorage.getItem('posface_estudiantes_data');
-        let list = local ? JSON.parse(local) : (window.POSFASSE_DATA ? [...window.POSFASSE_DATA.estudiantes] : []);
+        let list = (local !== null) ? JSON.parse(local) : [];
+        if (!Array.isArray(list)) list = [];
         
         // Evitar duplicados por id
         const idx = list.findIndex(e => e.id === estudiante.id);
@@ -562,6 +561,29 @@
       // 3. Notificar a otras pestañas
       try {
         window.dispatchEvent(new CustomEvent('posface_estudiante_eliminado', { detail: { id: estId } }));
+      } catch (e) {}
+    },
+
+    // Vaciar todos los estudiantes (para iniciar limpio sin registros de prueba)
+    clearAllEstudiantes: async function () {
+      localStorage.setItem('posface_estudiantes_data', JSON.stringify([]));
+      if (this.isCloudActive() && dbInstance) {
+        try {
+          const snapshot = await dbInstance.collection('estudiantes').get();
+          if (!snapshot.empty) {
+            const batch = dbInstance.batch();
+            snapshot.docs.forEach(doc => {
+              batch.delete(doc.ref);
+            });
+            await batch.commit();
+            console.log("%c✓ Todos los estudiantes eliminados de Firestore Cloud", "color: #e11d48; font-weight: bold;");
+          }
+        } catch (err) {
+          console.warn("Error vaciando Firestore:", err);
+        }
+      }
+      try {
+        window.dispatchEvent(new CustomEvent('posface_estudiante_eliminado', { detail: { all: true } }));
       } catch (e) {}
     },
 

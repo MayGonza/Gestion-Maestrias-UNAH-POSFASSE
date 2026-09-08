@@ -389,8 +389,8 @@ const POSFASSE_DATA = {
     }
   ],
 
-  // Expedientes Estudiantiles POSFACE (con Universidad de Procedencia e Índice de Pregrado)
-  estudiantes: [
+  // Expedientes de prueba para demostración (opcional)
+  estudiantesDemo: [
     {
       id: "EST-01",
       cuentaUNAH: "20181003491",
@@ -648,6 +648,9 @@ const POSFASSE_DATA = {
       ]
     }
   ],
+
+  // Directorio activo de expedientes POSFACE (vacío por defecto, solo inscripciones reales)
+  estudiantes: [],
 
   // Malla curricular oficial de asignaturas
   asignaturas: [

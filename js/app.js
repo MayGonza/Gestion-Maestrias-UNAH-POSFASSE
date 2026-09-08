@@ -18,14 +18,29 @@ document.addEventListener('DOMContentLoaded', () => {
   // ===========================================================================
   // 1. ESTADO GLOBAL E INTEGRACIÓN DE DATOS (FIREBASE / LOCAL)
   // ===========================================================================
-  let currentView = 'dashboard';
-  let estudiantesList = [...data.estudiantes];
+  // Inicialización resiliente: leer siempre de LocalStorage primero (incluso si es lista vacía [])
+  let initialEstudiantes = [];
+  try {
+    const local = localStorage.getItem('posface_estudiantes_data');
+    if (local !== null) {
+      const parsed = JSON.parse(local);
+      if (Array.isArray(parsed)) {
+        initialEstudiantes = parsed;
+      }
+    } else if (Array.isArray(data.estudiantes) && data.estudiantes.length > 0) {
+      initialEstudiantes = [...data.estudiantes];
+    }
+  } catch (e) {
+    initialEstudiantes = [];
+  }
+
+  let estudiantesList = initialEstudiantes;
   let maestriasList = [...data.maestrias];
 
   // Sincronizar estudiantes con PosfaceDB (Firestore o Local)
   if (window.PosfaceDB) {
-    window.PosfaceDB.fetchEstudiantes(data.estudiantes).then(list => {
-      if (list && list.length > 0) {
+    window.PosfaceDB.fetchEstudiantes(initialEstudiantes).then(list => {
+      if (Array.isArray(list)) {
         estudiantesList = list;
         filtrarEstudiantes();
         renderDashboard();
@@ -33,12 +48,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Escucha reactiva en tiempo real para nuevos estudiantes agregados (inscripción pública u otra pestaña)
+  // Escucha reactiva en tiempo real para nuevos estudiantes o eliminaciones en otra pestaña
   window.addEventListener('storage', (e) => {
-    if (e.key === 'posface_estudiantes_data' && e.newValue) {
+    if (e.key === 'posface_estudiantes_data') {
       try {
-        const updated = JSON.parse(e.newValue);
-        if (Array.isArray(updated) && updated.length > 0) {
+        const updated = e.newValue ? JSON.parse(e.newValue) : [];
+        if (Array.isArray(updated)) {
           estudiantesList = updated;
           filtrarEstudiantes();
           renderDashboard();
@@ -58,8 +73,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   window.addEventListener('posface_estudiante_eliminado', (e) => {
-    if (e.detail && e.detail.id) {
-      estudiantesList = estudiantesList.filter(est => est.id !== e.detail.id);
+    if (e.detail) {
+      if (e.detail.all) {
+        estudiantesList = [];
+      } else if (e.detail.id) {
+        estudiantesList = estudiantesList.filter(est => est.id !== e.detail.id);
+      }
       filtrarEstudiantes();
       renderDashboard();
     }
@@ -164,6 +183,28 @@ document.addEventListener('DOMContentLoaded', () => {
           currentExpedienteEstudiante.id,
           `${currentExpedienteEstudiante.nombres} ${currentExpedienteEstudiante.apellidos}`
         );
+      }
+    });
+  }
+
+  // Botón para vaciar lista de prueba y dejar el sistema limpio
+  const btnLimpiarDatosPrueba = document.getElementById('btnLimpiarDatosPrueba');
+  if (btnLimpiarDatosPrueba) {
+    btnLimpiarDatosPrueba.addEventListener('click', () => {
+      if (!estudiantesList || estudiantesList.length === 0) {
+        showToast('La lista ya se encuentra completamente vacía.', 'info');
+        return;
+      }
+      if (confirm('¿Deseas vaciar la lista de estudiantes y limpiar todos los registros para iniciar desde cero con las inscripciones reales?')) {
+        estudiantesList = [];
+        if (window.PosfaceDB && typeof window.PosfaceDB.clearAllEstudiantes === 'function') {
+          window.PosfaceDB.clearAllEstudiantes();
+        } else {
+          localStorage.setItem('posface_estudiantes_data', JSON.stringify([]));
+        }
+        filtrarEstudiantes();
+        renderDashboard();
+        showToast('✓ Se han eliminado todos los registros. El sistema está listo para inscripciones reales.', 'success');
       }
     });
   }

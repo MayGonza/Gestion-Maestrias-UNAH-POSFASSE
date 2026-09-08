@@ -546,7 +546,15 @@
               <p id="contadorEstudiantes">Cargando expedientes estudiantiles...</p>
             </div>
 
-            <div class="section-actions">
+              <button class="btn btn-outline" id="btnLimpiarDatosPrueba"
+                title="Vaciar la lista de estudiantes para iniciar con inscripciones reales desde cero"
+                style="color: #b91c1c; border-color: #fecaca;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                <span>Vaciar Lista / Limpiar</span>
+              </button>
               <button class="btn btn-outline" id="btnExportarEstudiantesCSV"
                 title="Descargar reporte en formato Excel/CSV">
                 <svg viewBox="0 0 24 24">
@@ -1230,12 +1238,12 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
   <!-- Módulos de Configuración y Servicios Firebase POSFACE -->
-  <script src="js/firebase-config.js?v=3.3"></script>
-  <script src="js/firebase-service.js?v=3.3"></script>
+  <script src="js/firebase-config.js?v=3.4"></script>
+  <script src="js/firebase-service.js?v=3.4"></script>
 
   <!-- Datos y Lógica de la Aplicación -->
-  <script src="js/mock-data.js?v=3.3"></script>
-  <script src="js/app.js?v=3.3"></script>
+  <script src="js/mock-data.js?v=3.4"></script>
+  <script src="js/app.js?v=3.4"></script>
 </body>
 
 </html>
