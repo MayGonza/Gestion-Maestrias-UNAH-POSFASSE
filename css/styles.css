@@ -1357,7 +1357,7 @@ h4,
   position: fixed;
   bottom: 24px;
   right: 24px;
-  z-index: 2000;
+  z-index: 100000;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -2248,6 +2248,107 @@ button.forgot-pwd-hint:hover {
 .login-input-box .form-input:focus {
   border-color: var(--unah-navy);
   box-shadow: 0 0 0 3.5px rgba(0, 40, 85, 0.1);
+}
+
+/* Indicadores visuales de error en inputs de autenticación */
+.login-input-box.has-error .form-input,
+.form-input.is-invalid {
+  border-color: #dc2626 !important;
+  background-color: #fffaf0 !important;
+  box-shadow: 0 0 0 3.5px rgba(220, 38, 38, 0.15) !important;
+  animation: inputShake 0.35s ease-in-out;
+}
+
+.login-input-box.has-error svg {
+  color: #dc2626 !important;
+}
+
+.login-field-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.77rem;
+  font-weight: 600;
+  color: #dc2626;
+  margin-top: 5px;
+  line-height: 1.35;
+  animation: fadeInDown 0.2s ease-out;
+}
+
+/* Banner de Alerta prominente de Login */
+.login-alert-banner {
+  padding: 13px 15px;
+  border-radius: var(--radius-md);
+  margin-bottom: 16px;
+  font-size: 0.83rem;
+  line-height: 1.45;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: shakeAlert 0.4s ease-out;
+}
+
+.login-alert-banner.alert-danger {
+  background: #fef2f2;
+  border: 1.5px solid #f87171;
+  color: #991b1b;
+}
+
+.login-alert-banner.alert-warning {
+  background: #fffbeb;
+  border: 1.5px solid #fbbf24;
+  color: #92400e;
+}
+
+.login-alert-banner-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.login-alert-banner-body {
+  font-size: 0.81rem;
+}
+
+.login-alert-banner-btn {
+  align-self: flex-start;
+  margin-top: 5px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  background: #ffffff;
+  border: 1.5px solid currentColor;
+  color: inherit;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.login-alert-banner-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px);
+}
+
+@keyframes inputShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+
+@keyframes shakeAlert {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .btn-toggle-pwd {

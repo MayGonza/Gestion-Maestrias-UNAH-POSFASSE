@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
           filtrarEstudiantes();
           renderDashboard();
         }
-      } catch (err) {}
+      } catch (err) { }
     }
   });
 
@@ -964,6 +964,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnSoporteTecnico = document.getElementById('btnSoporteTecnico');
   const modalSoporteTecnico = document.getElementById('modalSoporteTecnico');
 
+  const loginAlertBox = document.getElementById('loginAlertBox');
+  const loginEmailInput = document.getElementById('loginEmail');
+  const loginEmailBox = document.getElementById('loginEmailBox');
+  const loginEmailError = document.getElementById('loginEmailError');
+  const loginPasswordBox = document.getElementById('loginPasswordBox');
+  const loginPasswordError = document.getElementById('loginPasswordError');
+
   // Soporte Técnico modal
   if (btnSoporteTecnico && modalSoporteTecnico) {
     btnSoporteTecnico.addEventListener('click', (e) => {
@@ -972,8 +979,81 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Limpiar estados de error visuales en login
+  function clearLoginErrors() {
+    if (loginAlertBox) {
+      loginAlertBox.style.display = 'none';
+      loginAlertBox.innerHTML = '';
+      loginAlertBox.className = 'login-alert-banner';
+      delete loginAlertBox.dataset.field;
+    }
+    if (loginEmailBox) loginEmailBox.classList.remove('has-error');
+    if (loginPasswordBox) loginPasswordBox.classList.remove('has-error');
+    if (loginEmailError) {
+      loginEmailError.style.display = 'none';
+      loginEmailError.textContent = '';
+    }
+    if (loginPasswordError) {
+      loginPasswordError.style.display = 'none';
+      loginPasswordError.textContent = '';
+    }
+  }
+
+  // Mostrar mensaje de alerta visual interactivo en el login
+  function showLoginAlert(type, title, message, actionText, onActionClick) {
+    if (!loginAlertBox) return;
+    loginAlertBox.className = `login-alert-banner alert-${type || 'danger'}`;
+    loginAlertBox.innerHTML = `
+      <div class="login-alert-banner-header">
+        <span>${type === 'warning' ? '⚠️' : '❌'}</span>
+        <span>${title}</span>
+      </div>
+      <div class="login-alert-banner-body">${message}</div>
+      ${actionText ? `<button type="button" class="login-alert-banner-btn" id="btnAlertAction">${actionText}</button>` : ''}
+    `;
+    loginAlertBox.style.display = 'flex';
+
+    if (actionText && onActionClick) {
+      const btn = document.getElementById('btnAlertAction');
+      if (btn) {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          onActionClick();
+        });
+      }
+    }
+  }
+
+  // Quitar errores en tiempo real cuando el usuario escribe
+  if (loginEmailInput) {
+    loginEmailInput.addEventListener('input', () => {
+      if (loginEmailBox) loginEmailBox.classList.remove('has-error');
+      if (loginEmailError) {
+        loginEmailError.style.display = 'none';
+        loginEmailError.textContent = '';
+      }
+      if (loginAlertBox && loginAlertBox.dataset.field === 'email') {
+        loginAlertBox.style.display = 'none';
+      }
+    });
+  }
+
+  if (loginPassword) {
+    loginPassword.addEventListener('input', () => {
+      if (loginPasswordBox) loginPasswordBox.classList.remove('has-error');
+      if (loginPasswordError) {
+        loginPasswordError.style.display = 'none';
+        loginPasswordError.textContent = '';
+      }
+      if (loginAlertBox && loginAlertBox.dataset.field === 'password') {
+        loginAlertBox.style.display = 'none';
+      }
+    });
+  }
+
   // Alternar entre pestaña de Iniciar Sesión y Registro
   function showLoginForm() {
+    clearLoginErrors();
     if (tabBtnLogin) tabBtnLogin.classList.add('active');
     if (tabBtnRegister) tabBtnRegister.classList.remove('active');
     if (formLoginPosface) formLoginPosface.style.display = 'flex';
@@ -981,6 +1061,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function showRegisterForm() {
+    clearLoginErrors();
     if (tabBtnRegister) tabBtnRegister.classList.add('active');
     if (tabBtnLogin) tabBtnLogin.classList.remove('active');
     if (formRegisterPosface) formRegisterPosface.style.display = 'flex';
@@ -1042,25 +1123,103 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Envío del formulario de Login
+  // Envío del formulario de Login con indicadores visuales
   if (formLoginPosface) {
     formLoginPosface.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value.trim();
+      clearLoginErrors();
+
+      const email = (loginEmailInput ? loginEmailInput.value : '').trim();
+      const password = (loginPassword ? loginPassword.value : '').trim();
       const btnSubmit = document.getElementById('btnLoginSubmit');
       const btnText = document.getElementById('btnLoginText');
+
+      if (!email) {
+        if (loginEmailBox) loginEmailBox.classList.add('has-error');
+        if (loginEmailError) {
+          loginEmailError.textContent = 'Por favor ingresa tu correo institucional UNAH.';
+          loginEmailError.style.display = 'flex';
+        }
+        if (loginEmailInput) loginEmailInput.focus();
+        showLoginAlert('warning', 'Campo Requerido', 'Debes ingresar tu correo institucional para iniciar sesión.');
+        return;
+      }
+
+      if (!password) {
+        if (loginPasswordBox) loginPasswordBox.classList.add('has-error');
+        if (loginPasswordError) {
+          loginPasswordError.textContent = 'Por favor ingresa tu contraseña.';
+          loginPasswordError.style.display = 'flex';
+        }
+        if (loginPassword) loginPassword.focus();
+        showLoginAlert('warning', 'Campo Requerido', 'Debes ingresar tu contraseña institucional para continuar.');
+        return;
+      }
 
       if (btnSubmit) btnSubmit.disabled = true;
       if (btnText) btnText.textContent = 'Autenticando...';
 
       try {
         const user = await window.PosfaceAuth.login(email, password);
+        clearLoginErrors();
         showToast(`Bienvenido(a) a POSFACE UNAH: ${user.name}`, 'success');
         checkAuthState();
         switchView('dashboard');
       } catch (err) {
-        showToast(err.message || 'Error al iniciar sesión', 'danger');
+        console.warn("Error de autenticación:", err);
+
+        if (err.code === 'USER_NOT_FOUND') {
+          // Indicador para cuenta NO registrada
+          if (loginEmailBox) loginEmailBox.classList.add('has-error');
+          if (loginEmailError) {
+            loginEmailError.textContent = 'Esta cuenta no está registrada en el sistema.';
+            loginEmailError.style.display = 'flex';
+          }
+          if (loginAlertBox) loginAlertBox.dataset.field = 'email';
+
+          showLoginAlert(
+            'danger',
+            'Cuenta no Registrada',
+            `El correo institucional <strong>"${email}"</strong> no está registrado en el sistema. Puedes crear tu cuenta institucional de acceso en pocos segundos.`,
+            '👉 Registrarme con esta cuenta ahora',
+            () => {
+              const regEmail = document.getElementById('regEmail');
+              if (regEmail) regEmail.value = email;
+              showRegisterForm();
+            }
+          );
+          if (loginEmailInput) loginEmailInput.focus();
+          showToast(`La cuenta "${email}" no está registrada`, 'danger');
+
+        } else if (err.code === 'WRONG_PASSWORD') {
+          // Indicador para contraseña incorrecta
+          if (loginPasswordBox) loginPasswordBox.classList.add('has-error');
+          if (loginPasswordError) {
+            loginPasswordError.textContent = 'La contraseña no coincide con este usuario.';
+            loginPasswordError.style.display = 'flex';
+          }
+          if (loginAlertBox) loginAlertBox.dataset.field = 'password';
+
+          showLoginAlert(
+            'danger',
+            'Contraseña Incorrecta',
+            `La contraseña ingresada no coincide con el usuario <strong>"${email}"</strong>. Por favor verifica tus credenciales o solicita asistencia a Soporte Técnico.`,
+            '🛠️ Solicitar Ayuda a Soporte Técnico',
+            () => {
+              if (modalSoporteTecnico) openModal(modalSoporteTecnico);
+            }
+          );
+          if (loginPassword) {
+            loginPassword.focus();
+            loginPassword.select();
+          }
+          showToast('La contraseña ingresada no coincide con el usuario', 'danger');
+
+        } else {
+          // Indicador general
+          showLoginAlert('danger', 'Error de Autenticación', err.message || 'No fue posible iniciar sesión.');
+          showToast(err.message || 'Error al iniciar sesión', 'danger');
+        }
       } finally {
         if (btnSubmit) btnSubmit.disabled = false;
         if (btnText) btnText.textContent = 'Ingresar al Sistema POSFACE';
@@ -1123,6 +1282,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnQuickLogin) {
     btnQuickLogin.addEventListener('click', async (e) => {
       e.preventDefault();
+      clearLoginErrors();
       const emailInput = document.getElementById('loginEmail');
       const pwdInput = document.getElementById('loginPassword');
       if (emailInput) emailInput.value = 'secretaria.posface@unah.edu.hn';
@@ -1135,10 +1295,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       try {
         const user = await window.PosfaceAuth.login('secretaria.posface@unah.edu.hn', 'posface2026');
+        clearLoginErrors();
         showToast(`Bienvenido(a) a POSFACE UNAH: ${user.name}`, 'success');
         checkAuthState();
         switchView('dashboard');
       } catch (err) {
+        showLoginAlert('danger', 'Error al acceder con cuenta demo', err.message);
         showToast(err.message || 'Error al acceder con cuenta demo', 'danger');
       } finally {
         if (btnSubmit) btnSubmit.disabled = false;
@@ -1147,10 +1309,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Rellenar automáticamente credenciales institucionales de prueba
+  document.querySelectorAll('.btn-fill-account').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      clearLoginErrors();
+      const email = btn.getAttribute('data-email');
+      const pass = btn.getAttribute('data-pass');
+      if (loginEmailInput) loginEmailInput.value = email;
+      if (loginPassword) loginPassword.value = pass;
+      if (loginEmailInput) loginEmailInput.focus();
+    });
+  });
+
   // Botón de Cerrar Sesión en Sidebar
   if (btnSidebarLogout) {
     btnSidebarLogout.addEventListener('click', async () => {
       await window.PosfaceAuth.logout();
+      clearLoginErrors();
       showToast('Has cerrado sesión correctamente', 'info');
       checkAuthState();
     });

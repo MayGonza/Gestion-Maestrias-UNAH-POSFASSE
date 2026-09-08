@@ -20,7 +20,7 @@
     rel="stylesheet">
 
   <!-- Estilos del Sistema Institucional -->
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/styles.css?v=2.6">
 </head>
 
 <body class="not-logged-in">
@@ -83,25 +83,30 @@
               <p>Ingresa tus credenciales institucionales para acceder al sistema administrativo</p>
             </div>
 
+            <!-- Banner Prominente de Alertas e Indicadores de Acceso -->
+            <div id="loginAlertBox" class="login-alert-banner" style="display: none;"></div>
+
             <div class="form-group">
               <label class="form-label" for="loginEmail">Correo Institucional UNAH</label>
-              <div class="login-input-box">
+              <div class="login-input-box" id="loginEmailBox">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
                   stroke-linecap="round" stroke-linejoin="round">
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                   <polyline points="22,6 12,13 2,6"></polyline>
                 </svg>
-                <input type="email" id="loginEmail" class="form-input" placeholder="ej. usuario@unah.edu.hn"
-                  required autocomplete="email">
+                <input type="email" id="loginEmail" class="form-input" placeholder="ej. usuario@unah.edu.hn" required
+                  autocomplete="email">
               </div>
+              <div id="loginEmailError" class="login-field-error" style="display: none;"></div>
             </div>
 
             <div class="form-group">
               <div class="label-row-between">
                 <label class="form-label" for="loginPassword">Contraseña</label>
-                <button type="button" class="forgot-pwd-hint" id="btnSoporteTecnico" title="Contactar con Soporte Técnico POSFACE">Soporte Técnico</button>
+                <button type="button" class="forgot-pwd-hint" id="btnSoporteTecnico"
+                  title="Contactar con Soporte Técnico POSFACE">Soporte Técnico</button>
               </div>
-              <div class="login-input-box">
+              <div class="login-input-box" id="loginPasswordBox">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
                   stroke-linecap="round" stroke-linejoin="round">
                   <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
@@ -114,6 +119,7 @@
                   👁️
                 </button>
               </div>
+              <div id="loginPasswordError" class="login-field-error" style="display: none;"></div>
             </div>
 
             <div class="login-options-row">
@@ -140,15 +146,48 @@
               </button>
             </div>
 
+            <!-- Selector Rápido de Cuentas Institucionales -->
+            <div class="test-accounts-box"
+              style="margin-top: 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; font-size: 0.76rem;">
+              <div
+                style="font-weight: 700; color: var(--unah-navy); margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;">
+                <span>🎓 Cuentas Institucionales Activas:</span>
+                <span style="color: var(--text-muted); font-size: 0.7rem; font-weight: normal;">(Clic para
+                  rellenar)</span>
+              </div>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                <button type="button" class="btn-fill-account" data-email="secretaria.posface@unah.edu.hn"
+                  data-pass="posface2026"
+                  style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 4px; padding: 3px 8px; font-size: 0.72rem; cursor: pointer; color: #1e293b;">
+                  📋 Secretaría Académica
+                </button>
+                <button type="button" class="btn-fill-account" data-email="posgrado.mae@unah.edu.hn"
+                  data-pass="posface2026"
+                  style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 4px; padding: 3px 8px; font-size: 0.72rem; cursor: pointer; color: #1e293b;">
+                  👔 Coordinación MAE
+                </button>
+                <button type="button" class="btn-fill-account" data-email="posface@unah.edu.hn" data-pass="posface2026"
+                  style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 4px; padding: 3px 8px; font-size: 0.72rem; cursor: pointer; color: #1e293b;">
+                  🏛️ Dirección Posgrados
+                </button>
+              </div>
+              <div style="margin-top: 6px; color: #64748b; font-size: 0.7rem;">
+                Contraseña institucional por defecto: <strong>posface2026</strong>
+              </div>
+            </div>
+
             <div class="auth-switch-prompt">
               <span>¿No tienes una cuenta aún?</span>
               <button type="button" class="btn-link-switch" id="btnSwitchToRegister">Crear cuenta nueva</button>
             </div>
 
             <!-- Acceso Directo Exclusivo para Estudiantes / Aspirantes -->
-            <div style="margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--border-color); text-align: center;">
-              <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 8px;">¿Eres un nuevo aspirante a maestría o posgrado?</span>
-              <a href="inscripcion.html" class="btn btn-gold" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; text-decoration: none; padding: 10px 16px; font-weight: 700; font-size: 0.88rem;">
+            <div
+              style="margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--border-color); text-align: center;">
+              <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 8px;">¿Eres un
+                nuevo aspirante a maestría o posgrado?</span>
+              <a href="inscripcion.html" class="btn btn-gold"
+                style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; text-decoration: none; padding: 10px 16px; font-weight: 700; font-size: 0.88rem;">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M12 20h9"></path>
                   <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
@@ -183,7 +222,8 @@
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                   <circle cx="12" cy="7" r="4"></circle>
                 </svg>
-                <input type="text" id="regNombre" class="form-input" placeholder="ej. Lic. Mario Roberto Valladares" required>
+                <input type="text" id="regNombre" class="form-input" placeholder="ej. Lic. Mario Roberto Valladares"
+                  required>
               </div>
             </div>
 
@@ -206,7 +246,8 @@
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                   <polyline points="22,6 12,13 2,6"></polyline>
                 </svg>
-                <input type="email" id="regEmail" class="form-input" placeholder="usuario.posgrado@unah.edu.hn" required autocomplete="email">
+                <input type="email" id="regEmail" class="form-input" placeholder="usuario.posgrado@unah.edu.hn" required
+                  autocomplete="email">
               </div>
             </div>
 
@@ -218,7 +259,8 @@
                   <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                   <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                 </svg>
-                <input type="password" id="regPassword" class="form-input" placeholder="Mínimo 6 caracteres" required autocomplete="new-password">
+                <input type="password" id="regPassword" class="form-input" placeholder="Mínimo 6 caracteres" required
+                  autocomplete="new-password">
               </div>
             </div>
 
@@ -230,7 +272,8 @@
                   <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                   <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                 </svg>
-                <input type="password" id="regPasswordConfirm" class="form-input" placeholder="Repite tu contraseña" required autocomplete="new-password">
+                <input type="password" id="regPasswordConfirm" class="form-input" placeholder="Repite tu contraseña"
+                  required autocomplete="new-password">
               </div>
             </div>
 
@@ -366,7 +409,9 @@
             </button>
           </div>
 
-          <a href="inscripcion.html" target="_blank" class="btn btn-outline btn-sm" title="Abrir portal exclusivo de aspirantes para compartir con estudiantes" style="display: flex; align-items: center; gap: 6px; text-decoration: none;">
+          <a href="inscripcion.html" target="_blank" class="btn btn-outline btn-sm"
+            title="Abrir portal exclusivo de aspirantes para compartir con estudiantes"
+            style="display: flex; align-items: center; gap: 6px; text-decoration: none;">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
               <polyline points="15 3 21 3 21 9"></polyline>
@@ -749,7 +794,8 @@
         <div class="exp-personal-grid">
           <div><strong>DNI / Identidad:</strong> <span id="expDni">0801-1900-00000</span></div>
           <div><strong>Teléfono de Contacto:</strong> <span id="expTelefono">+504 0000-0000</span></div>
-          <div><strong>Procedencia Geográfica:</strong> <span id="expProcedencia">Tegucigalpa, Francisco Morazán</span></div>
+          <div><strong>Procedencia Geográfica:</strong> <span id="expProcedencia">Tegucigalpa, Francisco Morazán</span>
+          </div>
           <div><strong>Correo Institucional UNAH:</strong> <span id="expCorreo"
               style="color: var(--color-accent-blue);">estudiante@unah.hn</span></div>
         </div>
@@ -878,7 +924,8 @@
 
             <div class="form-group">
               <label class="form-label" for="nuevoEstCiudad">Ciudad / Municipio</label>
-              <input type="text" class="form-input" id="nuevoEstCiudad" placeholder="ej. Tegucigalpa, San Pedro Sula...">
+              <input type="text" class="form-input" id="nuevoEstCiudad"
+                placeholder="ej. Tegucigalpa, San Pedro Sula...">
             </div>
 
             <!-- NUEVO CAMPO OBLIGATORIO: UNIVERSIDAD DE PROCEDENCIA -->
@@ -987,12 +1034,15 @@
       </div>
 
       <div class="modal-body" style="padding: 24px;">
-        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
-          <h4 style="font-size: 0.92rem; color: var(--unah-navy); margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+        <div
+          style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+          <h4
+            style="font-size: 0.92rem; color: var(--unah-navy); margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
             <span>🛠️</span> Canales Oficiales de Asistencia Institucional
           </h4>
           <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5; margin: 0;">
-            Si eres coordinador(a), docente o personal administrativo y requieres restablecimiento de contraseña, desbloqueo de usuario o asistencia con el sistema de posgrados:
+            Si eres coordinador(a), docente o personal administrativo y requieres restablecimiento de contraseña,
+            desbloqueo de usuario o asistencia con el sistema de posgrados:
           </p>
         </div>
 
@@ -1001,8 +1051,10 @@
             <span style="font-size: 1.2rem; line-height: 1;">✉️</span>
             <div>
               <strong style="display: block; color: var(--unah-navy);">Correo Electrónico de Soporte:</strong>
-              <a href="mailto:soporte.posface@unah.edu.hn" style="color: var(--color-accent-blue); text-decoration: none; font-weight: 700;">soporte.posface@unah.edu.hn</a>
-              <span style="color: var(--text-muted); font-size: 0.75rem; display: block; margin-top: 2px;">Con copia a: <a href="mailto:posface@unah.edu.hn" style="color: inherit;">posface@unah.edu.hn</a></span>
+              <a href="mailto:soporte.posface@unah.edu.hn"
+                style="color: var(--color-accent-blue); text-decoration: none; font-weight: 700;">soporte.posface@unah.edu.hn</a>
+              <span style="color: var(--text-muted); font-size: 0.75rem; display: block; margin-top: 2px;">Con copia a:
+                <a href="mailto:posface@unah.edu.hn" style="color: inherit;">posface@unah.edu.hn</a></span>
             </div>
           </div>
 
@@ -1011,7 +1063,8 @@
             <div>
               <strong style="display: block; color: var(--unah-navy);">Línea Telefónica y PBX UNAH:</strong>
               <span style="color: #334155; font-weight: 600;">+504 2232-2110 / +504 2216-6100</span>
-              <span style="color: var(--text-muted); font-size: 0.75rem; display: block; margin-top: 2px;">Extensiones de Atención: 100450 / 100452</span>
+              <span style="color: var(--text-muted); font-size: 0.75rem; display: block; margin-top: 2px;">Extensiones
+                de Atención: 100450 / 100452</span>
             </div>
           </div>
 
@@ -1019,7 +1072,8 @@
             <span style="font-size: 1.2rem; line-height: 1;">🏢</span>
             <div>
               <strong style="display: block; color: var(--unah-navy);">Atención Presencial:</strong>
-              <span style="color: #334155;">Ciudad Universitaria José Trinidad Reyes, Edificio C2, Segundo Nivel, Dirección de Posgrados de Ciencias Económicas.</span>
+              <span style="color: #334155;">Ciudad Universitaria José Trinidad Reyes, Edificio C2, Segundo Nivel,
+                Dirección de Posgrados de Ciencias Económicas.</span>
             </div>
           </div>
 
@@ -1032,14 +1086,18 @@
           </div>
         </div>
 
-        <div style="margin-top: 20px; padding: 12px 14px; background: #fffbeb; border: 1px solid #fef3c7; border-radius: 8px; font-size: 0.78rem; color: #92400e; line-height: 1.45;">
-          💡 <strong>Acceso Inmediato:</strong> Para acceder al sistema con fines de demostración o evaluación, puedes presionar el botón <strong>"⚡ Entrar con Cuenta de Demostración"</strong> o crear tu usuario en la pestaña <strong>"Registrarse"</strong>.
+        <div
+          style="margin-top: 20px; padding: 12px 14px; background: #fffbeb; border: 1px solid #fef3c7; border-radius: 8px; font-size: 0.78rem; color: #92400e; line-height: 1.45;">
+          💡 <strong>Acceso Inmediato:</strong> Para acceder al sistema con fines de demostración o evaluación, puedes
+          presionar el botón <strong>"⚡ Entrar con Cuenta de Demostración"</strong> o crear tu usuario en la pestaña
+          <strong>"Registrarse"</strong>.
         </div>
       </div>
 
       <div class="modal-footer">
         <button type="button" class="btn btn-outline btn-modal-cancel">Cerrar</button>
-        <a href="mailto:soporte.posface@unah.edu.hn?subject=Solicitud%20de%20Soporte%20POSFACE%20UNAH" class="btn btn-primary" style="text-decoration: none;">
+        <a href="mailto:soporte.posface@unah.edu.hn?subject=Solicitud%20de%20Soporte%20POSFACE%20UNAH"
+          class="btn btn-primary" style="text-decoration: none;">
           Enviar Correo a Soporte
         </a>
       </div>
@@ -1058,12 +1116,12 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
   <!-- Módulos de Configuración y Servicios Firebase POSFACE -->
-  <script src="js/firebase-config.js?v=2.5"></script>
-  <script src="js/firebase-service.js?v=2.5"></script>
+  <script src="js/firebase-config.js?v=2.6"></script>
+  <script src="js/firebase-service.js?v=2.6"></script>
 
   <!-- Datos y Lógica de la Aplicación -->
-  <script src="js/mock-data.js?v=2.5"></script>
-  <script src="js/app.js?v=2.5"></script>
+  <script src="js/mock-data.js?v=2.6"></script>
+  <script src="js/app.js?v=2.6"></script>
 </body>
 
 </html>

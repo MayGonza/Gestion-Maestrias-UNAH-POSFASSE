@@ -55,7 +55,103 @@
       }
     },
 
-    checkLocalUser: function (email, password) {
+    // Catálogo de cuentas institucionales preconfiguradas POSFACE UNAH
+    getInstitutionalAccounts: function () {
+      return [
+        {
+          uid: "posface-admin-01",
+          email: "secretaria.posface@unah.edu.hn",
+          password: "posface2026",
+          name: "Secretaría Académica POSFACE",
+          role: "Secretaría Académica POSFACE",
+          institution: "UNAH - Ciudad Universitaria",
+          mode: "institucional"
+        },
+        {
+          uid: "posface-admin-02",
+          email: "posface@unah.edu.hn",
+          password: "posface2026",
+          name: "Dirección del Posgrado POSFACE",
+          role: "Dirección de Posgrados",
+          institution: "UNAH - Ciudad Universitaria",
+          mode: "institucional"
+        },
+        {
+          uid: "posface-dir-01",
+          email: "direccion.posface@unah.edu.hn",
+          password: "posface2026",
+          name: "Dirección de Posgrados POSFACE",
+          role: "Dirección de Posgrados",
+          institution: "UNAH - Ciudad Universitaria",
+          mode: "institucional"
+        },
+        {
+          uid: "posface-coord-01",
+          email: "posgrado.mae@unah.edu.hn",
+          password: "posface2026",
+          name: "MSc. José Roberto Argueta",
+          role: "Coordinador(a) de Maestría (MAE)",
+          institution: "UNAH POSFACE",
+          mode: "institucional"
+        },
+        {
+          uid: "posface-coord-02",
+          email: "posgrado.negocios@unah.edu.hn",
+          password: "posface2026",
+          name: "Dra. Brenda Lizeth Flores",
+          role: "Coordinador(a) de Maestría (MDNI)",
+          institution: "UNAH POSFACE",
+          mode: "institucional"
+        },
+        {
+          uid: "posface-coord-03",
+          email: "doctorado.empresarial@unah.edu.hn",
+          password: "posface2026",
+          name: "Dr. José Efraín Deras",
+          role: "Coordinador(a) de Doctorado",
+          institution: "UNAH POSFACE",
+          mode: "institucional"
+        },
+        {
+          uid: "posface-coord-04",
+          email: "doctorado.economicas@unah.edu.hn",
+          password: "posface2026",
+          name: "Dra. Mirna Suyapa Zepeda",
+          role: "Coordinador(a) de Doctorado",
+          institution: "UNAH POSFACE",
+          mode: "institucional"
+        },
+        {
+          uid: "posface-coord-05",
+          email: "btc.posface@unah.edu.hn",
+          password: "posface2026",
+          name: "Lic. Karla Iveth Romero",
+          role: "Coordinador(a) de Centro Ejecutivo",
+          institution: "UNAH POSFACE",
+          mode: "institucional"
+        },
+        {
+          uid: "posface-admin-sys",
+          email: "admin@unah.edu.hn",
+          password: "posface2026",
+          name: "Administrador del Sistema",
+          role: "Administrador del Sistema",
+          institution: "UNAH POSFACE",
+          mode: "institucional"
+        }
+      ];
+    },
+
+    // Buscar si un usuario/correo ya existe en el sistema
+    findUserByEmail: function (email) {
+      if (!email) return null;
+      const normalized = email.trim().toLowerCase();
+
+      // 1. Cuentas institucionales oficiales
+      const inst = this.getInstitutionalAccounts().find(a => a.email.toLowerCase() === normalized);
+      if (inst) return inst;
+
+      // 2. Usuarios registrados en el almacenamiento local
       let users = [];
       try {
         const raw = localStorage.getItem('posface_registered_users');
@@ -63,21 +159,37 @@
       } catch (e) {
         users = [];
       }
+      const local = users.find(u => u.email && u.email.toLowerCase() === normalized);
+      if (local) return local;
 
-      // Cuenta demo oficial de la secretaría
-      if ((email === 'secretaria.posface@unah.edu.hn' || email === 'posface@unah.edu.hn') && (password === 'posface2026' || password === 'admin2026')) {
-        return {
-          uid: "posface-admin-01",
-          email: email,
-          name: "Secretaría Académica POSFACE",
-          role: "Secretaría Académica POSFACE",
-          institution: "UNAH - Ciudad Universitaria",
-          mode: "demo"
-        };
+      // 3. Estudiantes registrados en el catálogo si aplican
+      if (window.POSFASSE_DATA && Array.isArray(window.POSFASSE_DATA.estudiantes)) {
+        const est = window.POSFASSE_DATA.estudiantes.find(e => (e.correoInstitucional || '').toLowerCase() === normalized);
+        if (est) {
+          return {
+            uid: est.id || `EST-${Date.now()}`,
+            email: est.correoInstitucional,
+            password: "posface2026",
+            name: `${est.nombres} ${est.apellidos}`,
+            role: "Estudiante de Posgrado",
+            institution: "UNAH POSFACE",
+            mode: "estudiante"
+          };
+        }
       }
 
-      const match = users.find(u => u.email.toLowerCase() === email.toLowerCase() && (!u.password || u.password === password));
-      return match || null;
+      return null;
+    },
+
+    checkLocalUser: function (email, password) {
+      const user = this.findUserByEmail(email);
+      if (!user) return null;
+
+      // Contraseña coincide con la guardada o con la clave maestra de secretaría
+      if (user.password === password || password === 'posface2026' || password === 'admin2026') {
+        return user;
+      }
+      return null;
     },
 
     saveLocalUser: function (user) {
@@ -99,40 +211,45 @@
       } catch (e) {}
     },
 
-    // Iniciar sesión (Firebase Auth con fallback local transparente)
+    // Iniciar sesión con indicadores detallados de error
     login: async function (email, password) {
       email = (email || '').trim().toLowerCase();
       password = (password || '').trim();
 
-      if (!email || !password) {
-        throw new Error("Por favor ingresa tu correo y contraseña institucional");
+      if (!email) {
+        const err = new Error("Por favor ingresa tu correo institucional UNAH.");
+        err.code = "EMAIL_EMPTY";
+        throw err;
       }
 
-      // 1. Acceso con cuenta de Demostración o Secretaría
-      if ((email === 'secretaria.posface@unah.edu.hn' || email === 'posface@unah.edu.hn') && (password === 'posface2026' || password === 'admin2026')) {
-        const demoUser = {
-          uid: "posface-admin-01",
-          email: email,
-          name: "Secretaría Académica POSFACE",
-          role: "Secretaría Académica POSFACE",
-          institution: "UNAH - Ciudad Universitaria",
-          mode: "demo"
-        };
-        localStorage.setItem('posface_session_user', JSON.stringify(demoUser));
-        return demoUser;
+      if (!password) {
+        const err = new Error("Por favor ingresa tu contraseña.");
+        err.code = "PASSWORD_EMPTY";
+        throw err;
       }
 
-      // 2. Verificar primero si es un usuario registrado en el sistema local
-      const localMatch = this.checkLocalUser(email, password);
-      if (localMatch) {
-        localStorage.setItem('posface_session_user', JSON.stringify(localMatch));
-        if (this.isCloudActive()) {
-          authInstance.signInWithEmailAndPassword(email, password).catch(() => {});
+      // 1. Buscar si el usuario está registrado en cuentas institucionales o locales
+      const knownUser = this.findUserByEmail(email);
+
+      if (knownUser) {
+        // El usuario sí existe. Comprobar si la contraseña coincide.
+        const matches = (knownUser.password === password || password === 'posface2026' || password === 'admin2026');
+        if (matches) {
+          localStorage.setItem('posface_session_user', JSON.stringify(knownUser));
+          if (this.isCloudActive() && authInstance) {
+            authInstance.signInWithEmailAndPassword(email, password).catch(() => {});
+          }
+          return knownUser;
+        } else {
+          // La contraseña NO coincide con el usuario existente
+          const err = new Error(`La contraseña ingresada no coincide con el usuario "${email}".`);
+          err.code = "WRONG_PASSWORD";
+          err.email = email;
+          throw err;
         }
-        return localMatch;
       }
 
-      // 3. Intentar autenticar con Firebase Authentication si está disponible
+      // 2. Si no está en catálogo local, comprobar con Firebase Authentication / Firestore
       if (this.isCloudActive()) {
         try {
           const userCredential = await authInstance.signInWithEmailAndPassword(email, password);
@@ -141,7 +258,7 @@
             uid: fbUser.uid,
             email: fbUser.email,
             name: fbUser.displayName || email.split('@')[0].toUpperCase(),
-            role: "Secretaría Académica POSFACE",
+            role: "Personal Institucional POSFACE",
             mode: "firebase"
           };
           this.saveLocalUser({ ...userObj, password });
@@ -149,18 +266,51 @@
           return userObj;
         } catch (fbErr) {
           console.warn("Firebase Auth error:", fbErr);
-          throw new Error(this.friendlyAuthError(fbErr));
+
+          if (fbErr.code === 'auth/wrong-password') {
+            const err = new Error(`La contraseña ingresada no coincide con el usuario "${email}".`);
+            err.code = "WRONG_PASSWORD";
+            err.email = email;
+            throw err;
+          } else if (fbErr.code === 'auth/user-not-found') {
+            const err = new Error(`La cuenta "${email}" no se encuentra registrada en el sistema.`);
+            err.code = "USER_NOT_FOUND";
+            err.email = email;
+            throw err;
+          } else if (fbErr.code === 'auth/invalid-credential' || fbErr.code === 'auth/invalid-login-credentials') {
+            // Comprobar si existe el usuario en Firestore para diferenciar entre cuenta no registrada y contraseña incorrecta
+            let existsInFirestore = false;
+            if (dbInstance) {
+              try {
+                const snap = await dbInstance.collection('usuarios').where('email', '==', email).limit(1).get();
+                if (!snap.empty) existsInFirestore = true;
+              } catch (e) {}
+            }
+
+            if (existsInFirestore) {
+              const err = new Error(`La contraseña ingresada no coincide con el usuario "${email}".`);
+              err.code = "WRONG_PASSWORD";
+              err.email = email;
+              throw err;
+            } else {
+              const err = new Error(`La cuenta "${email}" no se encuentra registrada en el sistema.`);
+              err.code = "USER_NOT_FOUND";
+              err.email = email;
+              throw err;
+            }
+          } else {
+            const err = new Error(this.friendlyAuthError(fbErr));
+            err.code = fbErr.code || "AUTH_ERROR";
+            throw err;
+          }
         }
       }
 
-      // 3. Modo Local: buscar en los usuarios registrados localmente
-      const found = this.checkLocalUser(email, password);
-      if (found) {
-        localStorage.setItem('posface_session_user', JSON.stringify(found));
-        return found;
-      }
-
-      throw new Error("Credenciales inválidas. Verifica tu correo y contraseña, o regístrate en 'Crear cuenta nueva'.");
+      // 3. Si no existe en ningún catálogo ni en Firebase
+      const err = new Error(`La cuenta "${email}" no se encuentra registrada en el sistema POSFACE.`);
+      err.code = "USER_NOT_FOUND";
+      err.email = email;
+      throw err;
     },
 
     // Registrar nuevo usuario (Guarda tanto en Firebase como en local para garantizar acceso)
