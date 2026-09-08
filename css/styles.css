@@ -496,6 +496,42 @@ h4,
   border-color: var(--text-muted);
 }
 
+.btn-danger-outline {
+  background: transparent;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-danger-outline:hover {
+  background: #fef2f2;
+  border-color: #ef4444;
+  color: #b91c1c;
+  transform: translateY(-1px);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-danger:hover {
+  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+}
+
 .btn-sm {
   padding: 6px 12px;
   font-size: 0.78rem;

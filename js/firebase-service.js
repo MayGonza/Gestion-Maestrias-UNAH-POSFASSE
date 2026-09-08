@@ -540,6 +540,31 @@
       }
     },
 
+    // Eliminar estudiante de la base de datos (Firestore y LocalStorage)
+    deleteEstudiante: async function (estId, updatedList) {
+      // 1. Guardar lista actualizada en LocalStorage
+      try {
+        localStorage.setItem('posface_estudiantes_data', JSON.stringify(updatedList));
+      } catch (e) {
+        console.warn("Error guardando en localStorage tras eliminar:", e);
+      }
+
+      // 2. Eliminar documento en Firestore si está conectado
+      if (this.isCloudActive() && dbInstance) {
+        try {
+          await dbInstance.collection('estudiantes').doc(estId).delete();
+          console.log(`%c✓ Estudiante ${estId} eliminado de Firestore Cloud`, "color: #e11d48; font-weight: bold;");
+        } catch (err) {
+          console.warn("Error eliminando en Firestore:", err);
+        }
+      }
+
+      // 3. Notificar a otras pestañas
+      try {
+        window.dispatchEvent(new CustomEvent('posface_estudiante_eliminado', { detail: { id: estId } }));
+      } catch (e) {}
+    },
+
     // Guardar período académico activo
     savePeriodoActivo: async function (periodo) {
       localStorage.setItem('posface_periodo_activo', periodo);

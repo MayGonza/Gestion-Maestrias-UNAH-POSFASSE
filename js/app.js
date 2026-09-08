@@ -57,6 +57,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  window.addEventListener('posface_estudiante_eliminado', (e) => {
+    if (e.detail && e.detail.id) {
+      estudiantesList = estudiantesList.filter(est => est.id !== e.detail.id);
+      filtrarEstudiantes();
+      renderDashboard();
+    }
+  });
+
   // Helper para clases visuales de estados de estudiantes
   function getBadgeClassForEstado(estado) {
     if (estado === 'En Tesis') return 'badge-tesis';
@@ -96,6 +104,68 @@ document.addEventListener('DOMContentLoaded', () => {
     filtrarEstudiantes();
     renderDashboard();
     showToast(`Estado de ${est.nombres} ${est.apellidos} actualizado a: "${nuevoEstado}"`, 'success');
+  }
+
+  // =========================================================================
+  // CONTROL Y ELIMINACIÓN DE ESTUDIANTES DE PREVIA INSCRIPCIÓN
+  // =========================================================================
+  let estudianteIdAEliminar = null;
+  const modalConfirmarEliminar = document.getElementById('modalConfirmarEliminar');
+  const nombreEstudianteEliminar = document.getElementById('nombreEstudianteEliminar');
+  const btnConfirmarEliminar = document.getElementById('btnConfirmarEliminar');
+  const btnEliminarExpedienteActual = document.getElementById('btnEliminarExpedienteActual');
+
+  function solicitarEliminarEstudiante(estId, nombre) {
+    estudianteIdAEliminar = estId;
+    if (nombreEstudianteEliminar) {
+      nombreEstudianteEliminar.textContent = nombre || 'este estudiante';
+    }
+    openModal(modalConfirmarEliminar);
+  }
+
+  function ejecutarEliminacionEstudiante() {
+    if (!estudianteIdAEliminar) return;
+    const est = estudiantesList.find(e => e.id === estudianteIdAEliminar);
+    const nombreCompleto = est ? `${est.nombres} ${est.apellidos}` : 'Estudiante';
+
+    // 1. Filtrar de la lista local
+    estudiantesList = estudiantesList.filter(e => e.id !== estudianteIdAEliminar);
+
+    // 2. Persistir en Firestore y/o LocalStorage
+    if (window.PosfaceDB) {
+      window.PosfaceDB.deleteEstudiante(estudianteIdAEliminar, estudiantesList);
+    } else {
+      try {
+        localStorage.setItem('posface_estudiantes_data', JSON.stringify(estudiantesList));
+      } catch (e) {}
+    }
+
+    // 3. Cerrar modales si están abiertos
+    closeModal(modalConfirmarEliminar);
+    if (modalExpediente) closeModal(modalExpediente);
+
+    // 4. Refrescar listado y estadísticas
+    filtrarEstudiantes();
+    renderDashboard();
+
+    showToast(`✓ Registro de ${nombreCompleto} eliminado exitosamente de la previa inscripción`, 'success');
+    estudianteIdAEliminar = null;
+    currentExpedienteEstudiante = null;
+  }
+
+  if (btnConfirmarEliminar) {
+    btnConfirmarEliminar.addEventListener('click', ejecutarEliminacionEstudiante);
+  }
+
+  if (btnEliminarExpedienteActual) {
+    btnEliminarExpedienteActual.addEventListener('click', () => {
+      if (currentExpedienteEstudiante) {
+        solicitarEliminarEstudiante(
+          currentExpedienteEstudiante.id,
+          `${currentExpedienteEstudiante.nombres} ${currentExpedienteEstudiante.apellidos}`
+        );
+      }
+    });
   }
 
   // Elementos de la interfaz
@@ -442,10 +512,19 @@ document.addEventListener('DOMContentLoaded', () => {
             <option value="Inactivo" ${est.estado === 'Inactivo' ? 'selected' : ''}>Inactivo</option>
           </select>
         </td>
-        <td style="text-align: right;">
-          <button class="btn btn-outline btn-sm btn-ver-expediente" data-id="${est.id}" title="Ver expediente académico y antecedentes">
-            Ver Expediente
-          </button>
+        <td style="text-align: right; white-space: nowrap;">
+          <div style="display: inline-flex; align-items: center; justify-content: flex-end; gap: 6px;">
+            <button class="btn btn-outline btn-sm btn-ver-expediente" data-id="${est.id}" title="Ver expediente académico y antecedentes">
+              Ver Expediente
+            </button>
+            <button class="btn btn-danger-outline btn-sm btn-eliminar-estudiante" data-id="${est.id}" data-nombre="${est.nombres} ${est.apellidos}" title="Eliminar registro de previa inscripción">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              <span>Eliminar</span>
+            </button>
+          </div>
         </td>
       `;
       tbody.appendChild(tr);
@@ -465,6 +544,15 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.addEventListener('click', () => {
         const estId = btn.getAttribute('data-id');
         openExpedienteModal(estId);
+      });
+    });
+
+    // Eventos para eliminar estudiante desde la fila
+    tbody.querySelectorAll('.btn-eliminar-estudiante').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const estId = btn.getAttribute('data-id');
+        const estNombre = btn.getAttribute('data-nombre');
+        solicitarEliminarEstudiante(estId, estNombre);
       });
     });
 
