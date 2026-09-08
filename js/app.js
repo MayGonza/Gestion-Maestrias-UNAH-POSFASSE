@@ -1309,19 +1309,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Rellenar automáticamente credenciales institucionales de prueba
-  document.querySelectorAll('.btn-fill-account').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      clearLoginErrors();
-      const email = btn.getAttribute('data-email');
-      const pass = btn.getAttribute('data-pass');
-      if (loginEmailInput) loginEmailInput.value = email;
-      if (loginPassword) loginPassword.value = pass;
-      if (loginEmailInput) loginEmailInput.focus();
-    });
-  });
-
   // Botón de Cerrar Sesión en Sidebar
   if (btnSidebarLogout) {
     btnSidebarLogout.addEventListener('click', async () => {
