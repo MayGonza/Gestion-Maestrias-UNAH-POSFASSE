@@ -607,6 +607,22 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
+    // 3. Validación Institucional de Título (UNAH)
+    const expTituloValidadoVal = document.getElementById('expTituloValidadoVal');
+    if (expTituloValidadoVal) {
+      const isUnah = (est.universidadProcedencia || '').toLowerCase().includes('unah -') || (est.universidadProcedencia || '').toLowerCase() === 'unah';
+      const val = est.tituloValidadoUNAH || (isUnah ? 'Exento' : 'Si');
+      if (isUnah || val === 'Exento') {
+        expTituloValidadoVal.innerHTML = '<span style="color: #15803d; font-weight: 700;">✓ Título Emitido Directamente por la UNAH (Exento de Trámite de Incorporación)</span>';
+      } else if (val === 'Si' || val === 'Validado') {
+        expTituloValidadoVal.innerHTML = '<span style="color: #15803d; font-weight: 700;">✓ Título Validado e Incorporado por la UNAH (Dirección de Educación Superior)</span>';
+      } else if (val === 'En Tramite') {
+        expTituloValidadoVal.innerHTML = '<span style="color: #b45309; font-weight: 700;">⏳ En Trámite de Incorporación ante la UNAH / Dirección de Educación Superior</span>';
+      } else {
+        expTituloValidadoVal.innerHTML = '<span style="color: #dc2626; font-weight: 700;">⚠️ Título Pendiente de Incorporación / Validación ante la UNAH</span>';
+      }
+    }
+
     // 4. Programa y Situación de Posgrado
     const expMaestria = document.getElementById('expMaestria');
     if (expMaestria) expMaestria.textContent = mae.nombre;
@@ -671,6 +687,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  const selectNuevoEstUniversidad = document.getElementById('nuevoEstUniversidad');
+  const boxNuevoEstTituloValidado = document.getElementById('boxNuevoEstTituloValidado');
+  const selectNuevoEstTituloValidado = document.getElementById('nuevoEstTituloValidadoUNAH');
+
+  if (selectNuevoEstUniversidad) {
+    selectNuevoEstUniversidad.addEventListener('change', () => {
+      const val = selectNuevoEstUniversidad.value.trim();
+      const isUnah = val.toLowerCase().includes('unah -') || val.toLowerCase() === 'unah';
+      if (boxNuevoEstTituloValidado) {
+        if (!val || isUnah) {
+          boxNuevoEstTituloValidado.style.display = 'none';
+          if (selectNuevoEstTituloValidado) selectNuevoEstTituloValidado.value = 'Exento';
+        } else {
+          boxNuevoEstTituloValidado.style.display = 'block';
+          if (selectNuevoEstTituloValidado && selectNuevoEstTituloValidado.value === 'Exento') {
+            selectNuevoEstTituloValidado.value = 'Si';
+          }
+        }
+      }
+    });
+  }
+
   if (formNuevoEstudiante) {
     formNuevoEstudiante.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -691,6 +729,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const tutorTesis = (document.getElementById('nuevoEstTutorTesis')?.value || '').trim();
       const maestriaId = selectNuevoEstMaestria.value;
       const indice = parseFloat(indiceRaw);
+
+      const isUnah = universidad.toLowerCase().includes('unah -') || universidad.toLowerCase() === 'unah';
+      const tituloValidado = isUnah ? 'Exento' : (selectNuevoEstTituloValidado?.value || 'Si');
 
       if (!dni || !nombres || !apellidos || !maestriaId || !universidad || !departamento || isNaN(indice)) {
         showToast('Por favor completa todos los campos requeridos (incluyendo Departamento, Universidad e Índice de Pregrado)', 'warning');
@@ -721,6 +762,7 @@ document.addEventListener('DOMContentLoaded', () => {
         departamento: departamento,
         ciudad: ciudad,
         universidadProcedencia: universidad,
+        tituloValidadoUNAH: tituloValidado,
         indicePregrado: indice,
         carreraPregrado: carreraPrevia || 'Licenciatura Universitaria',
         maestriaId: maestriaId,
@@ -749,12 +791,19 @@ document.addEventListener('DOMContentLoaded', () => {
       renderDashboard();
       closeModal(modalNuevoEstudiante);
       formNuevoEstudiante.reset();
+      if (boxNuevoEstTituloValidado) boxNuevoEstTituloValidado.style.display = 'none';
 
       if (indice < 70) {
         showToast(`Aspirante inscrito condicionalmente (Índice pregrado: ${indice.toFixed(1)}% <  70 % normativo)`, 'warning');
       } else {
-        showToast(`Estudiante ${nombres} ${apellidos} inscrito con éxito (${universidad.split('-')[0].trim()})`, 'success');
+        showToast(`✓ Estudiante ${nombres} ${apellidos} matriculado con éxito`, 'success');
       }
+
+      // Abrir inmediatamente la Ficha Oficial de Matrícula (Expediente) del nuevo estudiante
+      setTimeout(() => {
+        openExpedienteModal(nuevoEst.id);
+        showToast('📄 Se ha generado la Ficha Oficial de Matrícula. Lista para revisión e impresión.', 'info');
+      }, 250);
     });
   }
 

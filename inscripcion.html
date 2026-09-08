@@ -537,6 +537,21 @@
               </select>
             </div>
 
+            <!-- VALIDACIÓN DE TÍTULO POR UNAH (PARA OTRAS UNIVERSIDADES) -->
+            <div class="form-group col-span-2" id="boxAspTituloValidado" style="display: none; background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 8px; padding: 12px 14px;">
+              <label class="form-label" for="aspTituloValidadoUNAH" style="color: #92400e; font-weight: 700;">
+                ⚖️ Validación e Incorporación del Título por la UNAH (Dirección de Educación Superior) *
+              </label>
+              <select class="form-select" id="aspTituloValidadoUNAH" style="background: #ffffff; border-color: #f59e0b;">
+                <option value="Si">✓ Sí: Título Validado e Incorporado por la UNAH (Con Acuerdo/Constancia DES)</option>
+                <option value="En Tramite">⏳ En Trámite de Incorporación ante la UNAH / DES</option>
+                <option value="No">⚠️ No: Pendiente de Trámite de Incorporación</option>
+              </select>
+              <small style="font-size: 0.72rem; color: #78350f; display: block; margin-top: 4px; line-height: 1.4;">
+                * Conforme a las Normas Académicas de la Educación Superior, los egresados de universidades privadas o extranjeras deben presentar su título incorporado y reconocido ante la UNAH.
+              </small>
+            </div>
+
             <div class="form-group">
               <label class="form-label" for="aspIndicePregrado">
                 Índice Académico Global de Pregrado (%) *
@@ -684,6 +699,10 @@
           <span class="receipt-val" id="recUniversidad">--</span>
         </div>
         <div class="receipt-row">
+          <span class="receipt-lbl">Validación Título UNAH:</span>
+          <span class="receipt-val" id="recTituloValidado">--</span>
+        </div>
+        <div class="receipt-row">
           <span class="receipt-lbl">Índice Pregrado:</span>
           <span class="receipt-val" id="recIndice">--</span>
         </div>
@@ -741,9 +760,9 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=2.5"></script>
-  <script src="js/firebase-service.js?v=2.5"></script>
-  <script src="js/mock-data.js?v=2.5"></script>
+  <script src="js/firebase-config.js?v=3.1"></script>
+  <script src="js/firebase-service.js?v=3.1"></script>
+  <script src="js/mock-data.js?v=3.1"></script>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -789,6 +808,27 @@
         }
       });
 
+      // Mostrar u ocultar campo de validación de título si la universidad no es UNAH
+      const selectUniv = document.getElementById('aspUniversidad');
+      const boxValidacion = document.getElementById('boxAspTituloValidado');
+      const selTituloValidado = document.getElementById('aspTituloValidadoUNAH');
+
+      if (selectUniv && boxValidacion) {
+        selectUniv.addEventListener('change', () => {
+          const val = selectUniv.value.trim();
+          const isUnah = val.toLowerCase().includes('unah -') || val.toLowerCase() === 'unah';
+          if (!val || isUnah) {
+            boxValidacion.style.display = 'none';
+            if (selTituloValidado) selTituloValidado.value = 'Exento';
+          } else {
+            boxValidacion.style.display = 'block';
+            if (selTituloValidado && selTituloValidado.value === 'Exento') {
+              selTituloValidado.value = 'Si';
+            }
+          }
+        });
+      }
+
       // Notificaciones Toast simples
       function showPortalToast(msg, type = 'info') {
         const toast = document.createElement('div');
@@ -820,15 +860,20 @@
         const telefono = document.getElementById('aspTelefono').value.trim();
         const departamento = document.getElementById('aspDepartamento').value.trim();
         const ciudad = document.getElementById('aspCiudad').value.trim();
-        const universidad = document.getElementById('aspUniversidad').value.trim();
-        const indiceRaw = document.getElementById('aspIndicePregrado').value.trim();
         const carreraPrevia = document.getElementById('aspCarreraPrevia').value.trim();
+        const indiceRaw = document.getElementById('aspIndicePregrado').value.trim();
         const maestriaId = selectMaestria.value;
+        const selectUniversidad = document.getElementById('aspUniversidad');
+        const universidad = selectUniversidad.value.trim();
+        const isUnah = universidad.toLowerCase().includes('unah -') || universidad.toLowerCase() === 'unah';
+        const selectTituloValidado = document.getElementById('aspTituloValidadoUNAH');
+        const tituloValidado = isUnah ? 'Exento' : (selectTituloValidado?.value || 'Si');
         const modalidad = selectModalidad.value;
         const indice = parseFloat(indiceRaw);
 
-        if (!dni || !nombres || !apellidos || !correo || !telefono || !departamento || !ciudad || !universidad || !maestriaId || isNaN(indice)) {
-          showPortalToast('Por favor completa todos los campos requeridos marcados con asterisco (*)', 'warning');
+        // Validar campos obligatorios
+        if (!dni || !nombres || !apellidos || !correo || !departamento || !universidad || !carreraPrevia || !maestriaId || isNaN(indice)) {
+          showPortalToast('Por favor completa todos los campos obligatorios del formulario', 'danger');
           return;
         }
 
@@ -874,6 +919,7 @@
           departamento: departamento,
           ciudad: ciudad,
           universidadProcedencia: universidad,
+          tituloValidadoUNAH: tituloValidado,
           indicePregrado: indice,
           carreraPregrado: carreraPrevia,
           maestriaId: maestriaId,
@@ -909,6 +955,19 @@
         document.getElementById('recProcedencia').textContent = `${ciudad}, ${departamento}`;
         document.getElementById('recUniversidad').textContent = universidad;
         document.getElementById('recIndice').textContent = `${indice.toFixed(2)}%`;
+
+        const recTitulo = document.getElementById('recTituloValidado');
+        if (recTitulo) {
+          if (isUnah || tituloValidado === 'Exento') {
+            recTitulo.innerHTML = '<span style="color: #15803d; font-weight: 700;">✓ Emisión Directa UNAH (Exento)</span>';
+          } else if (tituloValidado === 'Si') {
+            recTitulo.innerHTML = '<span style="color: #15803d; font-weight: 700;">✓ Título Incorporado por UNAH (DES)</span>';
+          } else if (tituloValidado === 'En Tramite') {
+            recTitulo.innerHTML = '<span style="color: #b45309; font-weight: 700;">⏳ En Trámite de Incorporación UNAH</span>';
+          } else {
+            recTitulo.innerHTML = '<span style="color: #dc2626; font-weight: 700;">⚠️ Título Pendiente de Incorporación</span>';
+          }
+        }
         
         const estNormativo = document.getElementById('recEstadoNormativo');
         if (indice >= 70) {

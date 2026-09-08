@@ -20,7 +20,7 @@
     rel="stylesheet">
 
   <!-- Estilos del Sistema Institucional -->
-  <link rel="stylesheet" href="css/styles.css?v=3.0">
+  <link rel="stylesheet" href="css/styles.css?v=3.1">
 </head>
 
 <body class="not-logged-in">
@@ -770,6 +770,10 @@
                 <span class="doc-label">Dictamen Normativo de Admisión (Normativa UNAH &ge; 70%):</span>
                 <span class="doc-value" id="expIndiceCumpleBadge">✓ Requisito Normativo Cumplido</span>
               </div>
+              <div class="doc-cell col-span-4" id="expBoxValidacionTitulo">
+                <span class="doc-label">Validación / Incorporación del Título de Pregrado (UNAH):</span>
+                <span class="doc-value" id="expTituloValidadoVal">✓ Emisión Directa UNAH (Exento de Trámite de Incorporación)</span>
+              </div>
             </div>
           </div>
 
@@ -1002,6 +1006,22 @@
               </select>
             </div>
 
+            <!-- VALIDACIÓN NORMATIVA: TÍTULO VALIDADO POR LA UNAH (PARA OTRAS UNIVERSIDADES) -->
+            <div class="form-group col-span-2" id="boxNuevoEstTituloValidado" style="display: none; background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 8px; padding: 12px 14px;">
+              <label class="form-label" for="nuevoEstTituloValidadoUNAH" style="color: #92400e; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+                <span>⚖️</span>
+                <span>Validación e Incorporación del Título por la UNAH (DES) *</span>
+              </label>
+              <select class="form-select" id="nuevoEstTituloValidadoUNAH" style="background: #ffffff; border-color: #f59e0b;">
+                <option value="Si">✓ Sí: Título Validado e Incorporado por la UNAH (Con Acuerdo/Constancia DES)</option>
+                <option value="En Tramite">⏳ En Trámite de Incorporación ante la UNAH / Dirección de Educación Superior</option>
+                <option value="No">⚠️ No: Título No Incorporado / Pendiente de Trámite</option>
+              </select>
+              <small style="font-size: 0.73rem; color: #78350f; display: block; margin-top: 5px; line-height: 1.4;">
+                🏛️ <em>Requisito Normativo: Conforme a la Ley Orgánica y las Normas de Educación Superior, los egresados de otras universidades nacionales o extranjeras deben contar con el reconocimiento oficial de su título de pregrado ante la UNAH.</em>
+              </small>
+            </div>
+
             <!-- NUEVO CAMPO OBLIGATORIO: ÍNDICE ACADÉMICO DE PREGRADO -->
             <div class="form-group">
               <label class="form-label" for="nuevoEstIndicePregrado">
@@ -1161,12 +1181,12 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
   <!-- Módulos de Configuración y Servicios Firebase POSFACE -->
-  <script src="js/firebase-config.js?v=3.0"></script>
-  <script src="js/firebase-service.js?v=3.0"></script>
+  <script src="js/firebase-config.js?v=3.1"></script>
+  <script src="js/firebase-service.js?v=3.1"></script>
 
   <!-- Datos y Lógica de la Aplicación -->
-  <script src="js/mock-data.js?v=3.0"></script>
-  <script src="js/app.js?v=3.0"></script>
+  <script src="js/mock-data.js?v=3.1"></script>
+  <script src="js/app.js?v=3.1"></script>
 </body>
 
 </html>
