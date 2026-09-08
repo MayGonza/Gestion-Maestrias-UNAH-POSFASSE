@@ -89,6 +89,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (selectModal && selectModal.getAttribute('data-id') === estId) {
       selectModal.value = nuevoEstado;
       selectModal.className = `badge-status-select badge ${getBadgeClassForEstado(nuevoEstado)}`;
+      const expEstadoPrint = document.getElementById('expEstadoPrint');
+      if (expEstadoPrint) expEstadoPrint.textContent = nuevoEstado.toUpperCase();
     }
 
     filtrarEstudiantes();
@@ -531,34 +533,54 @@ document.addEventListener('DOMContentLoaded', () => {
   // 6. EXPEDIENTE ACADÉMICO Y CONSTANCIA OFICIAL IMPRIMIBLE
   // =========================================================================
   const modalExpediente = document.getElementById('modalExpediente');
+  let currentExpedienteEstudiante = null;
 
   function openExpedienteModal(estudianteId) {
     const est = estudiantesList.find(e => e.id === estudianteId);
     if (!est) return;
 
-    const mae = maestriasList.find(m => m.id === est.maestriaId) || { nombre: 'Programa POSFACE' };
-    document.getElementById('expNombre').textContent = `${est.nombres} ${est.apellidos}`;
-    document.getElementById('expCuenta').textContent = est.cuentaUNAH || 'Pendiente (Graduado Externo)';
-    document.getElementById('expMaestria').textContent = `${mae.nombre} · Modalidad ${est.modalidad || mae.modalidad || 'Presencial'}`;
+    currentExpedienteEstudiante = est;
 
-    // Selector de estado en modal
-    const selectModal = document.getElementById('selectEstadoExpediente');
-    if (selectModal) {
-      selectModal.setAttribute('data-id', est.id);
-      selectModal.value = est.estado;
-      selectModal.className = `badge-status-select badge ${getBadgeClassForEstado(est.estado)}`;
+    const mae = maestriasList.find(m => m.id === est.maestriaId) || { nombre: 'Programa de Posgrado POSFACE', codigo: 'POS', totalUV: 52 };
+    const coh = (window.POSFASSE_DATA && Array.isArray(window.POSFASSE_DATA.cohortes))
+      ? window.POSFASSE_DATA.cohortes.find(c => c.id === est.cohorteId)
+      : null;
+
+    // 1. Encabezado y Metadatos de Folio Oficial
+    const expFolioNumero = document.getElementById('expFolioNumero');
+    if (expFolioNumero) {
+      const num = (est.cuentaUNAH ? est.cuentaUNAH.slice(-4) : (est.dni ? est.dni.slice(-4) : '0042'));
+      expFolioNumero.textContent = `EXP-2026-${num}`;
     }
 
-    const badgeExp = document.getElementById('expEstadoBadge');
-    if (badgeExp) badgeExp.textContent = est.estado;
-    const expIndiceFicha = document.getElementById('expIndicePregradoFicha');
-    if (expIndiceFicha) expIndiceFicha.textContent = `${Number(est.indicePregrado || 0).toFixed(1)}%`;
-    document.getElementById('expDni').textContent = est.dni;
-    document.getElementById('expCorreo').textContent = est.correoInstitucional;
-    document.getElementById('expTelefono').textContent = est.telefono;
-    document.getElementById('expFechaIngreso').textContent = est.fechaIngreso;
+    const expFechaEmision = document.getElementById('expFechaEmision');
+    if (expFechaEmision) {
+      const ahora = new Date();
+      expFechaEmision.textContent = ahora.toLocaleDateString('es-HN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
 
-    // Procedencia geográfica (Departamento / Ciudad)
+    const expCodigoVerif = document.getElementById('expCodigoVerif');
+    if (expCodigoVerif) {
+      const hashSource = (est.dni || est.id || 'POSFACE').replace(/[^a-zA-Z0-9]/g, '');
+      expCodigoVerif.textContent = `UNAH-PF-${hashSource.slice(-4).toUpperCase() || '8921'}`;
+    }
+
+    // 2. Datos de Identificación Personal
+    const expNombre = document.getElementById('expNombre');
+    if (expNombre) expNombre.textContent = `${est.nombres} ${est.apellidos}`;
+
+    const expCuenta = document.getElementById('expCuenta');
+    if (expCuenta) expCuenta.textContent = est.cuentaUNAH || 'Pendiente (Graduado Externo)';
+
+    const expDni = document.getElementById('expDni');
+    if (expDni) expDni.textContent = est.dni || 'No registrado';
+
+    const expCorreo = document.getElementById('expCorreo');
+    if (expCorreo) expCorreo.textContent = est.correoInstitucional || 'estudiante@unah.edu.hn';
+
+    const expTelefono = document.getElementById('expTelefono');
+    if (expTelefono) expTelefono.textContent = est.telefono || '+504 0000-0000';
+
     const expProcedencia = document.getElementById('expProcedencia');
     if (expProcedencia) {
       const depto = est.departamento || '';
@@ -566,12 +588,12 @@ document.addEventListener('DOMContentLoaded', () => {
       expProcedencia.textContent = (ciudad && depto) ? `${ciudad}, ${depto}` : (ciudad || depto || 'Honduras');
     }
 
-    // Datos de Procedencia e Índice de Pregrado (Campos Solicitados)
+    // 3. Antecedentes Académicos (Pregrado)
     const expUni = document.getElementById('expUniversidad');
     if (expUni) expUni.textContent = est.universidadProcedencia || 'UNAH - Universidad Nacional Autónoma de Honduras';
 
     const expCarrera = document.getElementById('expCarreraPrevia');
-    if (expCarrera) expCarrera.textContent = est.carreraPregrado || 'Licenciatura / Título Universitario';
+    if (expCarrera) expCarrera.textContent = est.carreraPregrado || 'Licenciatura / Grado Universitario';
 
     const expIndiceVal = document.getElementById('expIndicePregradoVal');
     const expIndiceBadge = document.getElementById('expIndiceCumpleBadge');
@@ -579,12 +601,89 @@ document.addEventListener('DOMContentLoaded', () => {
     if (expIndiceVal) expIndiceVal.textContent = `${ind.toFixed(1)}%`;
     if (expIndiceBadge) {
       if (ind >= 70) {
-        expIndiceBadge.className = 'badge-indice badge-indice-ok';
-        expIndiceBadge.textContent = '✓ ≥ 70% Requisito Cumplido';
+        expIndiceBadge.innerHTML = '<span style="color: #15803d; font-weight: 700;">✓ Requisito Normativo Cumplido (&ge; 70.00%)</span>';
       } else {
-        expIndiceBadge.className = 'badge-indice badge-indice-warn';
-        expIndiceBadge.textContent = '⚠️ < 70% Matrícula Condicional';
+        expIndiceBadge.innerHTML = '<span style="color: #b45309; font-weight: 700;">⚠️ Condicional (&lt; 70.00% Dictamen Académico)</span>';
       }
+    }
+
+    // 4. Programa y Situación de Posgrado
+    const expMaestria = document.getElementById('expMaestria');
+    if (expMaestria) expMaestria.textContent = `${mae.nombre} · Modalidad ${est.modalidad || mae.modalidad || 'Presencial'}`;
+
+    const expCohorte = document.getElementById('expCohorte');
+    if (expCohorte) expCohorte.textContent = coh ? `${coh.nombre} (${coh.anio})` : (est.cohorteId || 'Cohorte General POSFACE');
+
+    const expFechaIngreso = document.getElementById('expFechaIngreso');
+    if (expFechaIngreso) expFechaIngreso.textContent = est.fechaIngreso || '--/--/----';
+
+    // Selector de estado en pantalla vs texto de impresión
+    const selectModal = document.getElementById('selectEstadoExpediente');
+    if (selectModal) {
+      selectModal.setAttribute('data-id', est.id);
+      selectModal.value = est.estado;
+      selectModal.className = `badge-status-select badge ${getBadgeClassForEstado(est.estado)}`;
+    }
+
+    const expEstadoPrint = document.getElementById('expEstadoPrint');
+    if (expEstadoPrint) expEstadoPrint.textContent = (est.estado || 'Activo').toUpperCase();
+
+    const expPromedioPosgrado = document.getElementById('expPromedioPosgrado');
+    if (expPromedioPosgrado) {
+      expPromedioPosgrado.textContent = est.promedio ? `${Number(est.promedio).toFixed(1)}%` : 'En curso (Primer Período)';
+    }
+
+    const expUvsProgreso = document.getElementById('expUvsProgreso');
+    if (expUvsProgreso) {
+      const aprobadas = est.uvsAprobadas !== undefined ? est.uvsAprobadas : 0;
+      const totales = est.totalUVs || mae.totalUV || 52;
+      const pct = Math.round((aprobadas / totales) * 100);
+      expUvsProgreso.textContent = `${aprobadas} de ${totales} UVs (${pct}% del plan de estudios)`;
+    }
+
+    // 5. Proyecto de Investigación y Tesis
+    const expTituloTesis = document.getElementById('expTituloTesis');
+    const expTutorTesis = document.getElementById('expTutorTesis');
+    if (expTituloTesis) {
+      expTituloTesis.textContent = est.tituloTesis ? `«${est.tituloTesis}»` : 'En proceso de definición metodológica de propuesta de tesis';
+    }
+    if (expTutorTesis) {
+      expTutorTesis.textContent = est.tutorTesis || 'Comité Académico y Metodológico POSFACE';
+    }
+
+    // 6. Calificaciones y Asignaturas Registradas
+    const tbodyCalificaciones = document.getElementById('expTablaCalificacionesBody');
+    if (tbodyCalificaciones) {
+      tbodyCalificaciones.innerHTML = '';
+      if (Array.isArray(est.calificacionesRecientes) && est.calificacionesRecientes.length > 0) {
+        est.calificacionesRecientes.forEach(cal => {
+          const tr = document.createElement('tr');
+          const isAprobada = (cal.estado || '').toLowerCase().includes('aprob');
+          tr.innerHTML = `
+            <td><code style="font-weight: 700; color: #002855;">${cal.codigo || 'POS-001'}</code></td>
+            <td><strong>${cal.asignatura}</strong></td>
+            <td style="text-align: center; font-weight: 800; color: #002855;">${cal.nota}%</td>
+            <td style="text-align: center;">
+              <span class="doc-calif-badge ${isAprobada ? 'aprobada' : 'pendiente'}">${cal.estado || 'Aprobada'}</span>
+            </td>
+          `;
+          tbodyCalificaciones.appendChild(tr);
+        });
+      } else {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td colspan="4" style="text-align: center; color: #64748b; font-style: italic; padding: 12px;">
+            Asignaturas de ciclo académico actual en desarrollo. Período oficial II PAC 2026.
+          </td>
+        `;
+        tbodyCalificaciones.appendChild(tr);
+      }
+    }
+
+    // 7. Firma del Estudiante
+    const expFirmaEstudianteNombre = document.getElementById('expFirmaEstudianteNombre');
+    if (expFirmaEstudianteNombre) {
+      expFirmaEstudianteNombre.textContent = `${est.nombres} ${est.apellidos}`;
     }
 
     openModal(modalExpediente);
@@ -824,14 +923,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Botón imprimir ficha / expediente
+  // Botón imprimir ficha / expediente oficial
   const btnImprimirExpediente = document.getElementById('btnImprimirExpediente');
   if (btnImprimirExpediente) {
     btnImprimirExpediente.addEventListener('click', () => {
-      showToast('Preparando vista de impresión de Ficha Oficial POSFACE...', 'gold');
+      const est = currentExpedienteEstudiante;
+      const originalTitle = document.title;
+      if (est) {
+        const cleanApellidos = (est.apellidos || 'Estudiante').replace(/[^a-zA-Z0-9]/g, '_');
+        const numId = est.cuentaUNAH || est.dni || 'Expediente';
+        document.title = `Expediente_Academico_POSFACE_${numId}_${cleanApellidos}`;
+      }
+
+      showToast('Generando formato oficial de impresión del expediente...', 'info');
+
       setTimeout(() => {
         window.print();
-      }, 400);
+        setTimeout(() => {
+          document.title = originalTitle;
+        }, 1200);
+      }, 350);
     });
   }
 

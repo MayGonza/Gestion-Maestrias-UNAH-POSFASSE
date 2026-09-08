@@ -1618,62 +1618,482 @@ h4,
   grid-column: span 2;
   border-top: 1px dashed var(--border-color);
   padding-top: 8px;
-  margin-top: 4px;
-}
-
-.ant-label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  color: var(--text-muted);
-}
-
-.ant-value {
-  font-size: 0.86rem;
-  font-weight: 600;
-  color: var(--unah-navy);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.exp-personal-grid {
-  background: #ffffff;
-  padding: 14px 16px;
-  border-radius: var(--radius-md);
-  margin-bottom: 20px;
-  font-size: 0.82rem;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  border: 1px solid var(--border-color);
-}
-
-/* Elementos exclusivos de impresión: ocultos en pantalla */
-.expediente-print-header,
-.expediente-print-footer {
-  display: none;
 }
 
 /* ==========================================================================
-   REGLAS DE IMPRESIÓN EXCLUSIVA DE FICHA DE EXPEDIENTE (OFICIAL POSFACE UNAH)
+   EXPEDIENTE ACADÉMICO Y CONSTANCIA OFICIAL IMPRIMIBLE (UNAH POSFACE)
+   ========================================================================== */
+
+.expediente-document-sheet {
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 24px 26px;
+  box-shadow: 0 4px 18px rgba(0, 40, 85, 0.05);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: #0f172a;
+}
+
+/* 1. Membrete Institucional Oficial */
+.expediente-print-header {
+  margin-bottom: 16px;
+}
+
+.print-header-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.print-logo-box {
+  flex-shrink: 0;
+}
+
+.print-unah-logo {
+  height: 60px;
+  max-height: 64px;
+  max-width: 180px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.print-header-text {
+  flex-grow: 1;
+  text-align: center;
+}
+
+.print-header-text h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #002855;
+  margin: 0 0 2px;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+}
+
+.print-header-text h3 {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #334155;
+  margin: 0 0 2px;
+  line-height: 1.25;
+}
+
+.print-header-text h4 {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #b45309;
+  margin: 0 0 6px;
+  letter-spacing: 0.3px;
+}
+
+.print-doc-title {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #002855;
+  background: rgba(0, 40, 85, 0.06);
+  padding: 3px 12px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 40, 85, 0.15);
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.print-header-meta-box {
+  flex-shrink: 0;
+  border: 1.5px solid #002855;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.68rem;
+  background: #f8fafc;
+  min-width: 140px;
+}
+
+.print-header-meta-box .meta-row {
+  margin-bottom: 2px;
+  color: #1e293b;
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.print-header-meta-box .meta-row:last-child {
+  margin-bottom: 0;
+}
+
+.print-header-meta-box strong {
+  color: #002855;
+}
+
+.print-header-divider {
+  height: 3px;
+  background: linear-gradient(to right, #002855 0%, #002855 75%, #f0b323 75%, #f0b323 100%);
+  margin-top: 12px;
+  border-radius: 2px;
+}
+
+/* 2. Secciones Formales del Documento */
+.doc-section {
+  margin-bottom: 14px;
+}
+
+.doc-section-title {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #002855;
+  background: #f1f5f9;
+  border-left: 3.5px solid #002855;
+  padding: 4px 8px;
+  margin-bottom: 6px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.doc-section-title .sec-num {
+  color: #b45309;
+  font-weight: 800;
+}
+
+.doc-grid-table {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #cbd5e1;
+  gap: 1px;
+}
+
+.doc-cell {
+  background: #ffffff;
+  padding: 6px 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.doc-cell.col-span-2 {
+  grid-column: span 2;
+}
+
+.doc-cell.col-span-3 {
+  grid-column: span 3;
+}
+
+.doc-cell.col-span-4 {
+  grid-column: span 4;
+}
+
+.doc-cell.highlight-name {
+  background: #f8fafc;
+}
+
+.doc-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+
+.doc-value {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #0f172a;
+  line-height: 1.3;
+}
+
+.doc-value.student-name-text {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #002855;
+  letter-spacing: 0.2px;
+}
+
+.doc-value.cuenta-highlight {
+  font-weight: 800;
+  color: #002855;
+  font-size: 0.95rem;
+}
+
+.doc-value.grade-highlight {
+  font-weight: 800;
+  color: #002855;
+  font-size: 0.95rem;
+}
+
+.doc-value.program-name-text {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #002855;
+}
+
+.doc-value.thesis-title-text {
+  font-style: italic;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.doc-value.email-text {
+  color: #0369a1;
+  font-weight: 600;
+}
+
+/* Indicadores de Impresión vs Pantalla */
+.only-print {
+  display: none !important;
+}
+
+.doc-badge-print {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 3px;
+  border: 1px solid #002855;
+  color: #002855;
+  text-transform: uppercase;
+}
+
+/* 3. Tabla de Asignaturas y Calificaciones */
+.doc-grades-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.doc-grades-table thead th {
+  background: #002855;
+  color: #ffffff;
+  font-weight: 700;
+  padding: 6px 10px;
+  text-align: left;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.doc-grades-table tbody td {
+  padding: 6px 10px;
+  border-bottom: 1px solid #e2e8f0;
+  color: #1e293b;
+}
+
+.doc-grades-table tbody tr:nth-child(even) {
+  background: #f8fafc;
+}
+
+.doc-grades-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.doc-calif-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.doc-calif-badge.aprobada {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+}
+
+.doc-calif-badge.pendiente {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+/* 4. Firmas y Certificación Oficial */
+.doc-signatures-section {
+  margin-top: 18px;
+  border-top: 1px solid #cbd5e1;
+  padding-top: 16px;
+}
+
+.signatures-grid {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.signature-column {
+  flex: 1;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.signature-line-mark {
+  width: 80%;
+  border-top: 1.5px solid #0f172a;
+  margin-bottom: 6px;
+}
+
+.signature-authority {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.signature-role {
+  font-size: 0.7rem;
+  color: #475569;
+  font-weight: 600;
+}
+
+.signature-sub {
+  font-size: 0.65rem;
+  color: #64748b;
+  font-style: italic;
+}
+
+/* Sello Oficial Circular UNAH POSFACE */
+.signature-seal-col {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 8px;
+}
+
+.unah-official-seal {
+  width: 90px;
+  height: 90px;
+  border: 2px dashed #002855;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, #f8fafc 0%, #ffffff 80%);
+  position: relative;
+  box-shadow: inset 0 0 0 3px rgba(0, 40, 85, 0.08);
+}
+
+.seal-inner-circle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.15;
+}
+
+.seal-icon {
+  font-size: 1.1rem;
+}
+
+.seal-text-circle strong {
+  display: block;
+  font-size: 0.68rem;
+  color: #002855;
+  letter-spacing: 1px;
+}
+
+.seal-text-circle small {
+  display: block;
+  font-size: 0.55rem;
+  color: #b45309;
+  font-weight: 700;
+}
+
+.seal-legend {
+  font-size: 0.52rem;
+  font-weight: 800;
+  color: #002855;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* 5. Cintillo Legal y Verificación QR */
+.doc-legal-footer {
+  border-top: 1px dashed #cbd5e1;
+  padding-top: 10px;
+  margin-top: 10px;
+}
+
+.qr-verify-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.qr-placeholder {
+  flex-shrink: 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 4px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.qr-lbl {
+  font-size: 0.55rem;
+  font-family: monospace;
+  font-weight: 700;
+  color: #002855;
+  margin-top: 1px;
+}
+
+.qr-info strong {
+  display: block;
+  font-size: 0.68rem;
+  color: #002855;
+  margin-bottom: 2px;
+}
+
+.qr-info p {
+  font-size: 0.62rem;
+  color: #64748b;
+  line-height: 1.35;
+  margin: 0;
+}
+
+/* ==========================================================================
+   REGLAS DE IMPRESIÓN PROFESIONAL TAMAÑO CARTA (@media print)
    ========================================================================== */
 @media print {
+  @page {
+    size: letter portrait;
+    margin: 8mm 12mm 10mm 12mm;
+  }
 
-  /* Ocultar absolutamente toda la interfaz base del sistema y otros modales */
   html,
   body {
     background: #ffffff !important;
-    color: #0f172a !important;
+    color: #000000 !important;
     margin: 0 !important;
     padding: 0 !important;
     width: 100% !important;
     height: auto !important;
     overflow: visible !important;
-    font-size: 10pt !important;
+    font-size: 8.5pt !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
+  /* Ocultar todos los elementos de la interfaz de la web app */
   .app-container,
   .sidebar,
   .topbar,
@@ -1682,18 +2102,21 @@ h4,
   .table-container,
   .toast-container,
   #modalNuevoEstudiante,
+  #modalSoporteTecnico,
+  .login-screen-wrapper,
   .btn-close-modal,
-  .modal-footer {
+  .modal-footer,
+  .no-print {
     display: none !important;
   }
 
-  /* Mostrar ÚNICA y EXCLUSIVAMENTE el modal de expediente abierto */
+  /* Mostrar ÚNICA y EXCLUSIVAMENTE el documento de expediente */
   #modalExpediente {
     display: block !important;
     position: static !important;
     width: 100% !important;
     height: auto !important;
-    background: transparent !important;
+    background: #ffffff !important;
     margin: 0 !important;
     padding: 0 !important;
     overflow: visible !important;
@@ -1715,212 +2138,69 @@ h4,
 
   #modalExpediente .modal-header {
     display: none !important;
-    /* Sustituido por el membrete institucional de impresión */
   }
 
   #modalExpediente .modal-body {
-    padding: 8mm 12mm !important;
+    padding: 0 !important;
+    margin: 0 !important;
     width: 100% !important;
     box-sizing: border-box !important;
+    overflow: visible !important;
   }
 
-  /* Membrete oficial de la Universidad */
-  .expediente-print-header {
-    display: flex !important;
-    align-items: center;
-    gap: 16px;
-    border-bottom: 2.5px solid #002855;
-    padding-bottom: 12px;
-    margin-bottom: 16px;
-  }
-
-  .print-unah-logo {
-    height: 55px !important;
-    width: auto !important;
-    object-fit: contain !important;
-  }
-
-  .print-header-text h2 {
-    font-size: 11.5pt !important;
-    font-weight: 800 !important;
-    color: #002855 !important;
-    margin: 0 0 2px !important;
-    font-family: 'Outfit', sans-serif !important;
-    letter-spacing: 0.3px !important;
-  }
-
-  .print-header-text h3 {
-    font-size: 8.5pt !important;
-    font-weight: 700 !important;
-    color: #334155 !important;
-    margin: 0 0 2px !important;
-  }
-
-  .print-header-text h4 {
-    font-size: 8pt !important;
-    font-weight: 600 !important;
-    color: #b37e00 !important;
-    margin: 0 0 4px !important;
-  }
-
-  .print-header-text .print-subtitle {
-    font-size: 9pt !important;
-    font-weight: 800 !important;
-    color: #002855 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.5px !important;
+  .expediente-document-sheet {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
     margin: 0 !important;
-  }
-
-  /* Cabecera del Estudiante en documento impreso */
-  .expediente-header-card {
-    background: #002855 !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-    color: #ffffff !important;
-    padding: 12px 16px !important;
-    border-radius: 6px !important;
-    margin-bottom: 12px !important;
-  }
-
-  .expediente-avatar-big {
-    display: none !important;
-  }
-
-  .expediente-header-info h4 {
-    color: #ffffff !important;
-    font-size: 12.5pt !important;
-    margin-bottom: 4px !important;
-  }
-
-  .expediente-header-info p {
-    color: rgba(255, 255, 255, 0.95) !important;
-    font-size: 9pt !important;
-  }
-
-  .cuenta-unah-tag {
-    background: #ffffff !important;
-    color: #002855 !important;
-    font-weight: 800 !important;
-    font-size: 8.5pt !important;
-  }
-
-  /* Antecedentes académicos */
-  .expediente-antecedentes-box {
-    border: 1px solid #94a3b8 !important;
-    background: #f8fafc !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-    padding: 10px 14px !important;
-    margin-bottom: 12px !important;
-  }
-
-  .ant-label {
-    color: #475569 !important;
-    font-size: 7pt !important;
-  }
-
-  .ant-value {
-    color: #002855 !important;
-    font-size: 8.5pt !important;
-  }
-
-  /* Métricas Resumen */
-  .expediente-stats-row {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 12px !important;
-    margin-bottom: 12px !important;
-  }
-
-  .exp-stat-box {
-    border: 1px solid #94a3b8 !important;
-    background: #ffffff !important;
-    padding: 8px 12px !important;
-  }
-
-  .exp-stat-box .val {
-    color: #002855 !important;
-    font-size: 12pt !important;
-  }
-
-  .exp-stat-box .lbl {
-    color: #64748b !important;
-    font-size: 7pt !important;
-  }
-
-  /* Datos Personales */
-  .exp-personal-grid {
-    border: 1px solid #94a3b8 !important;
-    background: #ffffff !important;
-    padding: 10px 14px !important;
-    margin-bottom: 12px !important;
-    font-size: 8pt !important;
-  }
-
-  /* Proyecto de Tesis */
-  .thesis-card-box {
-    border: 1px solid #d97706 !important;
-    background: #fffbeb !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-    padding: 10px 14px !important;
-    margin-bottom: 24px !important;
-  }
-
-  .thesis-card-box h5 {
-    color: #92400e !important;
-    font-size: 8pt !important;
-  }
-
-  .thesis-card-box p {
-    color: #78350f !important;
-    font-size: 8.5pt !important;
-  }
-
-  /* Bloque de firmas oficiales */
-  .expediente-print-footer {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    justify-content: space-between !important;
-    align-items: flex-end !important;
-    margin-top: 36px !important;
-    page-break-inside: avoid !important;
-  }
-
-  .print-signature-col {
-    width: 44% !important;
-    text-align: center !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 3px !important;
-  }
-
-  .signature-line {
-    width: 85% !important;
-    border-top: 1.5px solid #1e293b !important;
-    margin-bottom: 6px !important;
-  }
-
-  .print-signature-col strong {
-    font-size: 8.5pt !important;
-    color: #0f172a !important;
-  }
-
-  .print-signature-col small {
-    font-size: 7.5pt !important;
-    color: #64748b !important;
-  }
-
-  .print-doc-meta {
     width: 100% !important;
-    text-align: center !important;
-    font-size: 7pt !important;
-    color: #64748b !important;
-    margin-top: 24px !important;
-    border-top: 1px dashed #cbd5e1 !important;
-    padding-top: 6px !important;
+  }
+
+  .only-print {
+    display: inline-block !important;
+  }
+
+  /* Control de saltos de página para que el expediente encaje perfecto */
+  .doc-section,
+  .doc-signatures-section,
+  .expediente-print-header {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .doc-grid-table {
+    border: 1px solid #334155 !important;
+  }
+
+  .doc-cell {
+    border: 0.5px solid #64748b !important;
+  }
+
+  .doc-grades-table {
+    border: 1px solid #334155 !important;
+  }
+
+  .doc-grades-table thead th {
+    background: #002855 !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .doc-section-title {
+    background: #f1f5f9 !important;
+    color: #002855 !important;
+    border-left: 3.5px solid #002855 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .print-doc-title {
+    background: #f1f5f9 !important;
+    color: #002855 !important;
+    border: 1px solid #002855 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }
 
