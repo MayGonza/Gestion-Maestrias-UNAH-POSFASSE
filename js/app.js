@@ -609,10 +609,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. Programa y Situación de Posgrado
     const expMaestria = document.getElementById('expMaestria');
-    if (expMaestria) expMaestria.textContent = `${mae.nombre} · Modalidad ${est.modalidad || mae.modalidad || 'Presencial'}`;
+    if (expMaestria) expMaestria.textContent = mae.nombre;
 
-    const expCohorte = document.getElementById('expCohorte');
-    if (expCohorte) expCohorte.textContent = coh ? `${coh.nombre} (${coh.anio})` : (est.cohorteId || 'Cohorte General POSFACE');
+    const expModalidad = document.getElementById('expModalidad');
+    if (expModalidad) expModalidad.textContent = est.modalidad || mae.modalidad || 'Presencial';
 
     const expFechaIngreso = document.getElementById('expFechaIngreso');
     if (expFechaIngreso) expFechaIngreso.textContent = est.fechaIngreso || '--/--/----';
@@ -628,59 +628,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const expEstadoPrint = document.getElementById('expEstadoPrint');
     if (expEstadoPrint) expEstadoPrint.textContent = (est.estado || 'Activo').toUpperCase();
 
-    const expPromedioPosgrado = document.getElementById('expPromedioPosgrado');
-    if (expPromedioPosgrado) {
-      expPromedioPosgrado.textContent = est.promedio ? `${Number(est.promedio).toFixed(1)}%` : 'En curso (Primer Período)';
-    }
-
-    const expUvsProgreso = document.getElementById('expUvsProgreso');
-    if (expUvsProgreso) {
-      const aprobadas = est.uvsAprobadas !== undefined ? est.uvsAprobadas : 0;
-      const totales = est.totalUVs || mae.totalUV || 52;
-      const pct = Math.round((aprobadas / totales) * 100);
-      expUvsProgreso.textContent = `${aprobadas} de ${totales} UVs (${pct}% del plan de estudios)`;
-    }
-
-    // 5. Proyecto de Investigación y Tesis
-    const expTituloTesis = document.getElementById('expTituloTesis');
-    const expTutorTesis = document.getElementById('expTutorTesis');
-    if (expTituloTesis) {
-      expTituloTesis.textContent = est.tituloTesis ? `«${est.tituloTesis}»` : 'En proceso de definición metodológica de propuesta de tesis';
-    }
-    if (expTutorTesis) {
-      expTutorTesis.textContent = est.tutorTesis || 'Comité Académico y Metodológico POSFACE';
-    }
-
-    // 6. Calificaciones y Asignaturas Registradas
-    const tbodyCalificaciones = document.getElementById('expTablaCalificacionesBody');
-    if (tbodyCalificaciones) {
-      tbodyCalificaciones.innerHTML = '';
-      if (Array.isArray(est.calificacionesRecientes) && est.calificacionesRecientes.length > 0) {
-        est.calificacionesRecientes.forEach(cal => {
-          const tr = document.createElement('tr');
-          const isAprobada = (cal.estado || '').toLowerCase().includes('aprob');
-          tr.innerHTML = `
-            <td><code style="font-weight: 700; color: #002855;">${cal.codigo || 'POS-001'}</code></td>
-            <td><strong>${cal.asignatura}</strong></td>
-            <td style="text-align: center; font-weight: 800; color: #002855;">${cal.nota}%</td>
-            <td style="text-align: center;">
-              <span class="doc-calif-badge ${isAprobada ? 'aprobada' : 'pendiente'}">${cal.estado || 'Aprobada'}</span>
-            </td>
-          `;
-          tbodyCalificaciones.appendChild(tr);
-        });
-      } else {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td colspan="4" style="text-align: center; color: #64748b; font-style: italic; padding: 12px;">
-            Asignaturas de ciclo académico actual en desarrollo. Período oficial II PAC 2026.
-          </td>
-        `;
-        tbodyCalificaciones.appendChild(tr);
-      }
-    }
-
-    // 7. Firma del Estudiante
+    // 5. Firma y Conformidad del Estudiante
     const expFirmaEstudianteNombre = document.getElementById('expFirmaEstudianteNombre');
     if (expFirmaEstudianteNombre) {
       expFirmaEstudianteNombre.textContent = `${est.nombres} ${est.apellidos}`;
@@ -937,12 +885,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
       showToast('Generando formato oficial de impresión del expediente...', 'info');
 
+      document.body.classList.add('printing-expediente');
+
+      const cleanupPrint = () => {
+        document.body.classList.remove('printing-expediente');
+        document.title = originalTitle;
+        window.removeEventListener('afterprint', cleanupPrint);
+      };
+      window.addEventListener('afterprint', cleanupPrint);
+
       setTimeout(() => {
         window.print();
-        setTimeout(() => {
-          document.title = originalTitle;
-        }, 1200);
-      }, 350);
+        setTimeout(cleanupPrint, 1500);
+      }, 300);
     });
   }
 

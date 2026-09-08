@@ -20,7 +20,7 @@
     rel="stylesheet">
 
   <!-- Estilos del Sistema Institucional -->
-  <link rel="stylesheet" href="css/styles.css?v=2.8">
+  <link rel="stylesheet" href="css/styles.css?v=3.0">
 </head>
 
 <body class="not-logged-in">
@@ -741,7 +741,7 @@
                 <span class="doc-label">Teléfono de Contacto:</span>
                 <span class="doc-value" id="expTelefono">+504 0000-0000</span>
               </div>
-              <div class="doc-cell col-span-3">
+              <div class="doc-cell col-span-4">
                 <span class="doc-label">Procedencia Geográfica:</span>
                 <span class="doc-value" id="expProcedencia">Tegucigalpa, Francisco Morazán</span>
               </div>
@@ -800,65 +800,21 @@
                 <span class="doc-badge-print only-print" id="expEstadoPrint">ACTIVO</span>
               </div>
               <div class="doc-cell col-span-2">
-                <span class="doc-label">Cohorte Asignada:</span>
-                <span class="doc-value" id="expCohorte">Cohorte Oficial</span>
+                <span class="doc-label">Modalidad de Estudio:</span>
+                <span class="doc-value" id="expModalidad">Presencial</span>
               </div>
-              <div class="doc-cell">
+              <div class="doc-cell col-span-2">
                 <span class="doc-label">Fecha Oficial de Matrícula:</span>
                 <span class="doc-value" id="expFechaIngreso">--/--/----</span>
               </div>
-              <div class="doc-cell">
-                <span class="doc-label">Promedio Acumulado Posgrado:</span>
-                <span class="doc-value grade-highlight" id="expPromedioPosgrado">--%</span>
-              </div>
-              <div class="doc-cell col-span-2">
-                <span class="doc-label">Avance de Unidades Valorativas (UVs):</span>
-                <span class="doc-value" id="expUvsProgreso">-- UVs Aprobadas</span>
-              </div>
             </div>
-          </div>
-
-          <!-- 5. PROYECTO DE INVESTIGACIÓN Y TESIS -->
-          <div class="doc-section" id="expSeccionTesis">
-            <div class="doc-section-title">
-              <span class="sec-num">IV.</span> PROYECTO DE INVESTIGACIÓN Y TESIS DE GRADO
-            </div>
-            <div class="doc-grid-table">
-              <div class="doc-cell col-span-3">
-                <span class="doc-label">Título Oficial de la Tesis o Proyecto de Graduación:</span>
-                <span class="doc-value thesis-title-text" id="expTituloTesis">--</span>
-              </div>
-              <div class="doc-cell">
-                <span class="doc-label">Tutor / Asesor Metodológico:</span>
-                <span class="doc-value" id="expTutorTesis">--</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- 6. CALIFICACIONES Y ASIGNATURAS RECIENTES -->
-          <div class="doc-section" id="expSeccionCalificaciones">
-            <div class="doc-section-title">
-              <span class="sec-num">V.</span> REGISTRO OFICIAL DE ASIGNATURAS Y CALIFICACIONES
-            </div>
-            <table class="doc-grades-table">
-              <thead>
-                <tr>
-                  <th style="width: 14%;">Código</th>
-                  <th style="width: 56%;">Asignatura / Módulo Curricular</th>
-                  <th style="width: 15%; text-align: center;">Calificación</th>
-                  <th style="width: 15%; text-align: center;">Estado</th>
-                </tr>
-              </thead>
-              <tbody id="expTablaCalificacionesBody">
-                <!-- Rellenado dinámico en app.js -->
-              </tbody>
-            </table>
           </div>
 
           <!-- 7. SELLO INSTITUCIONAL, CERTIFICACIÓN Y FIRMAS -->
           <div class="doc-section doc-signatures-section">
             <div class="signatures-grid">
               <div class="signature-column">
+                <div class="signature-blank-space"></div>
                 <div class="signature-line-mark"></div>
                 <strong class="signature-authority">Secretaría Académica POSFACE</strong>
                 <span class="signature-role">Dirección de Posgrados de Ciencias Económicas</span>
@@ -868,7 +824,9 @@
               <div class="signature-seal-col">
                 <div class="unah-official-seal">
                   <div class="seal-inner-circle">
-                    <span class="seal-icon">🏛️</span>
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="#002855" style="margin-bottom: 2px;">
+                      <path d="M12 2L2 7v2h20V7L12 2zm-8 7v10h2V9H4zm5 0v10h2V9H9zm5 0v10h2V9h-2zm5 0v10h2V9h-2zM2 20v2h20v-2H2z"/>
+                    </svg>
                     <div class="seal-text-circle">
                       <strong>POSFACE</strong>
                       <small>UNAH · 1847</small>
@@ -879,6 +837,7 @@
               </div>
 
               <div class="signature-column">
+                <div class="signature-blank-space"></div>
                 <div class="signature-line-mark"></div>
                 <strong class="signature-authority" id="expFirmaEstudianteNombre">Firma del Estudiante</strong>
                 <span class="signature-role">Estudiante / Maestrante</span>
@@ -1202,12 +1161,12 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
   <!-- Módulos de Configuración y Servicios Firebase POSFACE -->
-  <script src="js/firebase-config.js?v=2.8"></script>
-  <script src="js/firebase-service.js?v=2.8"></script>
+  <script src="js/firebase-config.js?v=3.0"></script>
+  <script src="js/firebase-service.js?v=3.0"></script>
 
   <!-- Datos y Lógica de la Aplicación -->
-  <script src="js/mock-data.js?v=2.8"></script>
-  <script src="js/app.js?v=2.8"></script>
+  <script src="js/mock-data.js?v=3.0"></script>
+  <script src="js/app.js?v=3.0"></script>
 </body>
 
 </html>
