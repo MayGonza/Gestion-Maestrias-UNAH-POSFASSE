@@ -457,7 +457,14 @@
           if (!snapshot.empty) {
             const cloudList = [];
             snapshot.forEach(doc => {
-              cloudList.push({ id: doc.id, ...doc.data() });
+              const docData = doc.data();
+              delete docData.tituloTesis;
+              delete docData.tutorTesis;
+              delete docData.calificacionesRecientes;
+              delete docData.uvsAprobadas;
+              delete docData.totalUVs;
+              delete docData.promedio;
+              cloudList.push({ id: doc.id, ...docData });
             });
             currentList = cloudList;
             localStorage.setItem('posface_estudiantes_data', JSON.stringify(cloudList));
@@ -480,6 +487,14 @@
 
     // Guardar nuevo estudiante / aspirante
     addEstudiante: async function (estudiante) {
+      // Limpiar campos no requeridos para pre-inscripción
+      delete estudiante.tituloTesis;
+      delete estudiante.tutorTesis;
+      delete estudiante.calificacionesRecientes;
+      delete estudiante.uvsAprobadas;
+      delete estudiante.totalUVs;
+      delete estudiante.promedio;
+
       // 1. Guardar siempre en LocalStorage asegurando no perder la lista base
       try {
         const local = localStorage.getItem('posface_estudiantes_data');

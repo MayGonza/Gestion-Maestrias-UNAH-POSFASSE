@@ -854,8 +854,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const indiceRaw = document.getElementById('nuevoEstIndicePregrado').value.trim();
       const carreraPrevia = (document.getElementById('nuevoEstCarreraPrevia')?.value || '').trim();
       const modalidad = document.getElementById('nuevoEstModalidad')?.value || 'Presencial';
-      const tituloTesis = (document.getElementById('nuevoEstTituloTesis')?.value || '').trim();
-      const tutorTesis = (document.getElementById('nuevoEstTutorTesis')?.value || '').trim();
       const maestriaId = selectNuevoEstMaestria.value;
       const indice = parseFloat(indiceRaw);
 
@@ -895,15 +893,9 @@ document.addEventListener('DOMContentLoaded', () => {
         indicePregrado: indice,
         carreraPregrado: carreraPrevia || 'Licenciatura Universitaria',
         maestriaId: maestriaId,
-        modalidad: modalidad,
+        modalidad: modalidad || 'Presencial',
         estado: 'Activo',
-        fechaIngreso: new Date().toLocaleDateString('es-HN'),
-        promedio: 0.0,
-        uvsAprobadas: 0,
-        totalUVs: selectedMae ? selectedMae.totalUV : 50,
-        tituloTesis: tituloTesis || 'Tema en proceso de formulación',
-        tutorTesis: tutorTesis || 'Pendiente de designación',
-        calificacionesRecientes: []
+        fechaIngreso: new Date().toLocaleDateString('es-HN')
       };
 
       estudiantesList.unshift(nuevoEst);
@@ -962,13 +954,12 @@ document.addEventListener('DOMContentLoaded', () => {
       "Departamento",
       "Ciudad",
       "Universidad de Procedencia",
+      "Título Validado UNAH",
       "Índice Pregrado (%)",
       "Carrera Previa",
       "Programa POSFACE",
       "Modalidad",
-      "Estado",
-      "Proyecto de Tesis",
-      "Tutor Asignado"
+      "Estado"
     ];
 
     const rows = estudiantesList.map(est => {
@@ -983,13 +974,12 @@ document.addEventListener('DOMContentLoaded', () => {
         `"${est.departamento || ''}"`,
         `"${est.ciudad || ''}"`,
         `"${est.universidadProcedencia || ''}"`,
+        `"${est.tituloValidadoUNAH || 'Exento'}"`,
         est.indicePregrado || 0,
         `"${est.carreraPregrado || ''}"`,
         `"${mae.nombre}"`,
         `"${est.modalidad || mae.modalidad || 'Presencial'}"`,
-        `"${est.estado}"`,
-        `"${est.tituloTesis || 'En formulación'}"`,
-        `"${est.tutorTesis || 'Pendiente'}"`
+        `"${est.estado}"`
       ].join(',');
     });
 
