@@ -212,7 +212,7 @@ const POSFASSE_DATA = {
       fechaInicio: "2024-02-15",
       fechaFin: "2026-02-28",
       cupoLimite: 25,
-      matriculados: 22,
+      inscritos: 22,
       estado: "En Curso",
       etapa: "Ciclo IV - Finanzas Corporativas y Tesis",
       progresoPorcentaje: 75
@@ -225,7 +225,7 @@ const POSFASSE_DATA = {
       fechaInicio: "2025-02-10",
       fechaFin: "2027-02-28",
       cupoLimite: 25,
-      matriculados: 20,
+      inscritos: 20,
       estado: "En Curso",
       etapa: "Ciclo II - Dirección Estratégica",
       progresoPorcentaje: 35
@@ -238,7 +238,7 @@ const POSFASSE_DATA = {
       fechaInicio: "2024-06-01",
       fechaFin: "2026-06-30",
       cupoLimite: 25,
-      matriculados: 21,
+      inscritos: 21,
       estado: "En Curso",
       etapa: "Ciclo III - Gestión de Riesgos y Valor",
       progresoPorcentaje: 60
@@ -251,7 +251,7 @@ const POSFASSE_DATA = {
       fechaInicio: "2025-02-01",
       fechaFin: "2027-01-30",
       cupoLimite: 20,
-      matriculados: 16,
+      inscritos: 16,
       estado: "En Curso",
       etapa: "Ciclo I - Gobernanza y Ciberseguridad TI",
       progresoPorcentaje: 25
@@ -264,7 +264,7 @@ const POSFASSE_DATA = {
       fechaInicio: "2024-03-01",
       fechaFin: "2025-12-15",
       cupoLimite: 25,
-      matriculados: 18,
+      inscritos: 18,
       estado: "En Curso",
       etapa: "Ciclo III - Logística Internacional",
       progresoPorcentaje: 65
@@ -277,7 +277,7 @@ const POSFASSE_DATA = {
       fechaInicio: "2024-04-15",
       fechaFin: "2026-03-30",
       cupoLimite: 20,
-      matriculados: 15,
+      inscritos: 15,
       estado: "En Curso",
       etapa: "Ciclo III - Analítica y Neuromarketing",
       progresoPorcentaje: 55
@@ -290,7 +290,7 @@ const POSFASSE_DATA = {
       fechaInicio: "2024-02-01",
       fechaFin: "2026-02-28",
       cupoLimite: 15,
-      matriculados: 12,
+      inscritos: 12,
       estado: "En Curso",
       etapa: "Ciclo IV - Seminario de Tesis Econométrica",
       progresoPorcentaje: 80
@@ -303,7 +303,7 @@ const POSFASSE_DATA = {
       fechaInicio: "2025-02-15",
       fechaFin: "2027-02-28",
       cupoLimite: 15,
-      matriculados: 11,
+      inscritos: 11,
       estado: "En Curso",
       etapa: "Ciclo I - Teoría del Riesgo Financiero",
       progresoPorcentaje: 20

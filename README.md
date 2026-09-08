@@ -11,7 +11,7 @@
 
 ## 📋 Resumen Ejecutivo
 
-Este sistema constituye la plataforma tecnológica institucional para la gestión, control escolar, matrícula y seguimiento administrativo de los programas de posgrado (Maestrías y Doctorados) adscritos a la **Dirección de Posgrados de la Facultad de Ciencias Económicas (POSFACE - UNAH)**.
+Este sistema constituye la plataforma tecnológica institucional para la gestión, control escolar, inscripción y seguimiento administrativo de los programas de posgrado (Maestrías y Doctorados) adscritos a la **Dirección de Posgrados de la Facultad de Ciencias Económicas (POSFACE - UNAH)**.
 
 La plataforma ha sido desarrollada con un estándar visual corporativo de alta gama, alineado a la identidad gráfica institucional de la UNAH (Azul Naval `#002855` y Dorado `#F0B323`), implementando control de acceso, cumplimiento normativo del Consejo de Educación Superior (CES) y preparación nativa para persistencia en **Google Firebase / Cloud Firestore**.
 
@@ -26,9 +26,9 @@ La plataforma ha sido desarrollada con un estándar visual corporativo de alta g
 * **Cierre de Sesión Seguro**: Botón dedicado de Logout en el sidebar con limpieza de sesión y estado reactivo.
 
 ### 2. Panel General de Control (Dashboard Analítico)
-* **Métricas en Tiempo Real**: Total de estudiantes matriculados, programas activos y diversidad de centros de egreso universitarios.
+* **Métricas en Tiempo Real**: Total de estudiantes inscritos, programas activos y diversidad de centros de egreso universitarios.
 * **Índice Pregrado Promedio**: Indicador de rendimiento académico de ingreso conforme a la normativa UNAH ($\ge 70.00\%$).
-* **Distribución por Programa**: Gráficos de distribución porcentual de alumnos matriculados por posgrado.
+* **Distribución por Programa**: Gráficos de distribución porcentual de alumnos inscritos por posgrado.
 * **Distribución por Universidad de Procedencia**: Clasificación por centro universitario de origen (UNAH, UNITEC, CEUTEC, UTH, UPNFM, UNICAH, USAP, Internacionales).
 
 ### 3. Directorio de Estudiantes y Control Escolar
@@ -42,12 +42,12 @@ La plataforma ha sido desarrollada con un estándar visual corporativo de alta g
   * 🔵 **Graduado**
   * ⚪ **Inactivo / Retirado**
 
-### 4. Expediente Académico y Constancia Oficial de Matrícula
+### 4. Expediente Académico y Constancia Oficial de Inscripción
 * **Ficha del Alumno**: Datos personales, cuenta UNAH, DNI, correo institucional y antecedentes académicos de pregrado.
 * **Línea de Tesis**: Registro y visualización del tema o proyecto de graduación y tutor metodológico asignado.
 * **Impresión de Calidad Oficial**: Al presionar *"Imprimir Ficha Oficial"*, el sistema aísla exclusivamente la constancia con membrete institucional de la UNAH, sello de secretaría académica, firmas de conformidad y control de período activo, eliminando la interfaz web y la tabla de fondo.
 
-### 5. Matrícula y Admisión Normativa
+### 5. Inscripción y Admisión Normativa
 * Formulario completo de nuevo aspirante que valida:
   * Número de cuenta UNAH único.
   * DNI / Identidad oficial de Honduras.
@@ -60,7 +60,7 @@ La plataforma ha sido desarrollada con un estándar visual corporativo de alta g
 * Botón para ingresar períodos personalizados con persistencia inmediata y sincronización en constancias impresas.
 
 ### 7. Exportación de Reportes Administrativos (CSV / Excel)
-* Descarga inmediata de la matrícula general en formato compatible con Microsoft Excel y hojas de cálculo, con codificación UTF-8 con BOM para caracteres en español.
+* Descarga inmediata de la inscripción general en formato compatible con Microsoft Excel y hojas de cálculo, con codificación UTF-8 con BOM para caracteres en español.
 
 ---
 

@@ -654,7 +654,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================================================================
-  // 7. MATRÍCULA Y ADMISIÓN DE NUEVOS ASPIRANTES (NORMATIVA >= 70%)
+  // 7. INSCRIPCIÓN Y ADMISIÓN DE NUEVOS ASPIRANTES (NORMATIVA >= 70%)
   // =========================================================================
   const modalNuevoEstudiante = document.getElementById('modalNuevoEstudiante');
   const formNuevoEstudiante = document.getElementById('formNuevoEstudiante');
@@ -796,13 +796,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (indice < 70) {
         showToast(`Aspirante inscrito condicionalmente (Índice pregrado: ${indice.toFixed(1)}% <  70 % normativo)`, 'warning');
       } else {
-        showToast(`✓ Estudiante ${nombres} ${apellidos} matriculado con éxito`, 'success');
+        showToast(`✓ Estudiante ${nombres} ${apellidos} inscrito con éxito`, 'success');
       }
 
-      // Abrir inmediatamente la Ficha Oficial de Matrícula (Expediente) del nuevo estudiante
+      // Abrir inmediatamente la Ficha Oficial de Inscripción (Expediente) del nuevo estudiante
       setTimeout(() => {
         openExpedienteModal(nuevoEst.id);
-        showToast('📄 Se ha generado la Ficha Oficial de Matrícula. Lista para revisión e impresión.', 'info');
+        showToast('📄 Se ha generado la Ficha Oficial de Inscripción. Lista para revisión e impresión.', 'info');
       }, 250);
     });
   }
@@ -869,7 +869,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', `matricula_posface_unah_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `inscripcion_posface_unah_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
