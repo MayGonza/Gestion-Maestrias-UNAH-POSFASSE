@@ -1082,16 +1082,37 @@
 
             <div class="form-group col-span-2">
               <label class="form-label" for="nuevoEstMaestria">Programa de Posgrado POSFACE *</label>
-              <select class="form-select" id="nuevoEstMaestria" required>
-                <option value="">Seleccione el programa...</option>
+              <select class="form-select" id="nuevoEstMaestria" name="nuevoEstMaestria" required>
+                <option value="">Seleccione el programa de posgrado al que aspira...</option>
+                <optgroup label="Posdoctorado (1)">
+                  <option value="M-POSDOC">POS-PDE-10 - Posdoctorado en Desarrollo Económico, Innovación y Gestión Empresarial</option>
+                </optgroup>
+                <optgroup label="Doctorados (2)">
+                  <option value="M-DCE">POS-DCE-08 - Doctorado en Ciencias Económicas</option>
+                  <option value="M-DDE">POS-DDE-09 - Doctorado en Dirección Empresarial</option>
+                </optgroup>
+                <optgroup label="Maestrías (7)">
+                  <option value="M-MAE">POS-MAE-01 - Maestría en Administración de Empresas</option>
+                  <option value="M-MDNI">POS-MDNI-02 - Maestría en Dirección de Negocios Internacionales</option>
+                  <option value="M-MDP">POS-MDP-03 - Maestría en Dirección de Proyectos</option>
+                  <option value="M-MGI">POS-GI-04 - Maestría en Gestión Informática</option>
+                  <option value="M-MME">POS-MME-05 - Maestría en Mercadotecnia Estratégica y Gestión Comercial</option>
+                  <option value="M-MMIES">POS-MIES-06 - Maestría en Metodologías de la Investigación Económica y Social</option>
+                  <option value="M-MCAF">POS-CAF-07 - Maestría en Ciencias Actuariales y Financieras</option>
+                </optgroup>
+                <optgroup label="Formación Continua y Educación Empresarial (2)">
+                  <option value="M-BTC">POS-BTC-11 - Centro de Formación Empresarial, Business Training Center (UNAH-BTC)</option>
+                  <option value="M-DIP-ACT">POS-DAC-12 - Diplomado en Valuación Actuarial de Seguros y Riesgos Financieros</option>
+                </optgroup>
               </select>
             </div>
 
             <div class="form-group col-span-2">
               <label class="form-label" for="nuevoEstModalidad">Modalidad de la Maestría *</label>
-              <select class="form-select" id="nuevoEstModalidad" required>
-                <option value="Presencial">Presencial</option>
-                <option value="Virtual">Virtual</option>
+              <select class="form-select" id="nuevoEstModalidad" name="nuevoEstModalidad" required>
+                <option value="Presencial">Presencial (Ciudad Universitaria, Tegucigalpa)</option>
+                <option value="Híbrida">Híbrida (Sesiones Presenciales y Campus Virtual)</option>
+                <option value="Virtual">Virtual (Campus Virtual UNAH / En Línea)</option>
               </select>
             </div>
 

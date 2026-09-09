@@ -414,6 +414,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     filtradas.forEach(m => {
+      // Calcular alumnos dinámicamente según las inscripciones reales
+      const numEstudiantes = estudiantesList.filter(e => e.maestriaId === m.id).length;
+
       const card = document.createElement('div');
       card.className = 'program-card';
       card.innerHTML = `
@@ -444,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="program-meta-item">
               <span class="lbl">Alumnos Activos:</span>
-              <span class="val" style="color: var(--unah-navy); font-weight: 700;">${m.estudiantesActivos}</span>
+              <span class="val" style="color: var(--unah-navy); font-weight: 700;">${numEstudiantes}</span>
             </div>
           </div>
 
