@@ -349,6 +349,123 @@
       color: var(--text-muted);
     }
 
+    /* ── Selector Visual de Programas ── */
+    .prog-picker {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .prog-category {
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .prog-category-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      border-bottom: 1.5px solid #e2e8f0;
+    }
+
+    .prog-category-header .cat-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+    }
+
+    .cat-posdoc .prog-category-header  { background: #fdf4ff; color: #7e22ce; border-color: #e9d5ff; }
+    .cat-posdoc .cat-icon              { background: #f3e8ff; }
+    .cat-posdoc                        { border-color: #e9d5ff; }
+
+    .cat-doc .prog-category-header     { background: #eff6ff; color: #1e40af; border-color: #bfdbfe; }
+    .cat-doc .cat-icon                 { background: #dbeafe; }
+    .cat-doc                           { border-color: #bfdbfe; }
+
+    .cat-mae .prog-category-header     { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
+    .cat-mae .cat-icon                 { background: #dcfce7; }
+    .cat-mae                           { border-color: #bbf7d0; }
+
+    .cat-cont .prog-category-header    { background: #fffbeb; color: #b45309; border-color: #fde68a; }
+    .cat-cont .cat-icon                { background: #fef3c7; }
+    .cat-cont                          { border-color: #fde68a; }
+
+    .prog-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .prog-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 16px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      border-bottom: 1px solid #f1f5f9;
+      position: relative;
+    }
+
+    .prog-option:last-child { border-bottom: none; }
+
+    .prog-option:hover { background: #f8fafc; }
+
+    .prog-option input[type="radio"] {
+      width: 17px;
+      height: 17px;
+      accent-color: var(--unah-navy);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .prog-option .prog-info {
+      flex: 1;
+    }
+
+    .prog-option .prog-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #1e293b;
+      line-height: 1.3;
+    }
+
+    .prog-option .prog-code {
+      font-size: 0.74rem;
+      color: #64748b;
+      margin-top: 2px;
+      font-family: 'Courier New', monospace;
+    }
+
+    .prog-option.selected { background: #f0f7ff; }
+    .prog-option.selected .prog-name { color: var(--unah-navy); }
+
+    .prog-selected-display {
+      margin-top: 10px;
+      padding: 10px 14px;
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      border-radius: 8px;
+      font-size: 0.83rem;
+      color: #0369a1;
+      font-weight: 600;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .prog-selected-display.visible { display: flex; }
+
     @media print {
       body {
         background: #ffffff !important;
@@ -611,32 +728,143 @@
           <div class="form-grid">
 
             <div class="form-group col-span-2">
-              <label class="form-label" for="aspMaestria">Programa de Posgrado POSFACE *</label>
-              <select class="form-select" id="aspMaestria" required>
-                <option value="">Seleccione el programa de posgrado al que aspira...</option>
-                <optgroup label="Maestrías Oficiales (7)">
-                  <option value="M-MAE">POS-MAE-01 - Maestría en Administración de Empresas</option>
-                  <option value="M-MDNI">POS-MDNI-02 - Maestría en Dirección de Negocios Internacionales</option>
-                  <option value="M-MDP">POS-MDP-03 - Maestría en Dirección de Proyectos</option>
-                  <option value="M-MGI">POS-GI-04 - Maestría en Gestión Informática</option>
-                  <option value="M-MME">POS-MME-05 - Maestría en Mercadotecnia Estratégica y Gestión Comercial</option>
-                  <option value="M-MMIES">POS-MIES-06 - Maestría en Metodologías de la Investigación Económica y Social
-                  </option>
-                  <option value="M-MCAF">POS-CAF-07 - Maestría en Ciencias Actuariales y Financieras</option>
-                </optgroup>
-                <optgroup label="Doctorados y Posdoctorado (3)">
-                  <option value="M-DCE">POS-DCE-08 - Doctorado en Ciencias Económicas</option>
-                  <option value="M-DDE">POS-DDE-09 - Doctorado en Dirección Empresarial</option>
-                  <option value="M-POSDOC">POS-PDE-10 - Posdoctorado en Desarrollo Económico, Innovación y Gestión
-                    Empresarial</option>
-                </optgroup>
-                <optgroup label="Educación Continua y Formación Empresarial (2)">
-                  <option value="M-BTC">POS-BTC-11 - Centro de Formación Empresarial, Business Training Center
-                    (UNAH-BTC)</option>
-                  <option value="M-DIP-ACT">POS-DAC-12 - Diplomado en Valuación Actuarial de Seguros y Riesgos
-                    Financieros</option>
-                </optgroup>
-              </select>
+              <label class="form-label">Programa de Posgrado POSFACE *</label>
+              <!-- Campo hidden que guarda el valor para el submit del formulario -->
+              <input type="hidden" id="aspMaestria" name="aspMaestria" required>
+
+              <div class="prog-picker" id="progPicker">
+
+                <!-- POSDOCTORADO -->
+                <div class="prog-category cat-posdoc">
+                  <div class="prog-category-header">
+                    <span class="cat-icon">🎓</span>
+                    Posdoctorado
+                  </div>
+                  <div class="prog-options">
+                    <label class="prog-option">
+                      <input type="radio" name="progSeleccion" value="M-POSDOC" data-label="Posdoctorado en Desarrollo Económico, Innovación y Gestión Empresarial">
+                      <div class="prog-info">
+                        <div class="prog-name">Posdoctorado en Desarrollo Económico, Innovación y Gestión Empresarial</div>
+                        <div class="prog-code">POS-PDE-10</div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- DOCTORADOS -->
+                <div class="prog-category cat-doc">
+                  <div class="prog-category-header">
+                    <span class="cat-icon">🔬</span>
+                    Doctorados
+                  </div>
+                  <div class="prog-options">
+                    <label class="prog-option">
+                      <input type="radio" name="progSeleccion" value="M-DCE" data-label="Doctorado en Ciencias Económicas">
+                      <div class="prog-info">
+                        <div class="prog-name">Doctorado en Ciencias Económicas</div>
+                        <div class="prog-code">POS-DCE-08</div>
+                      </div>
+                    </label>
+                    <label class="prog-option">
+                      <input type="radio" name="progSeleccion" value="M-DDE" data-label="Doctorado en Dirección Empresarial">
+                      <div class="prog-info">
+                        <div class="prog-name">Doctorado en Dirección Empresarial</div>
+                        <div class="prog-code">POS-DDE-09</div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- MAESTRÍAS -->
+                <div class="prog-category cat-mae">
+                  <div class="prog-category-header">
+                    <span class="cat-icon">📚</span>
+                    Maestrías
+                  </div>
+                  <div class="prog-options">
+                    <label class="prog-option">
+                      <input type="radio" name="progSeleccion" value="M-MAE" data-label="Maestría en Administración de Empresas">
+                      <div class="prog-info">
+                        <div class="prog-name">Maestría en Administración de Empresas</div>
+                        <div class="prog-code">POS-MAE-01</div>
+                      </div>
+                    </label>
+                    <label class="prog-option">
+                      <input type="radio" name="progSeleccion" value="M-MDP" data-label="Maestría en Dirección de Proyectos">
+                      <div class="prog-info">
+                        <div class="prog-name">Maestría en Dirección de Proyectos</div>
+                        <div class="prog-code">POS-MDP-03</div>
+                      </div>
+                    </label>
+                    <label class="prog-option">
+                      <input type="radio" name="progSeleccion" value="M-MME" data-label="Maestría en Mercadotecnia Estratégica y Gestión Comercial">
+                      <div class="prog-info">
+                        <div class="prog-name">Maestría en Mercadotecnia Estratégica y Gestión Comercial</div>
+                        <div class="prog-code">POS-MME-05</div>
+                      </div>
+                    </label>
+                    <label class="prog-option">
+                      <input type="radio" name="progSeleccion" value="M-MDNI" data-label="Maestría en Dirección de Negocios Internacionales">
+                      <div class="prog-info">
+                        <div class="prog-name">Maestría en Dirección de Negocios Internacionales</div>
+                        <div class="prog-code">POS-MDNI-02</div>
+                      </div>
+                    </label>
+                    <label class="prog-option">
+                      <input type="radio" name="progSeleccion" value="M-MCAF" data-label="Maestría en Ciencias Actuariales y Financieras">
+                      <div class="prog-info">
+                        <div class="prog-name">Maestría en Ciencias Actuariales y Financieras</div>
+                        <div class="prog-code">POS-CAF-07</div>
+                      </div>
+                    </label>
+                    <label class="prog-option">
+                      <input type="radio" name="progSeleccion" value="M-MGI" data-label="Maestría en Gestión Informática">
+                      <div class="prog-info">
+                        <div class="prog-name">Maestría en Gestión Informática</div>
+                        <div class="prog-code">POS-GI-04</div>
+                      </div>
+                    </label>
+                    <label class="prog-option">
+                      <input type="radio" name="progSeleccion" value="M-MMIES" data-label="Maestría en Metodologías de la Investigación Económica y Social">
+                      <div class="prog-info">
+                        <div class="prog-name">Maestría en Metodologías de la Investigación Económica y Social</div>
+                        <div class="prog-code">POS-MIES-06</div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- FORMACIÓN CONTINUA -->
+                <div class="prog-category cat-cont">
+                  <div class="prog-category-header">
+                    <span class="cat-icon">🏢</span>
+                    Formación Continua y Educación Empresarial
+                  </div>
+                  <div class="prog-options">
+                    <label class="prog-option">
+                      <input type="radio" name="progSeleccion" value="M-BTC" data-label="Centro de Formación Empresarial, Business Training Center (UNAH-BTC)">
+                      <div class="prog-info">
+                        <div class="prog-name">Centro de Formación Empresarial — Business Training Center (UNAH-BTC)</div>
+                        <div class="prog-code">POS-BTC-11</div>
+                      </div>
+                    </label>
+                    <label class="prog-option">
+                      <input type="radio" name="progSeleccion" value="M-DIP-ACT" data-label="Diplomado en Valuación Actuarial de Seguros y Riesgos Financieros">
+                      <div class="prog-info">
+                        <div class="prog-name">Diplomado en Valuación Actuarial de Seguros y Riesgos Financieros</div>
+                        <div class="prog-code">POS-DAC-12</div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+              </div><!-- /prog-picker -->
+
+              <!-- Indicador del programa seleccionado -->
+              <div class="prog-selected-display" id="progSelectedDisplay">
+                <span>✅</span>
+                <span id="progSelectedText"></span>
+              </div>
             </div>
 
             <div class="form-group col-span-2">
@@ -835,14 +1063,34 @@
         }
       });
 
-      // Sincronización sugerida de modalidad al cambiar maestría
-      selectMaestria.addEventListener('change', () => {
-        if (typeof POSFASSE_DATA !== 'undefined' && POSFASSE_DATA.maestrias) {
-          const mae = POSFASSE_DATA.maestrias.find(m => m.id === selectMaestria.value);
-          if (mae && selectModalidad && mae.modalidad) {
-            selectModalidad.value = mae.modalidad;
+      // ── Selector visual de programas: conectar radio buttons con hidden input ──
+      const hiddenMaestria = document.getElementById('aspMaestria');
+      const progRadios = document.querySelectorAll('input[name="progSeleccion"]');
+      const progSelectedDisplay = document.getElementById('progSelectedDisplay');
+      const progSelectedText = document.getElementById('progSelectedText');
+
+      progRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+          // Actualizar campo hidden (el que usa el formulario)
+          hiddenMaestria.value = radio.value;
+
+          // Resaltar visualmente la opción seleccionada
+          document.querySelectorAll('.prog-option').forEach(opt => opt.classList.remove('selected'));
+          radio.closest('.prog-option').classList.add('selected');
+
+          // Mostrar indicador de selección
+          const label = radio.getAttribute('data-label') || radio.value;
+          progSelectedText.textContent = label;
+          progSelectedDisplay.classList.add('visible');
+
+          // Sincronizar modalidad automáticamente según el programa
+          if (typeof POSFASSE_DATA !== 'undefined' && POSFASSE_DATA.maestrias) {
+            const mae = POSFASSE_DATA.maestrias.find(m => m.id === radio.value);
+            if (mae && selectModalidad && mae.modalidad) {
+              selectModalidad.value = mae.modalidad;
+            }
           }
-        }
+        });
       });
 
       // Mostrar u ocultar campo de validación de título si la universidad no es UNAH

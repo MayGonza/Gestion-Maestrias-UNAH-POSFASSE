@@ -1,12 +1,14 @@
 {
   "hosting": {
-    "site": "gestion-maestrias-unah",
+    "site": "posfaceunah",
     "public": ".",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**",
-      "serve.js"
+      "serve.js",
+      "**/*.pdf",
+      "README.md"
     ],
     "headers": [
       {

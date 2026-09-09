@@ -304,22 +304,46 @@ document.addEventListener('DOMContentLoaded', () => {
     const containerBars = document.getElementById('dashboardProgramBars');
     if (containerBars) {
       containerBars.innerHTML = '';
-      maestriasList.slice(0, 6).forEach(m => {
-        const count = estudiantesList.filter(e => e.maestriaId === m.id).length;
-        const pct = Math.round((count / (totalEst || 1)) * 100);
+      
+      // Agrupar programas por tipo
+      const programasPorTipo = maestriasList.reduce((acc, m) => {
+        const tipo = m.tipo || 'Otros';
+        if (!acc[tipo]) acc[tipo] = [];
+        acc[tipo].push(m);
+        return acc;
+      }, {});
 
-        const barItem = document.createElement('div');
-        barItem.className = 'program-bar-item';
-        barItem.innerHTML = `
-          <div class="program-bar-header">
-            <span style="color: var(--unah-navy); font-weight: 600;">${m.nombre}</span>
-            <span style="color: var(--text-muted); font-size: 0.78rem;">${count} alumnos (${pct}%)</span>
-          </div>
-          <div class="program-bar-bg">
-            <div class="program-bar-fill" style="width: ${Math.max(pct, 8)}%; background: ${m.color};"></div>
-          </div>
-        `;
-        containerBars.appendChild(barItem);
+      // Definir el orden de presentación de las categorías
+      const ordenTipos = ['Posdoctorado', 'Doctorado', 'Maestría', 'Formación Continua', 'Diplomado', 'Otros'];
+
+      ordenTipos.forEach(tipo => {
+        if (programasPorTipo[tipo] && programasPorTipo[tipo].length > 0) {
+          
+          // Añadir título de categoría
+          const tituloCat = document.createElement('div');
+          tituloCat.style.cssText = 'padding: 8px 0 4px 0; font-size: 0.8rem; font-weight: 700; color: var(--unah-gold); text-transform: uppercase; border-bottom: 1px solid #e2e8f0; margin-bottom: 10px; margin-top: 5px;';
+          tituloCat.textContent = tipo + 'S';
+          containerBars.appendChild(tituloCat);
+
+          // Renderizar barras de esa categoría
+          programasPorTipo[tipo].forEach(m => {
+            const count = estudiantesList.filter(e => e.maestriaId === m.id).length;
+            const pct = Math.round((count / (totalEst || 1)) * 100);
+
+            const barItem = document.createElement('div');
+            barItem.className = 'program-bar-item';
+            barItem.innerHTML = `
+              <div class="program-bar-header">
+                <span style="color: var(--unah-navy); font-weight: 600;">${m.nombre}</span>
+                <span style="color: var(--text-muted); font-size: 0.78rem;">${count} alumnos (${pct}%)</span>
+              </div>
+              <div class="program-bar-bg">
+                <div class="program-bar-fill" style="width: ${Math.max(pct, 8)}%; background: ${m.color || '#002855'};"></div>
+              </div>
+            `;
+            containerBars.appendChild(barItem);
+          });
+        }
       });
     }
 
