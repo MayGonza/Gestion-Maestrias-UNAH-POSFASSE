@@ -7,13 +7,13 @@
   <title>Portal de Inscripción de Aspirantes | POSFACE · UNAH</title>
   <meta name="description"
     content="Portal oficial de inscripción y registro para aspirantes a maestrías y doctorados de la Facultad de Ciencias Económicas, Administrativas y Contables (POSFACE) de la UNAH.">
-  
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Cinzel:wght@600;700&display=swap"
     rel="stylesheet">
-  
+
   <link rel="stylesheet" href="css/styles.css">
   <style>
     :root {
@@ -22,7 +22,7 @@
 
     body {
       background-color: #f1f5f9;
-      background-image: 
+      background-image:
         radial-gradient(at 0% 0%, rgba(0, 43, 91, 0.05) 0px, transparent 50%),
         radial-gradient(at 100% 100%, rgba(212, 175, 55, 0.06) 0px, transparent 50%);
       min-height: 100vh;
@@ -61,7 +61,7 @@
       width: 58px;
       height: 58px;
       object-fit: contain;
-      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3));
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
     }
 
     .portal-brand h1 {
@@ -353,9 +353,16 @@
       body {
         background: #ffffff !important;
       }
-      .portal-header, .portal-banner, .portal-form-card, .receipt-actions, .portal-footer, .portal-nav-badge {
+
+      .portal-header,
+      .portal-banner,
+      .portal-form-card,
+      .receipt-actions,
+      .portal-footer,
+      .portal-nav-badge {
         display: none !important;
       }
+
       .receipt-container {
         display: block !important;
         box-shadow: none !important;
@@ -396,7 +403,8 @@
       </h2>
       <p>
         Bienvenido al portal oficial de recepción de aspirantes a Maestrías y Doctorados de la Facultad de Ciencias
-        Económicas (POSFACE · UNAH). Por favor complete todos los datos requeridos para formalizar su expediente de ingreso.
+        Económicas (POSFACE · UNAH). Por favor complete todos los datos requeridos para formalizar su expediente de
+        ingreso.
       </p>
       <div class="portal-banner-tags">
         <span class="portal-tag">🏛️ Ciudad Universitaria, Tegucigalpa</span>
@@ -439,9 +447,11 @@
             <div class="form-group">
               <label class="form-label" for="aspCuenta">
                 No. de Cuenta UNAH
-                <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">(Opcional si eres externo)</span>
+                <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">(Opcional si eres
+                  externo)</span>
               </label>
-              <input type="text" class="form-input" id="aspCuenta" placeholder="ej. 20241004521 (dejar vacío si no procede de UNAH)">
+              <input type="text" class="form-input" id="aspCuenta"
+                placeholder="ej. 20241004521 (dejar vacío si no procede de UNAH)">
               <small style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-top: 3px;">
                 Si egresaste de otra universidad, se te asignará tu cuenta oficial UNAH al ser admitido.
               </small>
@@ -464,7 +474,8 @@
 
             <div class="form-group">
               <label class="form-label" for="aspCorreo">Correo Electrónico de Contacto *</label>
-              <input type="email" class="form-input" id="aspCorreo" placeholder="ej. aspirante@gmail.com o institucional" required>
+              <input type="email" class="form-input" id="aspCorreo"
+                placeholder="ej. aspirante@gmail.com o institucional" required>
             </div>
 
             <div class="form-group">
@@ -501,7 +512,8 @@
 
             <div class="form-group">
               <label class="form-label" for="aspCiudad">Ciudad / Municipio de Residencia *</label>
-              <input type="text" class="form-input" id="aspCiudad" placeholder="ej. Tegucigalpa, San Pedro Sula, Comayagua..." required>
+              <input type="text" class="form-input" id="aspCiudad"
+                placeholder="ej. Tegucigalpa, San Pedro Sula, Comayagua..." required>
             </div>
 
           </div>
@@ -520,35 +532,46 @@
             <div class="form-group col-span-2">
               <label class="form-label" for="aspUniversidad">
                 Universidad de Egreso de Pregrado *
-                <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">— Centro donde obtuvo su licenciatura o título previo</span>
+                <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">— Centro donde obtuvo
+                  su licenciatura o título previo</span>
               </label>
               <select class="form-select" id="aspUniversidad" required>
                 <option value="">Seleccione su universidad de egreso...</option>
-                <option value="UNAH - Universidad Nacional Autónoma de Honduras">UNAH - Universidad Nacional Autónoma de Honduras</option>
-                <option value="UNITEC - Universidad Tecnológica Centroamericana">UNITEC - Universidad Tecnológica Centroamericana</option>
-                <option value="CEUTEC - Centro Universitario Tecnológico">CEUTEC - Centro Universitario Tecnológico</option>
-                <option value="UTH - Universidad Tecnológica de Honduras">UTH - Universidad Tecnológica de Honduras</option>
-                <option value="UPNFM - Univ. Pedagógica Nacional Francisco Morazán">UPNFM - Univ. Pedagógica Nacional Francisco Morazán</option>
-                <option value="UNICAH - Universidad Católica de Honduras">UNICAH - Universidad Católica de Honduras</option>
+                <option value="UNAH - Universidad Nacional Autónoma de Honduras">UNAH - Universidad Nacional Autónoma de
+                  Honduras</option>
+                <option value="UNITEC - Universidad Tecnológica Centroamericana">UNITEC - Universidad Tecnológica
+                  Centroamericana</option>
+                <option value="CEUTEC - Centro Universitario Tecnológico">CEUTEC - Centro Universitario Tecnológico
+                </option>
+                <option value="UTH - Universidad Tecnológica de Honduras">UTH - Universidad Tecnológica de Honduras
+                </option>
+                <option value="UPNFM - Univ. Pedagógica Nacional Francisco Morazán">UPNFM - Univ. Pedagógica Nacional
+                  Francisco Morazán</option>
+                <option value="UNICAH - Universidad Católica de Honduras">UNICAH - Universidad Católica de Honduras
+                </option>
                 <option value="USAP - Universidad de San Pedro Sula">USAP - Universidad de San Pedro Sula</option>
-                <option value="UJCV - Universidad José Cecilio del Valle">UJCV - Universidad José Cecilio del Valle</option>
+                <option value="UJCV - Universidad José Cecilio del Valle">UJCV - Universidad José Cecilio del Valle
+                </option>
                 <option value="UNAG - Univ. Nacional de Agricultura">UNAG - Univ. Nacional de Agricultura</option>
                 <option value="Universidad Extranjera / Internacional">Universidad Extranjera / Internacional</option>
               </select>
             </div>
 
             <!-- VALIDACIÓN DE TÍTULO POR UNAH (PARA OTRAS UNIVERSIDADES) -->
-            <div class="form-group col-span-2" id="boxAspTituloValidado" style="display: none; background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 8px; padding: 12px 14px;">
+            <div class="form-group col-span-2" id="boxAspTituloValidado"
+              style="display: none; background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 8px; padding: 12px 14px;">
               <label class="form-label" for="aspTituloValidadoUNAH" style="color: #92400e; font-weight: 700;">
                 ⚖️ Validación e Incorporación del Título por la UNAH (Dirección de Educación Superior) *
               </label>
-              <select class="form-select" id="aspTituloValidadoUNAH" style="background: #ffffff; border-color: #f59e0b;">
+              <select class="form-select" id="aspTituloValidadoUNAH"
+                style="background: #ffffff; border-color: #f59e0b;">
                 <option value="Si">✓ Sí: Título Validado e Incorporado por la UNAH (Con Acuerdo/Constancia DES)</option>
                 <option value="En Tramite">⏳ En Trámite de Incorporación ante la UNAH / DES</option>
                 <option value="No">⚠️ No: Pendiente de Trámite de Incorporación</option>
               </select>
               <small style="font-size: 0.72rem; color: #78350f; display: block; margin-top: 4px; line-height: 1.4;">
-                * Conforme a las Normas Académicas de la Educación Superior, los egresados de universidades privadas o extranjeras deben presentar su título incorporado y reconocido ante la UNAH.
+                * Conforme a las Normas Académicas de la Educación Superior, los egresados de universidades privadas o
+                extranjeras deben presentar su título incorporado y reconocido ante la UNAH.
               </small>
             </div>
 
@@ -559,7 +582,8 @@
               <div style="position: relative;">
                 <input type="number" step="0.01" min="60" max="100" class="form-input" id="aspIndicePregrado"
                   placeholder="ej. 85.50" required style="padding-right: 32px;">
-                <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-weight: 700; color: var(--text-muted);">%</span>
+                <span
+                  style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-weight: 700; color: var(--text-muted);">%</span>
               </div>
               <div id="indiceFeedback" style="font-size: 0.72rem; margin-top: 4px; display: none;"></div>
               <small style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-top: 3px;">
@@ -590,16 +614,28 @@
               <label class="form-label" for="aspMaestria">Programa de Posgrado POSFACE *</label>
               <select class="form-select" id="aspMaestria" required>
                 <option value="">Seleccione el programa de posgrado al que aspira...</option>
-                <option value="M-MAE">POS-MAE-01 - Maestría en Administración de Empresas (MAE)</option>
-                <option value="M-MDNI">POS-MDNI-02 - Maestría en Dirección de Negocios Internacionales</option>
-                <option value="M-MDP">POS-MDP-03 - Maestría en Formulación, Gestión y Evaluación de Proyectos</option>
-                <option value="M-MAF">POS-MAF-04 - Maestría en Administración Financiera</option>
-                <option value="M-MGP">POS-MGP-05 - Maestría en Gestión Pública</option>
-                <option value="M-MME">POS-MME-06 - Maestría en Métodos Cuantitativos de Gestión</option>
-                <option value="M-MSIG">POS-SIG-07 - Maestría en Sistemas de Información Gerencial</option>
-                <option value="D-DCE">DOC-DCE-01 - Doctorado en Ciencias Económicas y Empresariales</option>
-                <option value="D-DAP">DOC-DAP-02 - Doctorado en Administración Pública</option>
-                <option value="BTC-01">BTC-FCE-01 - Programa Especializado en Finanzas Aplicadas</option>
+                <optgroup label="Maestrías Oficiales (7)">
+                  <option value="M-MAE">POS-MAE-01 - Maestría en Administración de Empresas</option>
+                  <option value="M-MDNI">POS-MDNI-02 - Maestría en Dirección de Negocios Internacionales</option>
+                  <option value="M-MDP">POS-MDP-03 - Maestría en Dirección de Proyectos</option>
+                  <option value="M-MGI">POS-GI-04 - Maestría en Gestión Informática</option>
+                  <option value="M-MME">POS-MME-05 - Maestría en Mercadotecnia Estratégica y Gestión Comercial</option>
+                  <option value="M-MMIES">POS-MIES-06 - Maestría en Metodologías de la Investigación Económica y Social
+                  </option>
+                  <option value="M-MCAF">POS-CAF-07 - Maestría en Ciencias Actuariales y Financieras</option>
+                </optgroup>
+                <optgroup label="Doctorados y Posdoctorado (3)">
+                  <option value="M-DCE">POS-DCE-08 - Doctorado en Ciencias Económicas</option>
+                  <option value="M-DDE">POS-DDE-09 - Doctorado en Dirección Empresarial</option>
+                  <option value="M-POSDOC">POS-PDE-10 - Posdoctorado en Desarrollo Económico, Innovación y Gestión
+                    Empresarial</option>
+                </optgroup>
+                <optgroup label="Educación Continua y Formación Empresarial (2)">
+                  <option value="M-BTC">POS-BTC-11 - Centro de Formación Empresarial, Business Training Center
+                    (UNAH-BTC)</option>
+                  <option value="M-DIP-ACT">POS-DAC-12 - Diplomado en Valuación Actuarial de Seguros y Riesgos
+                    Financieros</option>
+                </optgroup>
               </select>
             </div>
 
@@ -607,6 +643,7 @@
               <label class="form-label" for="aspModalidad">Modalidad de Estudio Preferida *</label>
               <select class="form-select" id="aspModalidad" required>
                 <option value="Presencial">Presencial (Ciudad Universitaria, Tegucigalpa)</option>
+                <option value="Híbrida">Híbrida (Sesiones Presenciales y Campus Virtual)</option>
                 <option value="Virtual">Virtual (Campus Virtual UNAH / En Línea)</option>
               </select>
             </div>
@@ -619,7 +656,8 @@
               <input type="checkbox" id="aspConsentimiento" required>
               <span>
                 <strong>Declaración de Autenticidad:</strong> Declaro bajo juramento que los datos suministrados en este
-                formulario son fidedignos y comprobables mediante la documentación original que presentaré ante la Secretaría
+                formulario son fidedignos y comprobables mediante la documentación original que presentaré ante la
+                Secretaría
                 Académica de la Dirección de Posgrados de la Facultad de Ciencias Económicas (POSFACE · UNAH).
               </span>
             </label>
@@ -636,7 +674,8 @@
             <span>Conexión cifrada y segura con el sistema POSFACE UNAH</span>
           </div>
 
-          <button type="submit" class="btn btn-gold btn-lg" id="btnEnviarInscripcion" style="padding: 12px 28px; font-size: 0.95rem;">
+          <button type="submit" class="btn btn-gold btn-lg" id="btnEnviarInscripcion"
+            style="padding: 12px 28px; font-size: 0.95rem;">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="22" y1="2" x2="11" y2="13"></line>
               <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
@@ -665,7 +704,8 @@
           <div style="font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted);">
             Comprobante Digital Oficial de Aspirante
           </div>
-          <div style="font-size: 1.25rem; font-weight: 800; color: var(--unah-navy); margin-top: 3px;" id="recNumeroSolicitud">
+          <div style="font-size: 1.25rem; font-weight: 800; color: var(--unah-navy); margin-top: 3px;"
+            id="recNumeroSolicitud">
             ASP-2026-0000
           </div>
         </div>
@@ -745,7 +785,8 @@
         <strong>Dirección del Sistema de Posgrados (POSFACE · UNAH)</strong>
       </p>
       <p style="margin: 0 0 8px 0;">
-        Facultad de Ciencias Económicas, Administrativas y Contables · Edificio C2, Ciudad Universitaria José Trinidad Reyes
+        Facultad de Ciencias Económicas, Administrativas y Contables · Edificio 1847, 5to Piso, Ciudad Universitaria
+        José Trinidad Reyes
       </p>
       <p style="font-size: 0.74rem; color: #94a3b8; margin: 0;">
         Tegucigalpa, M.D.C., Honduras, C.A. · "Lucem Aspicio"
@@ -798,12 +839,8 @@
       selectMaestria.addEventListener('change', () => {
         if (typeof POSFASSE_DATA !== 'undefined' && POSFASSE_DATA.maestrias) {
           const mae = POSFASSE_DATA.maestrias.find(m => m.id === selectMaestria.value);
-          if (mae && selectModalidad) {
-            if (mae.modalidad && mae.modalidad.toLowerCase().includes('virtual')) {
-              selectModalidad.value = 'Virtual';
-            } else {
-              selectModalidad.value = 'Presencial';
-            }
+          if (mae && selectModalidad && mae.modalidad) {
+            selectModalidad.value = mae.modalidad;
           }
         }
       });
@@ -962,7 +999,7 @@
             recTitulo.innerHTML = '<span style="color: #dc2626; font-weight: 700;">⚠️ Título Pendiente de Incorporación</span>';
           }
         }
-        
+
         const estNormativo = document.getElementById('recEstadoNormativo');
         if (indice >= 70) {
           estNormativo.innerHTML = `<span style="color: #15803d;">✓ Cumple requisito normativo (&ge; 70%)</span>`;
