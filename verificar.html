@@ -294,6 +294,11 @@
       }
 
       try {
+        // Inicializar Firebase
+        if (!firebase.apps.length) {
+          firebase.initializeApp(window.FIREBASE_CONFIG);
+        }
+
         const db = firebase.firestore();
         const docRef = db.collection('verificaciones_documentos').doc(token);
         const docSnap = await docRef.get();
