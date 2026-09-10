@@ -672,15 +672,30 @@ document.addEventListener('DOMContentLoaded', () => {
   if (filtroEstudianteUniversidad) filtroEstudianteUniversidad.addEventListener('change', filtrarEstudiantes);
   if (filtroEstudianteEstado) filtroEstudianteEstado.addEventListener('change', filtrarEstudiantes);
 
-  // Llenar select de maestrías en filtro de estudiantes
+  // Llenar select de maestrías en filtro de estudiantes con optgroups
   function populateFiltroMaestriasSelect() {
     if (!filtroEstudianteMaestria) return;
     filtroEstudianteMaestria.innerHTML = '<option value="todas">Todos los Programas POSFACE</option>';
-    maestriasList.forEach(m => {
-      const opt = document.createElement('option');
-      opt.value = m.id;
-      opt.textContent = m.nombre;
-      filtroEstudianteMaestria.appendChild(opt);
+
+    const grupos = [
+      { label: 'Posdoctorado',        tipos: ['Posdoctorado'] },
+      { label: 'Doctorados',          tipos: ['Doctorado'] },
+      { label: 'Maestrías',           tipos: ['Maestría'] },
+      { label: 'Formación Continua',  tipos: ['Centro Empresarial', 'Diplomado'] }
+    ];
+
+    grupos.forEach(grupo => {
+      const programasGrupo = maestriasList.filter(m => grupo.tipos.includes(m.tipo));
+      if (programasGrupo.length === 0) return;
+      const optgroup = document.createElement('optgroup');
+      optgroup.label = grupo.label;
+      programasGrupo.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.id;
+        opt.textContent = `${m.codigo} - ${m.nombre}`;
+        optgroup.appendChild(opt);
+      });
+      filtroEstudianteMaestria.appendChild(optgroup);
     });
   }
   populateFiltroMaestriasSelect();
@@ -816,15 +831,31 @@ document.addEventListener('DOMContentLoaded', () => {
   const formNuevoEstudiante = document.getElementById('formNuevoEstudiante');
   const selectNuevoEstMaestria = document.getElementById('nuevoEstMaestria');
 
-  // Llenar select de nuevo estudiante
+  // Llenar select de nuevo estudiante con optgroups (igual que portal externo)
   function populateNuevoEstudianteSelects() {
     if (!selectNuevoEstMaestria) return;
-    selectNuevoEstMaestria.innerHTML = '<option value="">Seleccione el programa...</option>';
-    maestriasList.forEach(m => {
-      const opt = document.createElement('option');
-      opt.value = m.id;
-      opt.textContent = `${m.codigo} - ${m.nombre}`;
-      selectNuevoEstMaestria.appendChild(opt);
+    selectNuevoEstMaestria.innerHTML = '<option value="">Seleccione el programa de posgrado al que aspira...</option>';
+
+    // Definir grupos en orden: Posdoctorado → Doctorados → Maestrías → Formación Continua
+    const grupos = [
+      { label: 'Posdoctorado (1)',                         tipos: ['Posdoctorado'] },
+      { label: 'Doctorados (2)',                           tipos: ['Doctorado'] },
+      { label: 'Maestrías (7)',                            tipos: ['Maestría'] },
+      { label: 'Formación Continua y Educación Empresarial (2)', tipos: ['Centro Empresarial', 'Diplomado'] }
+    ];
+
+    grupos.forEach(grupo => {
+      const programasGrupo = maestriasList.filter(m => grupo.tipos.includes(m.tipo));
+      if (programasGrupo.length === 0) return;
+      const optgroup = document.createElement('optgroup');
+      optgroup.label = grupo.label;
+      programasGrupo.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.id;
+        opt.textContent = `${m.codigo} - ${m.nombre}`;
+        optgroup.appendChild(opt);
+      });
+      selectNuevoEstMaestria.appendChild(optgroup);
     });
   }
   populateNuevoEstudianteSelects();
