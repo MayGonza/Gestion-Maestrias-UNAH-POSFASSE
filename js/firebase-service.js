@@ -500,6 +500,106 @@
       return { ...userObj, authWarning };
     },
 
+    // =========================================================================
+    // MÓDULO DE GESTIÓN DE CONTRASEÑAS Y AUDITORÍA
+    // =========================================================================
+
+    // Registrar evento de auditoría en Firestore
+    logPasswordAudit: async function (uid, eventType, email) {
+      if (this.isCloudActive() && dbInstance) {
+        try {
+          await dbInstance.collection('auditoria_passwords').add({
+            uid: uid || 'anonymous',
+            email: email || 'unknown',
+            eventType: eventType, // 'RESET_REQUEST', 'PASSWORD_CHANGED_AUTH', 'FORCED_CHANGE'
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent
+          });
+        } catch (e) {
+          console.warn("No se pudo guardar la auditoría de contraseña:", e);
+        }
+      }
+    },
+
+    // Enviar correo de recuperación (Olvidé mi contraseña)
+    sendPasswordReset: async function (email) {
+      const emailNorm = (email || '').trim().toLowerCase();
+      if (!emailNorm) throw new Error("Por favor ingresa un correo electrónico válido.");
+
+      if (this.isCloudActive()) {
+        try {
+          await authInstance.sendPasswordResetEmail(emailNorm);
+          // Registrar solicitud (anónimo porque no estamos logueados)
+          this.logPasswordAudit('anonymous', 'RESET_REQUEST', emailNorm);
+        } catch (err) {
+          console.warn("Error al enviar reset (enmascarado en UI):", err);
+          // Ocultamos el error intencionalmente en la UI para evitar enumeración de usuarios
+          if (err.code !== 'auth/user-not-found' && err.code !== 'auth/invalid-email') {
+            throw new Error("No se pudo procesar la solicitud en este momento. Intenta más tarde.");
+          }
+        }
+      } else {
+        // Modo local
+        throw new Error("La recuperación de contraseñas requiere conexión a internet (Modo Cloud).");
+      }
+    },
+
+    // Cambiar contraseña estando autenticado
+    changePassword: async function (currentPassword, newPassword) {
+      if (!this.isCloudActive()) {
+        throw new Error("El cambio de contraseña requiere conexión a la nube.");
+      }
+
+      const user = authInstance.currentUser;
+      if (!user) {
+        throw new Error("No hay un usuario activo. Por favor inicia sesión nuevamente.");
+      }
+
+      try {
+        // 1. Re-autenticar al usuario por seguridad
+        const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
+        await user.reauthenticateWithCredential(credential);
+
+        // 2. Actualizar la contraseña en Firebase Auth
+        await user.updatePassword(newPassword);
+
+        // 3. Registrar fecha de cambio en Firestore (para forzar cambio futuro)
+        if (dbInstance) {
+          try {
+            await dbInstance.collection('usuarios').doc(user.uid).update({
+              lastPasswordChange: new Date().toISOString()
+            });
+          } catch(e) {
+             // Ignorar si el doc no existe o faltan permisos directos
+          }
+        }
+
+        // 4. Actualizar usuario en localStorage si corresponde (para modo offline)
+        try {
+          const raw = localStorage.getItem('posface_session_user');
+          if (raw) {
+            const userObj = JSON.parse(raw);
+            userObj.password = newPassword; 
+            localStorage.setItem('posface_session_user', JSON.stringify(userObj));
+            this.saveLocalUser(userObj);
+          }
+        } catch(e) {}
+
+        // 5. Auditoría
+        this.logPasswordAudit(user.uid, 'PASSWORD_CHANGED_AUTH', user.email);
+
+      } catch (err) {
+        if (err.code === 'auth/wrong-password') {
+          throw new Error("La contraseña actual es incorrecta.");
+        } else if (err.code === 'auth/weak-password') {
+          throw new Error("La nueva contraseña es demasiado débil.");
+        } else if (err.code === 'auth/too-many-requests') {
+          throw new Error("Demasiados intentos fallidos. Por favor, intenta de nuevo más tarde.");
+        }
+        throw new Error(err.message || "Error al actualizar la contraseña.");
+      }
+    },
+
     // Cerrar sesión
     logout: async function () {
       if (this.isCloudActive()) {

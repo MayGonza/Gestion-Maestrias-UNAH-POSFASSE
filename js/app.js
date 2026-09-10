@@ -1659,6 +1659,201 @@ document.addEventListener('DOMContentLoaded', () => {
       showToast('Has cerrado sesión correctamente', 'info');
       checkAuthState();
     });
+            loginEmailError.textContent = 'Esta cuenta no está registrada en el sistema.';
+            loginEmailError.style.display = 'flex';
+          }
+          if (loginAlertBox) loginAlertBox.dataset.field = 'email';
+
+          showLoginAlert(
+            'danger',
+            'Cuenta no Registrada',
+            `El correo institucional <strong>"${email}"</strong> no está registrado en el sistema. Puedes crear tu cuenta institucional de acceso en pocos segundos.`,
+            '👉 Registrarme con esta cuenta ahora',
+            () => {
+              const regEmail = document.getElementById('regEmail');
+              if (regEmail) regEmail.value = email;
+              showRegisterForm();
+            }
+          );
+          if (loginEmailInput) loginEmailInput.focus();
+          showToast(`La cuenta "${email}" no está registrada`, 'danger');
+
+        } else if (err.code === 'WRONG_PASSWORD') {
+          // Indicador para contraseña incorrecta
+          if (loginPasswordBox) loginPasswordBox.classList.add('has-error');
+          if (loginPasswordError) {
+            loginPasswordError.textContent = 'La contraseña no coincide con este usuario.';
+            loginPasswordError.style.display = 'flex';
+          }
+          if (loginAlertBox) loginAlertBox.dataset.field = 'password';
+
+          showLoginAlert(
+            'danger',
+            'Contraseña Incorrecta',
+            `La contraseña ingresada no coincide con el usuario <strong>"${email}"</strong>. Por favor verifica tus credenciales o solicita asistencia a Soporte Técnico.`,
+            '🛠️ Solicitar Ayuda a Soporte Técnico',
+            () => {
+              if (modalSoporteTecnico) openModal(modalSoporteTecnico);
+            }
+          );
+          if (loginPassword) {
+            loginPassword.focus();
+            loginPassword.select();
+          }
+          showToast('La contraseña ingresada no coincide con el usuario', 'danger');
+
+        } else {
+          // Indicador general
+          showLoginAlert('danger', 'Error de Autenticación', err.message || 'No fue posible iniciar sesión.');
+          showToast(err.message || 'Error al iniciar sesión', 'danger');
+        }
+      } finally {
+        if (btnSubmit) btnSubmit.disabled = false;
+        if (btnText) btnText.textContent = 'Ingresar al Sistema POSFACE';
+      }
+    });
+  }
+
+  // Envío del formulario de Registro
+  if (formRegisterPosface) {
+    // Función auxiliar: resaltar campo con error de duplicado
+    function markFieldDuplicate(fieldId, hasDuplicate) {
+      const input = document.getElementById(fieldId);
+      if (!input) return;
+      if (hasDuplicate) {
+        input.style.borderColor = '#dc2626';
+        input.style.boxShadow   = '0 0 0 3px rgba(220,38,38,0.15)';
+        // Limpiar resaltado al retomar foco
+        input.addEventListener('focus', function clearMark() {
+          input.style.borderColor = '';
+          input.style.boxShadow   = '';
+          input.removeEventListener('focus', clearMark);
+        });
+      } else {
+        input.style.borderColor = '';
+        input.style.boxShadow   = '';
+      }
+    }
+
+    formRegisterPosface.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Limpiar cualquier resaltado previo
+      markFieldDuplicate('regNombre', false);
+      markFieldDuplicate('regEmail',  false);
+
+      const nombre     = document.getElementById('regNombre').value.trim();
+      const rol        = document.getElementById('regRol').value;
+      const email      = document.getElementById('regEmail').value.trim().toLowerCase();
+      const pwd        = document.getElementById('regPassword').value.trim();
+      const pwdConfirm = document.getElementById('regPasswordConfirm').value.trim();
+      const btnSubmit  = document.getElementById('btnRegisterSubmit');
+      const btnText    = document.getElementById('btnRegisterText');
+
+      if (!nombre || !email || !pwd || !pwdConfirm) {
+        showToast('Por favor completa todos los campos requeridos', 'warning');
+        return;
+      }
+
+      if (pwd !== pwdConfirm) {
+        showToast('Las contraseñas no coinciden. Por favor verifícalas.', 'danger');
+        return;
+      }
+
+      if (pwd.length < 6) {
+        showToast('La contraseña debe contener al menos 6 caracteres', 'warning');
+        return;
+      }
+
+      if (btnSubmit) btnSubmit.disabled = true;
+      if (btnText)   btnText.textContent = 'Verificando datos...';
+
+      try {
+        if (btnText) btnText.textContent = 'Creando cuenta...';
+        const newUser = await window.PosfaceAuth.register(nombre, email, pwd, rol);
+        showToast(`¡Cuenta creada exitosamente! Bienvenido(a) ${newUser.name}`, 'success');
+        if (newUser.authWarning) {
+          setTimeout(() => { showToast(newUser.authWarning, 'warning'); }, 2500);
+        }
+        checkAuthState();
+        switchView('dashboard');
+        formRegisterPosface.reset();
+        showLoginForm();
+
+      } catch (err) {
+        // ── Manejo de errores de duplicado (409 Conflict) ─────────────────────
+        if (err.name === 'DuplicateError' && err.fields) {
+          const hasEmailDup = err.fields.includes('EMAIL');
+          const hasNameDup  = err.fields.includes('NAME');
+
+          // Resaltar campos conflictivos
+          markFieldDuplicate('regEmail',  hasEmailDup);
+          markFieldDuplicate('regNombre', hasNameDup);
+
+          // Mensaje descriptivo con icono
+          let icon = '⚠️';
+          let toastMsg = err.message;
+
+          if (hasEmailDup && hasNameDup) {
+            toastMsg = `${icon} Registro duplicado: el correo y el nombre ya existen en el sistema POSFACE. Usa datos diferentes.`;
+          } else if (hasEmailDup) {
+            toastMsg = `${icon} Correo ya registrado: "${email}" ya tiene una cuenta activa. Inicia sesión o utiliza otro correo institucional.`;
+          } else {
+            toastMsg = `${icon} Nombre ya registrado en el sistema. Diferéncialo con tu grado académico (ej. "Lic. Mario Valladares").`;
+          }
+
+          showToast(toastMsg, 'danger');
+
+        } else {
+          // Error genérico
+          showToast(err.message || 'Error al crear la cuenta. Intenta nuevamente.', 'danger');
+        }
+      } finally {
+        if (btnSubmit) btnSubmit.disabled = false;
+        if (btnText)   btnText.textContent = 'Crear Cuenta POSFACE';
+      }
+    });
+  }
+
+  // Botón de Acceso Rápido Demostración
+  if (btnQuickLogin) {
+    btnQuickLogin.addEventListener('click', async (e) => {
+      e.preventDefault();
+      clearLoginErrors();
+      const emailInput = document.getElementById('loginEmail');
+      const pwdInput = document.getElementById('loginPassword');
+      if (emailInput) emailInput.value = 'secretaria.posface@unah.edu.hn';
+      if (pwdInput) pwdInput.value = 'posface2026';
+
+      const btnSubmit = document.getElementById('btnLoginSubmit');
+      const btnText = document.getElementById('btnLoginText');
+      if (btnSubmit) btnSubmit.disabled = true;
+      if (btnText) btnText.textContent = 'Accediendo...';
+
+      try {
+        const user = await window.PosfaceAuth.login('secretaria.posface@unah.edu.hn', 'posface2026');
+        clearLoginErrors();
+        showToast(`Bienvenido(a) a POSFACE UNAH: ${user.name}`, 'success');
+        checkAuthState();
+        switchView('dashboard');
+      } catch (err) {
+        showLoginAlert('danger', 'Error al acceder con cuenta demo', err.message);
+        showToast(err.message || 'Error al acceder con cuenta demo', 'danger');
+      } finally {
+        if (btnSubmit) btnSubmit.disabled = false;
+        if (btnText) btnText.textContent = 'Ingresar al Sistema POSFACE';
+      }
+    });
+  }
+
+  // Botón de Cerrar Sesión en Sidebar
+  if (btnSidebarLogout) {
+    btnSidebarLogout.addEventListener('click', async () => {
+      await window.PosfaceAuth.logout();
+      clearLoginErrors();
+      showToast('Has cerrado sesión correctamente', 'info');
+      checkAuthState();
+    });
   }
 
   // Ejecutar verificación inicial de sesión
@@ -1668,5 +1863,142 @@ document.addEventListener('DOMContentLoaded', () => {
   renderDashboard();
   renderMaestrias();
   renderEstudiantes();
+
+  // =========================================================================
+  // MÓDULO DE GESTIÓN DE CONTRASEÑAS
+  // =========================================================================
+
+  // Elementos de Recuperación de Contraseña
+  const btnOlvidePassword = document.getElementById('btnOlvidePassword');
+  const modalResetPassword = document.getElementById('modalResetPassword');
+  const btnCloseResetModal = document.getElementById('btnCloseResetModal');
+  const btnCancelReset = document.getElementById('btnCancelReset');
+  const formResetPassword = document.getElementById('formResetPassword');
+
+  // Elementos de Cambio de Contraseña
+  const btnChangePasswordMenu = document.getElementById('btnChangePasswordMenu');
+  const modalChangePassword = document.getElementById('modalChangePassword');
+  const btnCloseChangeModal = document.getElementById('btnCloseChangeModal');
+  const btnCancelChange = document.getElementById('btnCancelChange');
+  const formChangePassword = document.getElementById('formChangePassword');
+  const newPasswordInput = document.getElementById('newPassword');
+  const confirmNewPasswordInput = document.getElementById('confirmNewPassword');
+  const pwdStrengthBar = document.getElementById('pwdStrengthBar');
+  const pwdStrengthText = document.getElementById('pwdStrengthText');
+  const pwdMatchError = document.getElementById('pwdMatchError');
+
+  // Abrir / Cerrar Modales
+  if (btnOlvidePassword) btnOlvidePassword.addEventListener('click', () => { if (modalResetPassword) modalResetPassword.classList.add('active'); });
+  if (btnCloseResetModal) btnCloseResetModal.addEventListener('click', () => { if (modalResetPassword) modalResetPassword.classList.remove('active'); });
+  if (btnCancelReset) btnCancelReset.addEventListener('click', () => { if (modalResetPassword) modalResetPassword.classList.remove('active'); });
+
+  if (btnChangePasswordMenu) btnChangePasswordMenu.addEventListener('click', () => { if (modalChangePassword) modalChangePassword.classList.add('active'); });
+  if (btnCloseChangeModal) btnCloseChangeModal.addEventListener('click', () => { if (modalChangePassword) modalChangePassword.classList.remove('active'); formChangePassword.reset(); updateStrengthBar(); });
+  if (btnCancelChange) btnCancelChange.addEventListener('click', () => { if (modalChangePassword) modalChangePassword.classList.remove('active'); formChangePassword.reset(); updateStrengthBar(); });
+
+  // Enviar formulario Recuperación
+  if (formResetPassword) {
+    formResetPassword.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('resetEmail').value.trim();
+      const btnSubmit = document.getElementById('btnSubmitReset');
+      if (!email) return;
+
+      const originalText = btnSubmit.textContent;
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = 'Procesando...';
+
+      try {
+        await window.PosfaceAuth.sendPasswordReset(email);
+        showToast('Si el correo está registrado, recibirás un enlace de recuperación en los próximos minutos.', 'success');
+        modalResetPassword.classList.remove('active');
+        formResetPassword.reset();
+      } catch (err) {
+        showToast(err.message || 'Error al intentar procesar la solicitud.', 'warning');
+      } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = originalText;
+      }
+    });
+  }
+
+  // Evaluar Fortaleza de la Contraseña en Tiempo Real
+  function updateStrengthBar() {
+    if (!newPasswordInput || !pwdStrengthBar || !pwdStrengthText) return;
+    const pwd = newPasswordInput.value;
+    if (!pwd) {
+      pwdStrengthBar.style.width = '0%';
+      pwdStrengthText.textContent = 'Sin evaluar';
+      pwdStrengthText.style.color = 'var(--text-muted)';
+      return;
+    }
+
+    let score = 0;
+    if (pwd.length >= 8) score += 20;
+    if (pwd.length >= 12) score += 10;
+    if (/[A-Z]/.test(pwd)) score += 20;
+    if (/[a-z]/.test(pwd)) score += 20;
+    if (/[0-9]/.test(pwd)) score += 15;
+    if (/[^A-Za-z0-9]/.test(pwd)) score += 15;
+
+    pwdStrengthBar.style.width = `${score}%`;
+    if (score < 50) {
+      pwdStrengthBar.style.backgroundColor = '#ef4444'; // Rojo (Débil)
+      pwdStrengthText.textContent = 'Débil';
+      pwdStrengthText.style.color = '#ef4444';
+    } else if (score < 80) {
+      pwdStrengthBar.style.backgroundColor = '#eab308'; // Amarillo (Media)
+      pwdStrengthText.textContent = 'Media';
+      pwdStrengthText.style.color = '#eab308';
+    } else {
+      pwdStrengthBar.style.backgroundColor = '#22c55e'; // Verde (Fuerte)
+      pwdStrengthText.textContent = 'Fuerte';
+      pwdStrengthText.style.color = '#22c55e';
+    }
+  }
+
+  if (newPasswordInput) newPasswordInput.addEventListener('input', updateStrengthBar);
+
+  // Enviar formulario Cambio de Contraseña
+  if (formChangePassword) {
+    formChangePassword.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const currentPwd = document.getElementById('currentPassword').value;
+      const newPwd = newPasswordInput.value;
+      const confirmPwd = confirmNewPasswordInput.value;
+      const btnSubmit = document.getElementById('btnSubmitChange');
+
+      if (pwdMatchError) pwdMatchError.style.display = 'none';
+
+      if (newPwd !== confirmPwd) {
+        if (pwdMatchError) pwdMatchError.style.display = 'block';
+        return;
+      }
+
+      // Validar complejidad básica requerida (al menos 8 char, mayúscula, minúscula, número)
+      const isStrong = newPwd.length >= 8 && /[A-Z]/.test(newPwd) && /[a-z]/.test(newPwd) && /[0-9]/.test(newPwd);
+      if (!isStrong) {
+        showToast('La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas y números.', 'warning');
+        return;
+      }
+
+      const originalText = btnSubmit.textContent;
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = 'Actualizando...';
+
+      try {
+        await window.PosfaceAuth.changePassword(currentPwd, newPwd);
+        showToast('Tu contraseña ha sido actualizada con éxito.', 'success');
+        modalChangePassword.classList.remove('active');
+        formChangePassword.reset();
+        updateStrengthBar();
+      } catch (err) {
+        showToast(err.message, 'danger');
+      } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = originalText;
+      }
+    });
+  }
 
 });
