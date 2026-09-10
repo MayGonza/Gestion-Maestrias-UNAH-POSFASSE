@@ -528,6 +528,7 @@
 
       if (this.isCloudActive()) {
         try {
+          authInstance.languageCode = 'es';
           await authInstance.sendPasswordResetEmail(emailNorm);
           // Registrar solicitud (anónimo porque no estamos logueados)
           this.logPasswordAudit('anonymous', 'RESET_REQUEST', emailNorm);
