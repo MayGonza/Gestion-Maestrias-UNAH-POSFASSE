@@ -937,18 +937,27 @@
       <form id="formNuevoEstudiante">
         <div class="modal-body">
 
+          <!-- SECCIÓN 1: IDENTIFICACIÓN Y CONTACTO -->
+          <div class="form-section-divider" style="display:flex;align-items:center;gap:8px;font-weight:600;font-size:0.8rem;color:var(--unah-navy);border-bottom:2px solid var(--unah-navy-light, #e2e8f0);padding-bottom:8px;margin-bottom:16px;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <span>1. Datos Personales y de Identificación</span>
+          </div>
+
           <div class="form-grid">
 
             <div class="form-group">
               <label class="form-label" for="nuevoEstCuenta">
                 No. de Cuenta UNAH
-                <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">(Opcional)</span>
+                <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">(Opcional si eres externo)</span>
               </label>
-              <input type="text" class="form-input" id="nuevoEstCuenta" placeholder="ej. 20241004521 (si aplica)">
+              <input type="text" class="form-input" id="nuevoEstCuenta" placeholder="ej. 20241004521 (dejar vacío si no procede de UNAH)">
+              <small style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-top: 3px;">
+                Si egresaste de otra universidad, se te asignará tu cuenta oficial UNAH al ser admitido.
+              </small>
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="nuevoEstDni">DNI / Identidad *</label>
+              <label class="form-label" for="nuevoEstDni">DNI / Documento de Identificación *</label>
               <input type="text" class="form-input" id="nuevoEstDni" placeholder="ej. 0801-1996-01234" required>
             </div>
 
@@ -959,27 +968,25 @@
 
             <div class="form-group">
               <label class="form-label" for="nuevoEstApellidos">Apellidos Completos *</label>
-              <input type="text" class="form-input" id="nuevoEstApellidos" placeholder="Apellidos del aspirante"
-                required>
+              <input type="text" class="form-input" id="nuevoEstApellidos" placeholder="Apellidos del aspirante" required>
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="nuevoEstCorreo">Correo Institucional / Personal *</label>
-              <input type="email" class="form-input" id="nuevoEstCorreo" placeholder="ej. aspirante@unah.edu.hn"
-                required>
+              <label class="form-label" for="nuevoEstCorreo">Correo Electrónico de Contacto *</label>
+              <input type="email" class="form-input" id="nuevoEstCorreo" placeholder="ej. aspirante@gmail.com o institucional" required>
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="nuevoEstTelefono">Teléfono / Celular</label>
-              <input type="text" class="form-input" id="nuevoEstTelefono" placeholder="+504 9999-9999">
+              <label class="form-label" for="nuevoEstTelefono">Teléfono Celular / WhatsApp *</label>
+              <input type="text" class="form-input" id="nuevoEstTelefono" placeholder="+504 9999-9999" required>
             </div>
 
-            <!-- CIUDAD O DEPARTAMENTO DE PROCEDENCIA -->
+            <!-- PROCEDENCIA GEOGRÁFICA -->
             <div class="form-group">
               <label class="form-label" for="nuevoEstDepartamento">Departamento de Procedencia *</label>
               <select class="form-select" id="nuevoEstDepartamento" required>
-                <option value="">Seleccione el departamento...</option>
-                <option value="Francisco Morazán">Francisco Morazán</option>
+                <option value="">Seleccione su departamento...</option>
+                <option value="Francisco Morazán" selected>Francisco Morazán</option>
                 <option value="Cortés">Cortés</option>
                 <option value="Atlántida">Atlántida</option>
                 <option value="Choluteca">Choluteca</option>
@@ -1002,83 +1009,86 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="nuevoEstCiudad">Ciudad / Municipio</label>
-              <input type="text" class="form-input" id="nuevoEstCiudad"
-                placeholder="ej. Tegucigalpa, San Pedro Sula...">
+              <label class="form-label" for="nuevoEstCiudad">Ciudad / Municipio de Residencia *</label>
+              <input type="text" class="form-input" id="nuevoEstCiudad" placeholder="ej. Tegucigalpa, San Pedro Sula, Comayagua..." required>
             </div>
 
-            <!-- NUEVO CAMPO OBLIGATORIO: UNIVERSIDAD DE PROCEDENCIA -->
+          </div>
+
+          <!-- SECCIÓN 2: ANTECEDENTES ACADÉMICOS -->
+          <div class="form-section-divider" style="display:flex;align-items:center;gap:8px;font-weight:600;font-size:0.8rem;color:var(--unah-navy);border-bottom:2px solid var(--unah-navy-light, #e2e8f0);padding-bottom:8px;margin:16px 0;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+            <span>2. Antecedentes Académicos (Pregrado / Licenciatura)</span>
+          </div>
+
+          <div class="form-grid">
+
             <div class="form-group col-span-2">
               <label class="form-label" for="nuevoEstUniversidad">
-                Universidad de Procedencia (Pregrado) *
-                <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">— Centro de egreso de
-                  licenciatura o equivalente</span>
+                Universidad de Egreso de Pregrado *
+                <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">— Centro donde obtuvo su licenciatura o título previo</span>
               </label>
               <select class="form-select" id="nuevoEstUniversidad" required>
-                <option value="">Seleccione la universidad de procedencia...</option>
-                <option value="UNAH - Universidad Nacional Autónoma de Honduras">UNAH - Universidad Nacional Autónoma de
-                  Honduras</option>
-                <option value="UNITEC - Universidad Tecnológica Centroamericana">UNITEC - Universidad Tecnológica
-                  Centroamericana</option>
-                <option value="CEUTEC - Centro Universitario Tecnológico">CEUTEC - Centro Universitario Tecnológico
-                </option>
-                <option value="UTH - Universidad Tecnológica de Honduras">UTH - Universidad Tecnológica de Honduras
-                </option>
-                <option value="UPNFM - Univ. Pedagógica Nacional Francisco Morazán">UPNFM - Univ. Pedagógica Nacional
-                  Francisco Morazán</option>
-                <option value="UNICAH - Universidad Católica de Honduras">UNICAH - Universidad Católica de Honduras
-                </option>
+                <option value="">Seleccione su universidad de egreso...</option>
+                <option value="UNAH - Universidad Nacional Autónoma de Honduras">UNAH - Universidad Nacional Autónoma de Honduras</option>
+                <option value="UNITEC - Universidad Tecnológica Centroamericana">UNITEC - Universidad Tecnológica Centroamericana</option>
+                <option value="CEUTEC - Centro Universitario Tecnológico">CEUTEC - Centro Universitario Tecnológico</option>
+                <option value="UTH - Universidad Tecnológica de Honduras">UTH - Universidad Tecnológica de Honduras</option>
+                <option value="UPNFM - Univ. Pedagógica Nacional Francisco Morazán">UPNFM - Univ. Pedagógica Nacional Francisco Morazán</option>
+                <option value="UNICAH - Universidad Católica de Honduras">UNICAH - Universidad Católica de Honduras</option>
                 <option value="USAP - Universidad de San Pedro Sula">USAP - Universidad de San Pedro Sula</option>
-                <option value="UJCV - Universidad José Cecilio del Valle">UJCV - Universidad José Cecilio del Valle
-                </option>
+                <option value="UJCV - Universidad José Cecilio del Valle">UJCV - Universidad José Cecilio del Valle</option>
                 <option value="UNAG - Univ. Nacional de Agricultura">UNAG - Univ. Nacional de Agricultura</option>
                 <option value="Universidad Extranjera / Internacional">Universidad Extranjera / Internacional</option>
               </select>
             </div>
 
-            <!-- VALIDACIÓN NORMATIVA: TÍTULO VALIDADO POR LA UNAH (PARA OTRAS UNIVERSIDADES) -->
+            <!-- VALIDACIÓN DE TÍTULO POR UNAH (PARA OTRAS UNIVERSIDADES) -->
             <div class="form-group col-span-2" id="boxNuevoEstTituloValidado"
               style="display: none; background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 8px; padding: 12px 14px;">
-              <label class="form-label" for="nuevoEstTituloValidadoUNAH"
-                style="color: #92400e; font-weight: 700; display: flex; align-items: center; gap: 6px;">
-                <span>⚖️</span>
-                <span>Validación e Incorporación del Título por la UNAH (DES) *</span>
+              <label class="form-label" for="nuevoEstTituloValidadoUNAH" style="color: #92400e; font-weight: 700;">
+                ⚖️ Validación e Incorporación del Título por la UNAH (Dirección de Educación Superior) *
               </label>
-              <select class="form-select" id="nuevoEstTituloValidadoUNAH"
-                style="background: #ffffff; border-color: #f59e0b;">
+              <select class="form-select" id="nuevoEstTituloValidadoUNAH" style="background: #ffffff; border-color: #f59e0b;">
                 <option value="Si">✓ Sí: Título Validado e Incorporado por la UNAH (Con Acuerdo/Constancia DES)</option>
-                <option value="En Tramite">⏳ En Trámite de Incorporación ante la UNAH / Dirección de Educación Superior
-                </option>
-                <option value="No">⚠️ No: Título No Incorporado / Pendiente de Trámite</option>
+                <option value="En Tramite">⏳ En Trámite de Incorporación ante la UNAH / DES</option>
+                <option value="No">⚠️ No: Pendiente de Trámite de Incorporación</option>
               </select>
-              <small style="font-size: 0.73rem; color: #78350f; display: block; margin-top: 5px; line-height: 1.4;">
-                🏛️ <em>Requisito Normativo: Conforme a la Ley Orgánica y las Normas de Educación Superior, los
-                  egresados de otras universidades nacionales o extranjeras deben contar con el reconocimiento oficial
-                  de su título de pregrado ante la UNAH.</em>
+              <small style="font-size: 0.72rem; color: #78350f; display: block; margin-top: 4px; line-height: 1.4;">
+                * Conforme a las Normas Académicas de la Educación Superior, los egresados de universidades privadas o
+                extranjeras deben presentar su título incorporado y reconocido ante la UNAH.
               </small>
             </div>
 
-            <!-- NUEVO CAMPO OBLIGATORIO: ÍNDICE ACADÉMICO DE PREGRADO -->
             <div class="form-group">
               <label class="form-label" for="nuevoEstIndicePregrado">
-                Índice Académico de Pregrado (%) *
+                Índice Académico Global de Pregrado (%) *
               </label>
               <div style="position: relative;">
-                <input type="number" step="0.01" min="0" max="100" class="form-input" id="nuevoEstIndicePregrado"
-                  placeholder="ej. 88.50" required style="padding-right: 30px;">
-                <span
-                  style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-weight: 700; color: var(--text-muted);">%</span>
+                <input type="number" step="0.01" min="60" max="100" class="form-input" id="nuevoEstIndicePregrado"
+                  placeholder="ej. 85.50" required style="padding-right: 32px;">
+                <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-weight: 700; color: var(--text-muted);">%</span>
               </div>
               <small style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-top: 3px;">
-                Requisito de admisión normativa UNAH posgrado: <strong>&ge; 70.00%</strong>
+                Normativa de Posgrados UNAH: Admisión directa con índice <strong>&ge; 70.00%</strong>.
               </small>
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="nuevoEstCarreraPrevia">Título / Carrera de Pregrado</label>
+              <label class="form-label" for="nuevoEstCarreraPrevia">Título / Carrera de Pregrado Obtenido *</label>
               <input type="text" class="form-input" id="nuevoEstCarreraPrevia"
-                placeholder="ej. Lic. en Administración, Economía...">
+                placeholder="ej. Lic. en Administración, Economía, Contaduría..." required>
             </div>
+
+          </div>
+
+          <!-- SECCIÓN 3: PROGRAMA DE POSGRADO SOLICITADO -->
+          <div class="form-section-divider" style="display:flex;align-items:center;gap:8px;font-weight:600;font-size:0.8rem;color:var(--unah-navy);border-bottom:2px solid var(--unah-navy-light, #e2e8f0);padding-bottom:8px;margin:16px 0;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+            <span>3. Programa de Posgrado Solicitado y Modalidad</span>
+          </div>
+
+          <div class="form-grid">
 
             <div class="form-group col-span-2">
               <label class="form-label" for="nuevoEstMaestria">Programa de Posgrado POSFACE *</label>
@@ -1108,7 +1118,7 @@
             </div>
 
             <div class="form-group col-span-2">
-              <label class="form-label" for="nuevoEstModalidad">Modalidad de la Maestría *</label>
+              <label class="form-label" for="nuevoEstModalidad">Modalidad de Estudio Preferida *</label>
               <select class="form-select" id="nuevoEstModalidad" name="nuevoEstModalidad" required>
                 <option value="Presencial">Presencial (Ciudad Universitaria, Tegucigalpa)</option>
                 <option value="Híbrida">Híbrida (Sesiones Presenciales y Campus Virtual)</option>
@@ -1116,7 +1126,18 @@
               </select>
             </div>
 
+          </div>
 
+          <!-- DECLARACIÓN JURADA -->
+          <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 14px 16px; margin-top: 16px;">
+            <label for="nuevoEstConsentimiento" style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:0.82rem;color:var(--text-dark);line-height:1.5;">
+              <input type="checkbox" id="nuevoEstConsentimiento" required style="margin-top:3px;flex-shrink:0;">
+              <span>
+                <strong>Declaración de Autenticidad:</strong> Declaro bajo juramento que los datos suministrados en este
+                formulario son fidedignos y comprobables mediante la documentación original que presentaré ante la
+                Secretaría Académica de la Dirección de Posgrados de la Facultad de Ciencias Económicas (POSFACE · UNAH).
+              </span>
+            </label>
           </div>
 
         </div>
