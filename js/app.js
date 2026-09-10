@@ -188,19 +188,18 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const btnAnularDocumentoQR = document.getElementById('btnAnularDocumentoQR');
+  const btnReactivarDocumentoQR = document.getElementById('btnReactivarDocumentoQR');
+  const btnRegenerarDocumentoQR = document.getElementById('btnRegenerarDocumentoQR');
+
   if (btnAnularDocumentoQR) {
     btnAnularDocumentoQR.addEventListener('click', async () => {
       if (currentExpedienteEstudiante && currentExpedienteEstudiante.qr_token) {
-        if (confirm('¿Está seguro de que desea REVOCAR el sello criptográfico (Código QR) de este documento? El código actual mostrará estado "ANULADO" a quien lo escanee.')) {
+        if (confirm('¿Está seguro de que desea REVOCAR el código QR de este documento? El código actual mostrará estado "ANULADO" a quien lo escanee.')) {
           try {
             await window.PosfaceDB.revokeDocumentToken(currentExpedienteEstudiante.qr_token);
-            // Delete the qr_token from the student so next time a new one is generated
-            if (window.PosfaceDB.isCloudActive()) {
-               await firebase.firestore().collection('estudiantes').doc(currentExpedienteEstudiante.id).update({ qr_token: firebase.firestore.FieldValue.delete() });
-            }
-            delete currentExpedienteEstudiante.qr_token;
-            showToast('Documento revocado exitosamente. Al volver a abrir este expediente, se generará un nuevo QR válido.', 'success');
-            closeModal(document.getElementById('modalExpediente'));
+            showToast('Documento revocado exitosamente.', 'success');
+            btnAnularDocumentoQR.style.display = 'none';
+            if (btnReactivarDocumentoQR) btnReactivarDocumentoQR.style.display = 'flex';
           } catch (err) {
             console.error("Error al revocar QR:", err);
             showToast('Hubo un error al intentar revocar el documento.', 'danger');
@@ -208,6 +207,50 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       } else {
         showToast('Este expediente aún no tiene un QR emitido válido para revocar.', 'warning');
+      }
+    });
+  }
+
+  if (btnReactivarDocumentoQR) {
+    btnReactivarDocumentoQR.addEventListener('click', async () => {
+      if (currentExpedienteEstudiante && currentExpedienteEstudiante.qr_token) {
+        if (confirm('¿Desea volver a ACTIVAR la validez de este documento?')) {
+          try {
+            await window.PosfaceDB.activateDocumentToken(currentExpedienteEstudiante.qr_token);
+            showToast('Documento reactivado exitosamente.', 'success');
+            btnReactivarDocumentoQR.style.display = 'none';
+            if (btnAnularDocumentoQR) btnAnularDocumentoQR.style.display = 'flex';
+          } catch (err) {
+            console.error("Error al reactivar QR:", err);
+            showToast('Hubo un error al reactivar el documento.', 'danger');
+          }
+        }
+      }
+    });
+  }
+
+  if (btnRegenerarDocumentoQR) {
+    btnRegenerarDocumentoQR.addEventListener('click', async () => {
+      if (currentExpedienteEstudiante) {
+        if (confirm('¿Desea ELIMINAR el código QR actual y GENERAR uno nuevo para este estudiante? El código anterior quedará inválido permanentemente.')) {
+          try {
+            if (currentExpedienteEstudiante.qr_token) {
+              await window.PosfaceDB.revokeDocumentToken(currentExpedienteEstudiante.qr_token);
+            }
+            if (window.PosfaceDB.isCloudActive()) {
+               await firebase.firestore().collection('estudiantes').doc(currentExpedienteEstudiante.id).update({ qr_token: firebase.firestore.FieldValue.delete() });
+            }
+            delete currentExpedienteEstudiante.qr_token;
+            showToast('QR anterior eliminado. Abriendo expediente para generar uno nuevo...', 'success');
+            closeModal(document.getElementById('modalExpediente'));
+            setTimeout(() => {
+              openExpedienteModal(currentExpedienteEstudiante.id);
+            }, 500);
+          } catch (err) {
+            console.error("Error al regenerar QR:", err);
+            showToast('Error al intentar regenerar el documento.', 'danger');
+          }
+        }
       }
     });
   }
@@ -856,6 +899,8 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Obtener o crear token de documento
       let token = est.qr_token;
+      let qrStatus = 'VALIDO';
+
       if (!token) {
         try {
           token = await window.PosfaceDB.generateDocumentToken(est.id, 'EXPEDIENTE', `${est.nombres} ${est.apellidos}`, mae.nombre);
@@ -868,6 +913,26 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) {
           console.warn("No se pudo generar QR en nube:", err);
           token = 'error-conexion';
+        }
+      } else {
+        // Fetch real status
+        try {
+          qrStatus = await window.PosfaceDB.getDocumentTokenStatus(token);
+        } catch (e) {
+          console.warn("No se pudo obtener estado del QR:", e);
+        }
+      }
+
+      // Configure Action Buttons
+      const btnAnular = document.getElementById('btnAnularDocumentoQR');
+      const btnReactivar = document.getElementById('btnReactivarDocumentoQR');
+      if (btnAnular && btnReactivar) {
+        if (qrStatus === 'ANULADO') {
+          btnAnular.style.display = 'none';
+          btnReactivar.style.display = 'flex';
+        } else {
+          btnAnular.style.display = 'flex';
+          btnReactivar.style.display = 'none';
         }
       }
 

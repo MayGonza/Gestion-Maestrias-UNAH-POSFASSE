@@ -847,6 +847,25 @@
         estado: 'ANULADO',
         fecha_anulacion: firebase.firestore.FieldValue.serverTimestamp()
       });
+    },
+
+    activateDocumentToken: async function(token) {
+      if (!this.isCloudActive()) return;
+      const db = firebase.firestore();
+      await db.collection('verificaciones_documentos').doc(token).update({
+        estado: 'VALIDO',
+        fecha_reactivacion: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    },
+
+    getDocumentTokenStatus: async function(token) {
+      if (!this.isCloudActive()) return 'VALIDO';
+      const db = firebase.firestore();
+      const snap = await db.collection('verificaciones_documentos').doc(token).get();
+      if (snap.exists) {
+        return snap.data().estado || 'VALIDO';
+      }
+      return 'NO_ENCONTRADO';
     }
   };
 
