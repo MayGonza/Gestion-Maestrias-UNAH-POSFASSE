@@ -48,7 +48,71 @@ const POSFASSE_DATA = {
   // Oferta Académica Oficial POSFACE UNAH (Documento Oficial SOMOS POSFACE)
   // 1 Posdoctorado · 2 Doctorados · 7 Maestrías · 1 Centro BTC · 1 Diplomado Actuarial = 12 Programas
   maestrias: [
-    // --- 1. MAESTRÍAS (7) ---
+    // --- 1. POSDOCTORADO (1) ---
+    {
+      id: "M-POSDOC",
+      codigo: "POS-PDE-10",
+      tipo: "Posdoctorado",
+      nombre: "Posdoctorado en Desarrollo Económico, Innovación y Gestión Empresarial",
+      grado: "Posdoctorado en Desarrollo Económico, Innovación y Gestión Empresarial",
+      modalidad: "Híbrida",
+      duracionMeses: 12,
+      totalUV: 24,
+      coordinador: "PhD. Joselyn Alvarado Siwady",
+      cargoCoordinador: "Coordinadora General POSFACE",
+      asistente: "Lcdo. Edgardo Matamoros (Asistente Académico)",
+      correoCoordinacion: "posdoctorado.posface@unah.edu.hn",
+      estado: "Activo",
+      color: "#831843",
+      descripcion: "Estudios posdoctorales avanzados orientados a investigadores doctorados para el desarrollo de líneas estratégicas de innovación, desarrollo económico y gestión.",
+      cohortesTotal: 1,
+      estudiantesActivos: 8,
+      asignaturasTotal: 6
+    },
+
+    // --- 2. DOCTORADOS (2) ---
+    {
+      id: "M-DCE",
+      codigo: "POS-DCE-08",
+      tipo: "Doctorado",
+      nombre: "Doctorado en Ciencias Económicas",
+      grado: "Doctorado (Ph.D.) en Ciencias Económicas",
+      modalidad: "Presencial",
+      duracionMeses: 36,
+      totalUV: 72,
+      coordinador: "PhD. Deysy Marlene Trejo Trejo",
+      cargoCoordinador: "Coordinadora Académica",
+      asistente: "Lcdo. Edgardo Matamoros (Asistente Académico)",
+      correoCoordinacion: "doctorado.economicas@unah.edu.hn",
+      estado: "Activo",
+      color: "#0f766e",
+      descripcion: "Investigación científica de frontera en macroeconomía, modelos estructurales, desarrollo económico y social, políticas públicas y econometría teórica.",
+      cohortesTotal: 1,
+      estudiantesActivos: 12,
+      asignaturasTotal: 16
+    },
+    {
+      id: "M-DDE",
+      codigo: "POS-DDE-09",
+      tipo: "Doctorado",
+      nombre: "Doctorado en Dirección Empresarial",
+      grado: "Doctorado (Ph.D.) en Dirección Empresarial",
+      modalidad: "Presencial",
+      duracionMeses: 36,
+      totalUV: 72,
+      coordinador: "PhD. Deysy Marlene Trejo Trejo",
+      cargoCoordinador: "Coordinadora Académica",
+      asistente: "Lcdo. Edgardo Matamoros (Asistente Académico)",
+      correoCoordinacion: "doctorado.empresarial@unah.edu.hn",
+      estado: "Activo",
+      color: "#b45309",
+      descripcion: "Máximo programa doctoral en teoría de la empresa, competitividad global, innovación corporativa, gobernanza empresarial y generación de conocimiento original.",
+      cohortesTotal: 1,
+      estudiantesActivos: 14,
+      asignaturasTotal: 16
+    },
+
+    // --- 3. MAESTRÍAS (7) ---
     {
       id: "M-MAE",
       codigo: "POS-MAE-01",
@@ -188,70 +252,6 @@ const POSFASSE_DATA = {
       cohortesTotal: 1,
       estudiantesActivos: 18,
       asignaturasTotal: 14
-    },
-
-    // --- 2. DOCTORADOS (2) ---
-    {
-      id: "M-DCE",
-      codigo: "POS-DCE-08",
-      tipo: "Doctorado",
-      nombre: "Doctorado en Ciencias Económicas",
-      grado: "Doctorado (Ph.D.) en Ciencias Económicas",
-      modalidad: "Presencial",
-      duracionMeses: 36,
-      totalUV: 72,
-      coordinador: "PhD. Deysy Marlene Trejo Trejo",
-      cargoCoordinador: "Coordinadora Académica",
-      asistente: "Lcdo. Edgardo Matamoros (Asistente Académico)",
-      correoCoordinacion: "doctorado.economicas@unah.edu.hn",
-      estado: "Activo",
-      color: "#0f766e",
-      descripcion: "Investigación científica de frontera en macroeconomía, modelos estructurales, desarrollo económico y social, políticas públicas y econometría teórica.",
-      cohortesTotal: 1,
-      estudiantesActivos: 12,
-      asignaturasTotal: 16
-    },
-    {
-      id: "M-DDE",
-      codigo: "POS-DDE-09",
-      tipo: "Doctorado",
-      nombre: "Doctorado en Dirección Empresarial",
-      grado: "Doctorado (Ph.D.) en Dirección Empresarial",
-      modalidad: "Presencial",
-      duracionMeses: 36,
-      totalUV: 72,
-      coordinador: "PhD. Deysy Marlene Trejo Trejo",
-      cargoCoordinador: "Coordinadora Académica",
-      asistente: "Lcdo. Edgardo Matamoros (Asistente Académico)",
-      correoCoordinacion: "doctorado.empresarial@unah.edu.hn",
-      estado: "Activo",
-      color: "#b45309",
-      descripcion: "Máximo programa doctoral en teoría de la empresa, competitividad global, innovación corporativa, gobernanza empresarial y generación de conocimiento original.",
-      cohortesTotal: 1,
-      estudiantesActivos: 14,
-      asignaturasTotal: 16
-    },
-
-    // --- 3. POSDOCTORADO (1) ---
-    {
-      id: "M-POSDOC",
-      codigo: "POS-PDE-10",
-      tipo: "Posdoctorado",
-      nombre: "Posdoctorado en Desarrollo Económico, Innovación y Gestión Empresarial",
-      grado: "Posdoctorado en Desarrollo Económico, Innovación y Gestión Empresarial",
-      modalidad: "Híbrida",
-      duracionMeses: 12,
-      totalUV: 24,
-      coordinador: "PhD. Joselyn Alvarado Siwady",
-      cargoCoordinador: "Coordinadora General POSFACE",
-      asistente: "Lcdo. Edgardo Matamoros (Asistente Académico)",
-      correoCoordinacion: "posdoctorado.posface@unah.edu.hn",
-      estado: "Activo",
-      color: "#831843",
-      descripcion: "Estudios posdoctorales avanzados orientados a investigadores doctorados para el desarrollo de líneas estratégicas de innovación, desarrollo económico y gestión.",
-      cohortesTotal: 1,
-      estudiantesActivos: 8,
-      asignaturasTotal: 6
     },
 
     // --- 4. CENTRO DE FORMACIÓN EMPRESARIAL (1) ---
