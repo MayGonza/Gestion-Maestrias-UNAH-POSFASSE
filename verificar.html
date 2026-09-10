@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verificación de Documento Oficial - POSFACE UNAH</title>
+  <style>
+    :root {
+      --unah-navy: #002D62;
+      --unah-gold: #D4AF37;
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --radius: 12px;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      margin-top: 20px;
+    }
+
+    .logo-container {
+      background-color: var(--unah-navy);
+      padding: 15px 30px;
+      border-radius: 8px;
+      display: inline-block;
+      margin-bottom: 15px;
+    }
+
+    .logo-container h1 {
+      color: white;
+      font-size: 1.5rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .logo-container h1 span {
+      color: var(--unah-gold);
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      width: 100%;
+      max-width: 480px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .card-header {
+      padding: 20px;
+      text-align: center;
+      border-bottom: 1px solid #e2e8f0;
+      background-color: #f1f5f9;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-top: 10px;
+    }
+
+    .status-VALIDO {
+      background-color: #dcfce7;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+
+    .status-ANULADO {
+      background-color: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    .status-EXPIRADO {
+      background-color: #fef9c3;
+      color: #854d0e;
+      border: 1px solid #fef08a;
+    }
+
+    .status-ERROR {
+      background-color: #f1f5f9;
+      color: #475569;
+      border: 1px solid #e2e8f0;
+    }
+
+    .card-body {
+      padding: 25px 20px;
+    }
+
+    .info-group {
+      margin-bottom: 15px;
+    }
+
+    .info-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .info-value {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-main);
+      word-break: break-word;
+    }
+
+    .loader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 0;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(0, 45, 98, 0.1);
+      border-left-color: var(--unah-navy);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 15px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .footer {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    
+    .watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-30deg);
+      font-size: 5rem;
+      font-weight: 900;
+      color: rgba(0,0,0,0.03);
+      pointer-events: none;
+      z-index: 0;
+      white-space: nowrap;
+    }
+    
+    .content-wrapper {
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn-share {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background-color: var(--unah-navy);
+      color: white;
+      text-align: center;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      margin-top: 20px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <div class="logo-container">
+      <h1>UNAH <span>POSFACE</span></h1>
+    </div>
+    <div class="subtitle">Sistema de Verificación de Documentos</div>
+  </div>
+
+  <div class="card" id="verificationCard">
+    <div class="watermark" id="watermark">POSFACE</div>
+    
+    <div class="card-header">
+      <h2 style="font-size: 1.1rem; color: var(--unah-navy);">Estado del Documento</h2>
+      <div id="statusBadgeContainer">
+        <!-- Loader inicial -->
+        <div class="loader" id="loader">
+          <div class="spinner"></div>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Consultando base de datos oficial...</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body content-wrapper" id="documentData" style="display: none;">
+      <div class="info-group">
+        <div class="info-label">Nombre del Titular</div>
+        <div class="info-value" id="lblNombre">-</div>
+      </div>
+      <div class="info-group">
+        <div class="info-label">Programa Académico</div>
+        <div class="info-value" id="lblPrograma">-</div>
+      </div>
+      <div class="info-group">
+        <div class="info-label">Tipo de Documento</div>
+        <div class="info-value" id="lblTipoDoc">-</div>
+      </div>
+      <div class="info-group">
+        <div class="info-label">Fecha de Emisión</div>
+        <div class="info-value" id="lblFecha">-</div>
+      </div>
+      <div class="info-group" style="border-top: 1px dashed #cbd5e1; padding-top: 15px; margin-top: 15px;">
+        <div class="info-label">Token de Seguridad (Referencia)</div>
+        <div class="info-value" id="lblToken" style="font-family: monospace; font-size: 0.8rem; color: #64748b;">-</div>
+      </div>
+      
+      <button class="btn-share" id="btnShare" style="display: none;">Compartir Verificación</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>Constancia Oficial de Validez Institucional</p>
+    <p>Dirección de POSFACE - Universidad Nacional Autónoma de Honduras</p>
+    <p id="lblAuditDate" style="margin-top: 10px; font-weight: bold;"></p>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js?v=3.5"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      
+      const badgeContainer = document.getElementById('statusBadgeContainer');
+      const documentData = document.getElementById('documentData');
+      const watermark = document.getElementById('watermark');
+      
+      document.getElementById('lblAuditDate').textContent = 'Consulta realizada: ' + new Date().toLocaleString('es-HN');
+
+      function renderStatus(estado, icon, mensaje) {
+        document.getElementById('loader').style.display = 'none';
+        badgeContainer.innerHTML = `
+          <div class="status-badge status-${estado}">
+            <span>${icon}</span> ${mensaje}
+          </div>
+        `;
+        watermark.textContent = estado;
+      }
+
+      if (!token) {
+        renderStatus('ERROR', '⚠️', 'Token de verificación no proporcionado');
+        return;
+      }
+
+      try {
+        const db = firebase.firestore();
+        const docRef = db.collection('verificaciones_documentos').doc(token);
+        const docSnap = await docRef.get();
+
+        if (!docSnap.exists) {
+          renderStatus('ERROR', '❌', 'Documento No Encontrado');
+          return;
+        }
+
+        const data = docSnap.data();
+        
+        // Simular un log de auditoría (lado cliente - limitación arquitectónica)
+        try {
+          db.collection('auditoria_verificaciones').add({
+            token_uuid: token,
+            fecha_consulta: firebase.firestore.FieldValue.serverTimestamp(),
+            user_agent: navigator.userAgent,
+            resultado: data.estado
+          });
+        } catch (e) {
+          console.warn("No se pudo registrar auditoría (probablemente por reglas de seguridad de cliente)", e);
+        }
+
+        // Llenar datos visuales
+        document.getElementById('lblNombre').textContent = data.nombre_estudiante || 'Dato no disponible';
+        document.getElementById('lblPrograma').textContent = data.programa_academico || 'Dato no disponible';
+        
+        const tipos = { 'FICHA': 'Ficha de Previa Inscripción', 'EXPEDIENTE': 'Expediente Estudiantil' };
+        document.getElementById('lblTipoDoc').textContent = tipos[data.tipo_documento] || data.tipo_documento;
+        
+        let fechaText = '-';
+        if (data.fecha_emision) {
+          const d = data.fecha_emision.toDate ? data.fecha_emision.toDate() : new Date(data.fecha_emision);
+          fechaText = d.toLocaleDateString('es-HN', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit' });
+        }
+        document.getElementById('lblFecha').textContent = fechaText;
+        document.getElementById('lblToken').textContent = token;
+
+        documentData.style.display = 'block';
+
+        // Renderizar Estado
+        if (data.estado === 'VALIDO') {
+          renderStatus('VALIDO', '✅', 'DOCUMENTO VÁLIDO Y OFICIAL');
+          
+          if (navigator.share) {
+            const btnShare = document.getElementById('btnShare');
+            btnShare.style.display = 'block';
+            btnShare.onclick = () => {
+              navigator.share({
+                title: 'Verificación POSFACE',
+                text: `El documento de ${data.nombre_estudiante} es VÁLIDO.`,
+                url: window.location.href
+              });
+            };
+          }
+        } else if (data.estado === 'ANULADO') {
+          renderStatus('ANULADO', '🛑', 'DOCUMENTO ANULADO/REVOCADO');
+        } else if (data.estado === 'EXPIRADO') {
+          renderStatus('EXPIRADO', '⏳', 'DOCUMENTO EXPIRADO');
+        } else {
+          renderStatus('ERROR', '❓', 'ESTADO DESCONOCIDO');
+        }
+
+      } catch (err) {
+        console.error("Error al verificar:", err);
+        renderStatus('ERROR', '🔌', 'Error de Conexión a la Base de Datos');
+      }
+    });
+  </script>
+</body>
+</html>

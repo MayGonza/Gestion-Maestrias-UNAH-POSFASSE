@@ -818,6 +818,35 @@
           console.warn("Error guardando período en Firestore:", e);
         }
       }
+    },
+    // =========================================================================
+    // MÓDULO DE VERIFICACIÓN QR DE DOCUMENTOS
+    // =========================================================================
+    generateDocumentToken: async function(estudianteId, tipoDocumento, nombreEstudiante, programaAcademico) {
+      if (!this.isCloudActive()) return 'token-local-demo';
+      const db = firebase.firestore();
+      
+      // Intentamos usar crypto.randomUUID() o fallback a math.random
+      const token = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : 'qr-' + Date.now() + '-' + Math.random().toString(36).substring(2, 9);
+      
+      await db.collection('verificaciones_documentos').doc(token).set({
+        estudiante_id: estudianteId,
+        tipo_documento: tipoDocumento,
+        nombre_estudiante: nombreEstudiante,
+        programa_academico: programaAcademico,
+        fecha_emision: firebase.firestore.FieldValue.serverTimestamp(),
+        estado: 'VALIDO'
+      });
+      return token;
+    },
+    
+    revokeDocumentToken: async function(token) {
+      if (!this.isCloudActive()) return;
+      const db = firebase.firestore();
+      await db.collection('verificaciones_documentos').doc(token).update({
+        estado: 'ANULADO',
+        fecha_anulacion: firebase.firestore.FieldValue.serverTimestamp()
+      });
     }
   };
 
@@ -825,3 +854,4 @@
   window.PosfaceAuth = PosfaceAuth;
   window.PosfaceDB = PosfaceDB;
 })();
+

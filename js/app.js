@@ -187,6 +187,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  const btnAnularDocumentoQR = document.getElementById('btnAnularDocumentoQR');
+  if (btnAnularDocumentoQR) {
+    btnAnularDocumentoQR.addEventListener('click', async () => {
+      if (currentExpedienteEstudiante && currentExpedienteEstudiante.qr_token) {
+        if (confirm('¿Está seguro de que desea REVOCAR el sello criptográfico (Código QR) de este documento? El código actual mostrará estado "ANULADO" a quien lo escanee.')) {
+          try {
+            await window.PosfaceDB.revokeDocumentToken(currentExpedienteEstudiante.qr_token);
+            // Delete the qr_token from the student so next time a new one is generated
+            if (window.PosfaceDB.isCloudActive()) {
+               await firebase.firestore().collection('estudiantes').doc(currentExpedienteEstudiante.id).update({ qr_token: firebase.firestore.FieldValue.delete() });
+            }
+            delete currentExpedienteEstudiante.qr_token;
+            showToast('Documento revocado exitosamente. Al volver a abrir este expediente, se generará un nuevo QR válido.', 'success');
+            closeModal(document.getElementById('modalExpediente'));
+          } catch (err) {
+            console.error("Error al revocar QR:", err);
+            showToast('Hubo un error al intentar revocar el documento.', 'danger');
+          }
+        }
+      } else {
+        showToast('Este expediente aún no tiene un QR emitido válido para revocar.', 'warning');
+      }
+    });
+  }
+
   // Botón para vaciar lista de prueba y dejar el sistema limpio
   const btnLimpiarDatosPrueba = document.getElementById('btnLimpiarDatosPrueba');
   if (btnLimpiarDatosPrueba) {
@@ -706,7 +731,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalExpediente = document.getElementById('modalExpediente');
   let currentExpedienteEstudiante = null;
 
-  function openExpedienteModal(estudianteId) {
+  async function openExpedienteModal(estudianteId) {
     const est = estudiantesList.find(e => e.id === estudianteId);
     if (!est) return;
 
@@ -819,6 +844,49 @@ document.addEventListener('DOMContentLoaded', () => {
     const expFirmaEstudianteNombre = document.getElementById('expFirmaEstudianteNombre');
     if (expFirmaEstudianteNombre) {
       expFirmaEstudianteNombre.textContent = `${est.nombres} ${est.apellidos}`;
+    }
+
+    // 6. Generación Dinámica de Código QR
+    const qrPlaceholder = document.querySelector('.qr-placeholder');
+    if (qrPlaceholder) {
+      qrPlaceholder.innerHTML = ''; // Limpiar QR anterior
+      
+      // Mostrar estado de carga temporal
+      qrPlaceholder.innerHTML = '<span class="qr-lbl" style="font-size: 0.7rem; color: #64748b;">Generando Seguridad...</span>';
+      
+      // Obtener o crear token de documento
+      let token = est.qr_token;
+      if (!token) {
+        try {
+          token = await window.PosfaceDB.generateDocumentToken(est.id, 'EXPEDIENTE', `${est.nombres} ${est.apellidos}`, mae.nombre);
+          
+          // Actualizar estudiante en Firestore con el nuevo token para no regenerarlo
+          if (window.PosfaceDB.isCloudActive()) {
+            await firebase.firestore().collection('estudiantes').doc(est.id).update({ qr_token: token });
+            est.qr_token = token; // Update local memory
+          }
+        } catch (err) {
+          console.warn("No se pudo generar QR en nube:", err);
+          token = 'error-conexion';
+        }
+      }
+
+      // Dibujar código QR
+      qrPlaceholder.innerHTML = ''; // Limpiar "Generando..."
+      try {
+        const verifyUrl = `${window.location.origin}/verificar.html?token=${token}`;
+        new QRCode(qrPlaceholder, {
+          text: verifyUrl,
+          width: 85,
+          height: 85,
+          colorDark: "#002D62",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.L
+        });
+      } catch (e) {
+        console.error("Error al renderizar QR:", e);
+        qrPlaceholder.innerHTML = '<span class="qr-lbl" style="color:red; font-size:10px;">Error QR</span>';
+      }
     }
 
     openModal(modalExpediente);
