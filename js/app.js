@@ -1693,13 +1693,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const pwdMatchError = document.getElementById('pwdMatchError');
 
   // Abrir / Cerrar Modales
-  if (btnOlvidePassword) btnOlvidePassword.addEventListener('click', () => { if (modalResetPassword) modalResetPassword.classList.add('active'); });
-  if (btnCloseResetModal) btnCloseResetModal.addEventListener('click', () => { if (modalResetPassword) modalResetPassword.classList.remove('active'); });
-  if (btnCancelReset) btnCancelReset.addEventListener('click', () => { if (modalResetPassword) modalResetPassword.classList.remove('active'); });
+  if (btnOlvidePassword) btnOlvidePassword.addEventListener('click', () => { if (modalResetPassword) modalResetPassword.classList.add('show'); });
+  if (btnCloseResetModal) btnCloseResetModal.addEventListener('click', () => { if (modalResetPassword) modalResetPassword.classList.remove('show'); });
+  if (btnCancelReset) btnCancelReset.addEventListener('click', () => { if (modalResetPassword) modalResetPassword.classList.remove('show'); });
 
-  if (btnChangePasswordMenu) btnChangePasswordMenu.addEventListener('click', () => { if (modalChangePassword) modalChangePassword.classList.add('active'); });
-  if (btnCloseChangeModal) btnCloseChangeModal.addEventListener('click', () => { if (modalChangePassword) modalChangePassword.classList.remove('active'); formChangePassword.reset(); updateStrengthBar(); });
-  if (btnCancelChange) btnCancelChange.addEventListener('click', () => { if (modalChangePassword) modalChangePassword.classList.remove('active'); formChangePassword.reset(); updateStrengthBar(); });
+  if (btnChangePasswordMenu) btnChangePasswordMenu.addEventListener('click', () => { if (modalChangePassword) modalChangePassword.classList.add('show'); });
+  if (btnCloseChangeModal) btnCloseChangeModal.addEventListener('click', () => { if (modalChangePassword) modalChangePassword.classList.remove('show'); formChangePassword.reset(); updateStrengthBar(); });
+  if (btnCancelChange) btnCancelChange.addEventListener('click', () => { if (modalChangePassword) modalChangePassword.classList.remove('show'); formChangePassword.reset(); updateStrengthBar(); });
 
   // Enviar formulario Recuperación
   if (formResetPassword) {
@@ -1716,7 +1716,7 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         await window.PosfaceAuth.sendPasswordReset(email);
         showToast('Si el correo está registrado, recibirás un enlace de recuperación en los próximos minutos.', 'success');
-        modalResetPassword.classList.remove('active');
+        modalResetPassword.classList.remove('show');
         formResetPassword.reset();
       } catch (err) {
         showToast(err.message || 'Error al intentar procesar la solicitud.', 'warning');
@@ -1794,7 +1794,7 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         await window.PosfaceAuth.changePassword(currentPwd, newPwd);
         showToast('Tu contraseña ha sido actualizada con éxito.', 'success');
-        modalChangePassword.classList.remove('active');
+        modalChangePassword.classList.remove('show');
         formChangePassword.reset();
         updateStrengthBar();
       } catch (err) {
