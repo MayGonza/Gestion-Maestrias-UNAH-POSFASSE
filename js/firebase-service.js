@@ -211,6 +211,16 @@
       } catch (e) {}
     },
 
+    removeLocalUser: function (email) {
+      const emailNorm = (email || '').trim().toLowerCase();
+      try {
+        const raw = localStorage.getItem('posface_registered_users');
+        if (!raw) return;
+        const users = JSON.parse(raw).filter(u => (u.email || '').toLowerCase() !== emailNorm);
+        localStorage.setItem('posface_registered_users', JSON.stringify(users));
+      } catch (e) {}
+    },
+
     // Iniciar sesión con indicadores detallados de error
     login: async function (email, password) {
       email = (email || '').trim().toLowerCase();
@@ -313,12 +323,87 @@
       throw err;
     },
 
+    // =========================================================================
+    // CLASE DE ERROR DE DUPLICADO (HTTP 409 Conflict)
+    // =========================================================================
+
+    // =========================================================================
+    // VERIFICACIÓN DE DUPLICADOS - Revisa institucionales + local + Firestore
+    // Retorna Promise<void> — lanza DuplicateError si hay conflicto
+    // =========================================================================
+    checkDuplicates: async function (name, email) {
+      const emailNorm = (email || '').trim().toLowerCase();
+      const nameNorm  = (name  || '').trim().toLowerCase();
+
+      const duplicateFields = [];
+
+      // --- 1. Verificar en cuentas institucionales hardcoded ---
+      const institutional = this.getInstitutionalAccounts();
+      const emailInInst = institutional.some(a => a.email.toLowerCase() === emailNorm);
+      const nameInInst  = institutional.some(a => a.name.toLowerCase()  === nameNorm);
+      if (emailInInst) duplicateFields.push('EMAIL');
+      if (nameInInst  && !duplicateFields.includes('NAME')) duplicateFields.push('NAME');
+
+      // --- 2. Verificar en localStorage ---
+      let localUsers = [];
+      try {
+        const raw = localStorage.getItem('posface_registered_users');
+        if (raw) localUsers = JSON.parse(raw);
+      } catch (_) { localUsers = []; }
+
+      const emailInLocal = localUsers.some(u => (u.email || '').toLowerCase() === emailNorm);
+      const nameInLocal  = localUsers.some(u => (u.name  || '').toLowerCase() === nameNorm);
+      if (emailInLocal && !duplicateFields.includes('EMAIL')) duplicateFields.push('EMAIL');
+      if (nameInLocal  && !duplicateFields.includes('NAME'))  duplicateFields.push('NAME');
+
+      // --- 3. Verificar en Firestore (si disponible) en paralelo ---
+      if (this.isCloudActive() && dbInstance) {
+        try {
+          const [emailSnap, nameSnap] = await Promise.all([
+            dbInstance.collection('usuarios').where('email', '==', emailNorm).limit(1).get(),
+            dbInstance.collection('usuarios').where('nameLower', '==', nameNorm).limit(1).get()
+          ]);
+          if (!emailSnap.empty && !duplicateFields.includes('EMAIL')) duplicateFields.push('EMAIL');
+          if (!nameSnap.empty  && !duplicateFields.includes('NAME'))  duplicateFields.push('NAME');
+        } catch (fsErr) {
+          // Firestore no disponible — las verificaciones locales son suficientes
+          console.warn('[POSFACE] checkDuplicates: Firestore no disponible, usando solo verificación local.', fsErr.code || '');
+        }
+      }
+
+      // --- 4. Lanzar error si hay duplicados ---
+      if (duplicateFields.length > 0) {
+        let message;
+        if (duplicateFields.includes('EMAIL') && duplicateFields.includes('NAME')) {
+          message = 'Tanto el correo electrónico como el nombre ya están registrados en el sistema POSFACE.';
+        } else if (duplicateFields.includes('EMAIL')) {
+          message = 'Este correo electrónico ya está registrado en el sistema POSFACE. Inicia sesión o usa otro correo.';
+        } else {
+          message = 'Este nombre de usuario ya existe en el sistema. Agrega tu grado académico para diferenciarlo (ej. "Lic. Mario Valladares").';
+        }
+
+        // Log de auditoría — sin exponer valores sensibles
+        console.warn('[POSFACE REGISTRO 409 Conflict]', {
+          timestamp: new Date().toISOString(),
+          duplicateFields,          // solo los nombres de campo, no los valores
+          source: this.isCloudActive() ? 'local+firestore' : 'local'
+        });
+
+        const err = new Error(message);
+        err.name   = 'DuplicateError';
+        err.code   = 'DUPLICATE_' + duplicateFields.join('_AND_');
+        err.status = 409;
+        err.fields = duplicateFields; // ['EMAIL'] | ['NAME'] | ['EMAIL','NAME']
+        throw err;
+      }
+    },
+
     // Registrar nuevo usuario (Guarda tanto en Firebase como en local para garantizar acceso)
     register: async function (name, email, password, role) {
-      name = (name || '').trim();
-      email = (email || '').trim().toLowerCase();
+      name     = (name     || '').trim();
+      email    = (email    || '').trim().toLowerCase();
       password = (password || '').trim();
-      role = role || 'Secretaría Académica POSFACE';
+      role     = role || 'Secretaría Académica POSFACE';
 
       if (!name || !email || !password) {
         throw new Error("Por favor completa todos los campos requeridos para el registro");
@@ -328,9 +413,14 @@
         throw new Error("La contraseña debe tener al menos 6 caracteres");
       }
 
+      // ── VALIDACIÓN DE DUPLICADOS (atómica a nivel cliente) ──────────────────
+      await this.checkDuplicates(name, email);
+      // ────────────────────────────────────────────────────────────────────────
+
       const userObj = {
         uid: `USR-${Date.now()}`,
         name: name,
+        nameLower: name.toLowerCase(), // campo auxiliar para búsqueda case-insensitive en Firestore
         email: email,
         password: password, // Guardado de respaldo local
         role: role,
@@ -348,6 +438,7 @@
           await dbInstance.collection('usuarios').doc(userObj.uid).set({
             uid: userObj.uid,
             name: name,
+            nameLower: name.toLowerCase(),
             email: email,
             role: role,
             institution: "UNAH POSFACE",
@@ -379,6 +470,7 @@
               await dbInstance.collection('usuarios').doc(fbUser.uid).set({
                 uid: fbUser.uid,
                 name: name,
+                nameLower: name.toLowerCase(),
                 email: email,
                 role: role,
                 institution: "UNAH POSFACE",
@@ -388,7 +480,17 @@
           }
         } catch (fbErr) {
           console.warn("Firebase Auth register aviso:", fbErr);
-          if (fbErr.code === 'auth/operation-not-allowed') {
+          if (fbErr.code === 'auth/email-already-in-use') {
+            // Firebase detectó duplicado — convertir a DuplicateError para manejo uniforme
+            const err = new Error('Este correo electrónico ya está registrado en Firebase Authentication. Inicia sesión con tu contraseña.');
+            err.name   = 'DuplicateError';
+            err.code   = 'DUPLICATE_EMAIL';
+            err.status = 409;
+            err.fields = ['EMAIL'];
+            // Limpiar el usuario local que se creó prematuramente
+            this.removeLocalUser(email);
+            throw err;
+          } else if (fbErr.code === 'auth/operation-not-allowed') {
             authWarning = "Aviso Firebase: Habilita 'Correo/contraseña' en Authentication -> Sign-in method de Firebase Console para registrar también en Auth.";
           }
         }

@@ -1521,15 +1521,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Envío del formulario de Registro
   if (formRegisterPosface) {
+    // Función auxiliar: resaltar campo con error de duplicado
+    function markFieldDuplicate(fieldId, hasDuplicate) {
+      const input = document.getElementById(fieldId);
+      if (!input) return;
+      if (hasDuplicate) {
+        input.style.borderColor = '#dc2626';
+        input.style.boxShadow   = '0 0 0 3px rgba(220,38,38,0.15)';
+        // Limpiar resaltado al retomar foco
+        input.addEventListener('focus', function clearMark() {
+          input.style.borderColor = '';
+          input.style.boxShadow   = '';
+          input.removeEventListener('focus', clearMark);
+        });
+      } else {
+        input.style.borderColor = '';
+        input.style.boxShadow   = '';
+      }
+    }
+
     formRegisterPosface.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const nombre = document.getElementById('regNombre').value.trim();
-      const rol = document.getElementById('regRol').value;
-      const email = document.getElementById('regEmail').value.trim();
-      const pwd = document.getElementById('regPassword').value.trim();
+
+      // Limpiar cualquier resaltado previo
+      markFieldDuplicate('regNombre', false);
+      markFieldDuplicate('regEmail',  false);
+
+      const nombre     = document.getElementById('regNombre').value.trim();
+      const rol        = document.getElementById('regRol').value;
+      const email      = document.getElementById('regEmail').value.trim().toLowerCase();
+      const pwd        = document.getElementById('regPassword').value.trim();
       const pwdConfirm = document.getElementById('regPasswordConfirm').value.trim();
-      const btnSubmit = document.getElementById('btnRegisterSubmit');
-      const btnText = document.getElementById('btnRegisterText');
+      const btnSubmit  = document.getElementById('btnRegisterSubmit');
+      const btnText    = document.getElementById('btnRegisterText');
 
       if (!nombre || !email || !pwd || !pwdConfirm) {
         showToast('Por favor completa todos los campos requeridos', 'warning');
@@ -1547,25 +1571,51 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (btnSubmit) btnSubmit.disabled = true;
-      if (btnText) btnText.textContent = 'Creando cuenta...';
+      if (btnText)   btnText.textContent = 'Verificando datos...';
 
       try {
+        if (btnText) btnText.textContent = 'Creando cuenta...';
         const newUser = await window.PosfaceAuth.register(nombre, email, pwd, rol);
         showToast(`¡Cuenta creada exitosamente! Bienvenido(a) ${newUser.name}`, 'success');
         if (newUser.authWarning) {
-          setTimeout(() => {
-            showToast(newUser.authWarning, 'warning');
-          }, 2500);
+          setTimeout(() => { showToast(newUser.authWarning, 'warning'); }, 2500);
         }
         checkAuthState();
         switchView('dashboard');
         formRegisterPosface.reset();
         showLoginForm();
+
       } catch (err) {
-        showToast(err.message || 'Error al crear la cuenta', 'danger');
+        // ── Manejo de errores de duplicado (409 Conflict) ─────────────────────
+        if (err.name === 'DuplicateError' && err.fields) {
+          const hasEmailDup = err.fields.includes('EMAIL');
+          const hasNameDup  = err.fields.includes('NAME');
+
+          // Resaltar campos conflictivos
+          markFieldDuplicate('regEmail',  hasEmailDup);
+          markFieldDuplicate('regNombre', hasNameDup);
+
+          // Mensaje descriptivo con icono
+          let icon = '⚠️';
+          let toastMsg = err.message;
+
+          if (hasEmailDup && hasNameDup) {
+            toastMsg = `${icon} Registro duplicado: el correo y el nombre ya existen en el sistema POSFACE. Usa datos diferentes.`;
+          } else if (hasEmailDup) {
+            toastMsg = `${icon} Correo ya registrado: "${email}" ya tiene una cuenta activa. Inicia sesión o utiliza otro correo institucional.`;
+          } else {
+            toastMsg = `${icon} Nombre ya registrado en el sistema. Diferéncialo con tu grado académico (ej. "Lic. Mario Valladares").`;
+          }
+
+          showToast(toastMsg, 'danger');
+
+        } else {
+          // Error genérico
+          showToast(err.message || 'Error al crear la cuenta. Intenta nuevamente.', 'danger');
+        }
       } finally {
         if (btnSubmit) btnSubmit.disabled = false;
-        if (btnText) btnText.textContent = 'Crear Cuenta POSFACE';
+        if (btnText)   btnText.textContent = 'Crear Cuenta POSFACE';
       }
     });
   }
