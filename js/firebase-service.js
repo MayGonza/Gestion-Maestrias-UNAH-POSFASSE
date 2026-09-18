@@ -528,6 +528,9 @@
             console.warn("No se pudo enviar el correo de verificación de Firebase", e);
           }
 
+          // CERRAR SESIÓN INMEDIATAMENTE PARA FORZAR VERIFICACIÓN
+          await authInstance.signOut();
+
           userObj.uid = fbUser.uid;
           userObj.mode = "firebase";
 
@@ -572,7 +575,7 @@
         }
       }
 
-      localStorage.setItem('posface_session_user', JSON.stringify(userObj));
+      // No guardamos la sesión local todavía, el usuario debe verificar su correo e iniciar sesión manualmente
       return { ...userObj, authWarning };
     },
 

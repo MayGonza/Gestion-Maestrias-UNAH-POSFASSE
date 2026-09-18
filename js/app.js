@@ -1709,12 +1709,10 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         if (btnText) btnText.textContent = 'Creando cuenta...';
         const newUser = await window.PosfaceAuth.register(nombre, email, pwd, rol);
-        showToast(`¡Cuenta creada exitosamente! Bienvenido(a) ${newUser.name}`, 'success');
+        showToast(`¡Cuenta creada exitosamente! Por favor, verifica el correo "${email}" antes de iniciar sesión.`, 'success');
         if (newUser.authWarning) {
           setTimeout(() => { showToast(newUser.authWarning, 'warning'); }, 2500);
         }
-        checkAuthState();
-        switchView('dashboard');
         formRegisterPosface.reset();
         showLoginForm();
 
