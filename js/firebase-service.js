@@ -399,7 +399,7 @@
       }
     },
 
-    // Registrar nuevo usuario (Guarda tanto en Firebase como en local para garantizar acceso)
+    // Registrar nuevo usuario (Autentica primero para evitar falsos registros si Firebase Auth falla)
     register: async function (name, email, password, role) {
       name     = (name     || '').trim();
       email    = (email    || '').trim().toLowerCase();
@@ -414,14 +414,14 @@
         throw new Error("La contraseña debe tener al menos 6 caracteres");
       }
 
-      // ── VALIDACIÓN DE DUPLICADOS (atómica a nivel cliente) ──────────────────
+      // ── VALIDACIÓN DE DUPLICADOS (atómica a nivel cliente y Firestore) ────────
       await this.checkDuplicates(name, email);
       // ────────────────────────────────────────────────────────────────────────
 
-      const userObj = {
+      let userObj = {
         uid: `USR-${Date.now()}`,
         name: name,
-        nameLower: name.toLowerCase(), // campo auxiliar para búsqueda case-insensitive en Firestore
+        nameLower: name.toLowerCase(),
         email: email,
         password: password, // Guardado de respaldo local
         role: role,
@@ -430,29 +430,9 @@
         mode: "local"
       };
 
-      // 1. Guardar de inmediato en local para garantizar que nunca se quede bloqueado
-      this.saveLocalUser(userObj);
-
-      // 2. Guardar SIEMPRE en Firestore colección 'usuarios'
-      if (this.isCloudActive() && dbInstance) {
-        try {
-          await dbInstance.collection('usuarios').doc(userObj.uid).set({
-            uid: userObj.uid,
-            name: name,
-            nameLower: name.toLowerCase(),
-            email: email,
-            role: role,
-            institution: "UNAH POSFACE",
-            createdAt: new Date().toISOString()
-          });
-          console.log("%c✓ POSFACE UNAH: Usuario guardado en Firestore (colección 'usuarios'): " + userObj.uid, "color: #059669; font-weight: bold;");
-        } catch (dbErr) {
-          console.warn("Firestore usuarios set error:", dbErr);
-        }
-      }
-
-      // 3. Intentar registrar en Firebase Authentication
       let authWarning = null;
+
+      // 1. Intentar registrar en Firebase Authentication PRIMERO
       if (this.isCloudActive() && authInstance) {
         try {
           const userCredential = await authInstance.createUserWithEmailAndPassword(email, password);
@@ -476,36 +456,45 @@
 
           userObj.uid = fbUser.uid;
           userObj.mode = "firebase";
-          this.saveLocalUser(userObj);
 
-          if (dbInstance) {
-            try {
-              await dbInstance.collection('usuarios').doc(fbUser.uid).set({
-                uid: fbUser.uid,
-                name: name,
-                nameLower: name.toLowerCase(),
-                email: email,
-                role: role,
-                institution: "UNAH POSFACE",
-                createdAt: new Date().toISOString()
-              });
-            } catch (e) {}
-          }
         } catch (fbErr) {
           console.warn("Firebase Auth register aviso:", fbErr);
           if (fbErr.code === 'auth/email-already-in-use') {
-            // Firebase detectó duplicado — convertir a DuplicateError para manejo uniforme
             const err = new Error('Este correo electrónico ya está registrado en Firebase Authentication. Inicia sesión con tu contraseña.');
             err.name   = 'DuplicateError';
             err.code   = 'DUPLICATE_EMAIL';
             err.status = 409;
             err.fields = ['EMAIL'];
-            // Limpiar el usuario local que se creó prematuramente
-            this.removeLocalUser(email);
             throw err;
+          } else if (fbErr.code === 'auth/weak-password') {
+             throw new Error('La contraseña es demasiado débil. Por favor usa al menos 6 caracteres.');
           } else if (fbErr.code === 'auth/operation-not-allowed') {
             authWarning = "Aviso Firebase: Habilita 'Correo/contraseña' en Authentication -> Sign-in method de Firebase Console para registrar también en Auth.";
+            // Si la operacion no esta permitida pero queremos guardarlo local, continuamos
+          } else {
+             throw new Error(this.friendlyAuthError(fbErr));
           }
+        }
+      }
+
+      // 2. Guardar en local (ahora que Auth fue exitoso o no está activo)
+      this.saveLocalUser(userObj);
+
+      // 3. Guardar en Firestore colección 'usuarios'
+      if (this.isCloudActive() && dbInstance) {
+        try {
+          await dbInstance.collection('usuarios').doc(userObj.uid).set({
+            uid: userObj.uid,
+            name: name,
+            nameLower: name.toLowerCase(),
+            email: email,
+            role: role,
+            institution: "UNAH POSFACE",
+            createdAt: new Date().toISOString()
+          });
+          console.log("%c✓ POSFACE UNAH: Usuario guardado en Firestore (colección 'usuarios'): " + userObj.uid, "color: #059669; font-weight: bold;");
+        } catch (dbErr) {
+          console.warn("Firestore usuarios set error:", dbErr);
         }
       }
 
