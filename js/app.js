@@ -1939,4 +1939,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // =========================================================================
+  // MANEJO DE REDIRECCIÓN AUTOMÁTICA DE FIREBASE AUTH (VERIFICACIÓN DE CORREO)
+  // =========================================================================
+  const urlParams = new URLSearchParams(window.location.search);
+  const mode = urlParams.get('mode');
+  const actionCode = urlParams.get('oobCode');
+
+  if (mode === 'verifyEmail' && actionCode && window.firebase) {
+    window.firebase.auth().applyActionCode(actionCode).then(() => {
+      window.history.replaceState({}, document.title, window.location.pathname);
+      showToast('¡Tu correo electrónico ha sido verificado exitosamente!', 'success');
+      // Redirigir al inicio de sesión limpiando pantalla si es necesario
+      if (document.body.classList.contains('not-logged-in')) {
+        const loginScreen = document.getElementById('loginScreen');
+        if (loginScreen) loginScreen.style.display = 'flex';
+      }
+    }).catch(err => {
+      window.history.replaceState({}, document.title, window.location.pathname);
+      showToast('El enlace de verificación es inválido o ya expiró.', 'warning');
+    });
+  }
+
 });

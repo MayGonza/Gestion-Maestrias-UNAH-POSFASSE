@@ -15,6 +15,7 @@
         firebase.initializeApp(window.FIREBASE_CONFIG);
       }
       authInstance = firebase.auth();
+      authInstance.languageCode = 'es'; // Forzar idioma español
       dbInstance = firebase.firestore();
       isFirebaseReady = true;
       console.log("%c✓ POSFACE UNAH: Conectado a Firebase Cloud (" + window.FIREBASE_CONFIG.projectId + ")", "color: #059669; font-weight: bold;");
@@ -463,7 +464,11 @@
 
           // Enviar correo de confirmación nativo de Firebase
           try {
-            await fbUser.sendEmailVerification();
+            const actionCodeSettings = {
+              url: window.location.origin + window.location.pathname, // Redirige al login principal
+              handleCodeInApp: true
+            };
+            await fbUser.sendEmailVerification(actionCodeSettings);
             console.log("%c✓ POSFACE UNAH: Correo de verificación enviado vía Firebase", "color: #059669; font-weight: bold;");
           } catch (e) {
             console.warn("No se pudo enviar el correo de verificación de Firebase", e);
