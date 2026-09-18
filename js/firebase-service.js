@@ -478,7 +478,7 @@
       name     = (name     || '').trim();
       email    = (email    || '').trim().toLowerCase();
       password = (password || '').trim();
-      role     = role || 'Secretaría Académica POSFACE';
+      role     = role || 'Coordinador general';
 
       if (!name || !email || !password) {
         throw new Error("Por favor completa todos los campos requeridos para el registro");

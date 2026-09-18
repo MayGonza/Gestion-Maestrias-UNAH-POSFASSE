@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       try {
         localStorage.setItem('posface_estudiantes_data', JSON.stringify(estudiantesList));
-      } catch (e) {}
+      } catch (e) { }
     }
 
     // 3. Cerrar modales si están abiertos
@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
               await window.PosfaceDB.revokeDocumentToken(currentExpedienteEstudiante.qr_token);
             }
             if (window.PosfaceDB.isCloudActive()) {
-               await firebase.firestore().collection('estudiantes').doc(currentExpedienteEstudiante.id).update({ qr_token: firebase.firestore.FieldValue.delete() });
+              await firebase.firestore().collection('estudiantes').doc(currentExpedienteEstudiante.id).update({ qr_token: firebase.firestore.FieldValue.delete() });
             }
             delete currentExpedienteEstudiante.qr_token;
             showToast('QR anterior eliminado. Abriendo expediente para generar uno nuevo...', 'success');
@@ -372,7 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const containerBars = document.getElementById('dashboardProgramBars');
     if (containerBars) {
       containerBars.innerHTML = '';
-      
+
       // Agrupar programas por tipo
       const programasPorTipo = maestriasList.reduce((acc, m) => {
         const tipo = m.tipo || 'Otros';
@@ -386,7 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       ordenTipos.forEach(tipo => {
         if (programasPorTipo[tipo] && programasPorTipo[tipo].length > 0) {
-          
+
           // Añadir título de categoría
           const tituloCat = document.createElement('div');
           tituloCat.style.cssText = 'padding: 8px 0 4px 0; font-size: 0.8rem; font-weight: 700; color: var(--unah-gold); text-transform: uppercase; border-bottom: 1px solid #e2e8f0; margin-bottom: 10px; margin-top: 5px;';
@@ -685,7 +685,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Eventos para eliminar estudiante desde la fila
     tbody.querySelectorAll('.btn-eliminar-estudiante').forEach(btn => {
-      btn.addEventListener('click', () => {
+      bt.addEventListener('click', () => {
         const estId = btn.getAttribute('data-id');
         const estNombre = btn.getAttribute('data-nombre');
         solicitarEliminarEstudiante(estId, estNombre);
@@ -746,10 +746,10 @@ document.addEventListener('DOMContentLoaded', () => {
     filtroEstudianteMaestria.innerHTML = '<option value="todas">Todos los Programas POSFACE</option>';
 
     const grupos = [
-      { label: 'Posdoctorado',        tipos: ['Posdoctorado'] },
-      { label: 'Doctorados',          tipos: ['Doctorado'] },
-      { label: 'Maestrías',           tipos: ['Maestría'] },
-      { label: 'Formación Continua',  tipos: ['Centro Empresarial', 'Diplomado'] }
+      { label: 'Posdoctorado', tipos: ['Posdoctorado'] },
+      { label: 'Doctorados', tipos: ['Doctorado'] },
+      { label: 'Maestrías', tipos: ['Maestría'] },
+      { label: 'Formación Continua', tipos: ['Centro Empresarial', 'Diplomado'] }
     ];
 
     grupos.forEach(grupo => {
@@ -893,10 +893,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const qrPlaceholder = document.querySelector('.qr-placeholder');
     if (qrPlaceholder) {
       qrPlaceholder.innerHTML = ''; // Limpiar QR anterior
-      
+
       // Mostrar estado de carga temporal
       qrPlaceholder.innerHTML = '<span class="qr-lbl" style="font-size: 0.7rem; color: #64748b;">Generando Seguridad...</span>';
-      
+
       // Obtener o crear token de documento
       let token = est.qr_token;
       let qrStatus = 'VALIDO';
@@ -904,7 +904,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!token) {
         try {
           token = await window.PosfaceDB.generateDocumentToken(est.id, 'EXPEDIENTE', `${est.nombres} ${est.apellidos}`, mae.nombre);
-          
+
           // Actualizar estudiante en Firestore con el nuevo token para no regenerarlo
           if (window.PosfaceDB.isCloudActive()) {
             await firebase.firestore().collection('estudiantes').doc(est.id).update({ qr_token: token });
@@ -971,9 +971,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Definir grupos en orden: Posdoctorado → Doctorados → Maestrías → Formación Continua
     const grupos = [
-      { label: 'Posdoctorado (1)',                         tipos: ['Posdoctorado'] },
-      { label: 'Doctorados (2)',                           tipos: ['Doctorado'] },
-      { label: 'Maestrías (7)',                            tipos: ['Maestría'] },
+      { label: 'Posdoctorado (1)', tipos: ['Posdoctorado'] },
+      { label: 'Doctorados (2)', tipos: ['Doctorado'] },
+      { label: 'Maestrías (7)', tipos: ['Maestría'] },
       { label: 'Formación Continua y Educación Empresarial (2)', tipos: ['Centro Empresarial', 'Diplomado'] }
     ];
 
@@ -1058,6 +1058,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (indice < 0 || indice > 100) {
         showToast('El índice académico debe estar en un rango válido entre 0% y 100%', 'danger');
+        return;
+      }
+
+      if (indice < 70) {
+        showToast('El aspirante no cumple con el índice académico mínimo del 70% requerido para la inscripción.', 'danger');
         return;
       }
 
@@ -1660,16 +1665,16 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!input) return;
       if (hasDuplicate) {
         input.style.borderColor = '#dc2626';
-        input.style.boxShadow   = '0 0 0 3px rgba(220,38,38,0.15)';
+        input.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.15)';
         // Limpiar resaltado al retomar foco
         input.addEventListener('focus', function clearMark() {
           input.style.borderColor = '';
-          input.style.boxShadow   = '';
+          input.style.boxShadow = '';
           input.removeEventListener('focus', clearMark);
         });
       } else {
         input.style.borderColor = '';
-        input.style.boxShadow   = '';
+        input.style.boxShadow = '';
       }
     }
 
@@ -1678,15 +1683,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Limpiar cualquier resaltado previo
       markFieldDuplicate('regNombre', false);
-      markFieldDuplicate('regEmail',  false);
+      markFieldDuplicate('regEmail', false);
 
-      const nombre     = document.getElementById('regNombre').value.trim();
-      const rol        = document.getElementById('regRol').value;
-      const email      = document.getElementById('regEmail').value.trim().toLowerCase();
-      const pwd        = document.getElementById('regPassword').value.trim();
+      const nombre = document.getElementById('regNombre').value.trim();
+      const rol = document.getElementById('regRol').value;
+      const email = document.getElementById('regEmail').value.trim().toLowerCase();
+      const pwd = document.getElementById('regPassword').value.trim();
       const pwdConfirm = document.getElementById('regPasswordConfirm').value.trim();
-      const btnSubmit  = document.getElementById('btnRegisterSubmit');
-      const btnText    = document.getElementById('btnRegisterText');
+      const btnSubmit = document.getElementById('btnRegisterSubmit');
+      const btnText = document.getElementById('btnRegisterText');
 
       if (!nombre || !email || !pwd || !pwdConfirm) {
         showToast('Por favor completa todos los campos requeridos', 'warning');
@@ -1704,7 +1709,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (btnSubmit) btnSubmit.disabled = true;
-      if (btnText)   btnText.textContent = 'Verificando datos...';
+      if (btnText) btnText.textContent = 'Verificando datos...';
 
       try {
         if (btnText) btnText.textContent = 'Creando cuenta...';
@@ -1720,10 +1725,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // ── Manejo de errores de duplicado (409 Conflict) ─────────────────────
         if (err.name === 'DuplicateError' && err.fields) {
           const hasEmailDup = err.fields.includes('EMAIL');
-          const hasNameDup  = err.fields.includes('NAME');
+          const hasNameDup = err.fields.includes('NAME');
 
           // Resaltar campos conflictivos
-          markFieldDuplicate('regEmail',  hasEmailDup);
+          markFieldDuplicate('regEmail', hasEmailDup);
           markFieldDuplicate('regNombre', hasNameDup);
 
           // Mensaje descriptivo con icono
@@ -1746,7 +1751,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       } finally {
         if (btnSubmit) btnSubmit.disabled = false;
-        if (btnText)   btnText.textContent = 'Crear Cuenta POSFACE';
+        if (btnText) btnText.textContent = 'Crear Cuenta POSFACE';
       }
     });
   }

@@ -205,11 +205,9 @@
             <div class="form-group">
               <label class="form-label" for="regRol">Cargo / Rol Institucional *</label>
               <select id="regRol" class="form-select" required style="width: 100%; height: 44px;">
-                <option value="Secretaría Académica POSFACE">Secretaría Académica POSFACE</option>
-                <option value="Coordinador(a) de Maestría">Coordinador(a) de Maestría / Posgrado</option>
-                <option value="Dirección de Posgrados">Dirección de Posgrados</option>
-                <option value="Asistente Técnico de Inscripción">Asistente Técnico de Inscripción</option>
-                <option value="Administrador del Sistema">Administrador del Sistema</option>
+                <option value="Coordinador general">Coordinador general</option>
+                <option value="Coordinadores académicos">Coordinadores académicos</option>
+                <option value="Asistentes académicos">Asistentes académicos</option>
               </select>
             </div>
 
@@ -1007,8 +1005,13 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="nuevoEstCorreo">Correo Electrónico de Contacto *</label>
-              <input type="email" class="form-input" id="nuevoEstCorreo" placeholder="ej. aspirante@gmail.com o institucional" required>
+              <label class="form-label" for="nuevoEstCorreo">Correo Electrónico Personal *</label>
+              <input type="email" class="form-input" id="nuevoEstCorreo" placeholder="ej. aspirante@gmail.com" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="nuevoEstCorreoInstitucional">Correo Institucional UNAH (Opcional)</label>
+              <input type="email" class="form-input" id="nuevoEstCorreoInstitucional" placeholder="ej. aspirante@unah.hn / unah.edu.hn">
             </div>
 
             <div class="form-group">
@@ -1100,8 +1103,8 @@
                 Índice Académico Global de Pregrado (%) *
               </label>
               <div style="position: relative;">
-                <input type="number" step="0.01" min="60" max="100" class="form-input" id="nuevoEstIndicePregrado"
-                  placeholder="ej. 85.50" required style="padding-right: 32px;">
+                <input type="number" step="0.01" min="70" max="100" class="form-input" id="nuevoEstIndicePregrado"
+                  placeholder="ej. 75.50" required style="padding-right: 32px;">
                 <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-weight: 700; color: var(--text-muted);">%</span>
               </div>
               <small style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-top: 3px;">
@@ -1156,7 +1159,6 @@
               <label class="form-label" for="nuevoEstModalidad">Modalidad de Estudio Preferida *</label>
               <select class="form-select" id="nuevoEstModalidad" name="nuevoEstModalidad" required>
                 <option value="Presencial">Presencial (Ciudad Universitaria, Tegucigalpa)</option>
-                <option value="Híbrida">Híbrida (Sesiones Presenciales y Campus Virtual)</option>
                 <option value="Virtual">Virtual (Campus Virtual UNAH / En Línea)</option>
               </select>
             </div>
