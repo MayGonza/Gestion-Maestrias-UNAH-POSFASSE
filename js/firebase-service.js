@@ -252,6 +252,11 @@
               // Validar en Firebase Auth
               const userCredential = await authInstance.signInWithEmailAndPassword(email, password);
               
+              if (!userCredential.user.emailVerified) {
+                await authInstance.signOut();
+                throw { code: 'auth/unverified-email' };
+              }
+
               // Validar en Firestore
               if (dbInstance) {
                 const docSnap = await dbInstance.collection('usuarios').doc(userCredential.user.uid).get();
@@ -266,7 +271,11 @@
                 }
               }
             } catch (err) {
-              if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-login-credentials' || err.code === 'USER_DELETED_FROM_DB') {
+              if (err.code === 'auth/unverified-email') {
+                const e = new Error(`Por favor, verifica tu correo electrónico antes de iniciar sesión. Hemos enviado un enlace a "${email}".`);
+                e.code = "EMAIL_NOT_VERIFIED";
+                throw e;
+              } else if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-login-credentials' || err.code === 'USER_DELETED_FROM_DB') {
                 this.removeLocalUser(email);
                 const e = new Error(`La cuenta "${email}" ha sido eliminada del sistema. Acceso denegado.`);
                 e.code = "USER_DELETED";
@@ -295,6 +304,11 @@
         try {
           const userCredential = await authInstance.signInWithEmailAndPassword(email, password);
           const fbUser = userCredential.user;
+
+          if (!fbUser.emailVerified) {
+            await authInstance.signOut();
+            throw { code: 'auth/unverified-email' };
+          }
 
           // --- VERIFICACIÓN DE SEGURIDAD PARA USUARIOS ELIMINADOS ---
           if (dbInstance) {
@@ -334,6 +348,10 @@
 
           if (fbErr.code === 'USER_DELETED_FROM_DB') {
             throw fbErr;
+          } else if (fbErr.code === 'auth/unverified-email') {
+            const err = new Error(`Por favor, verifica tu correo electrónico antes de iniciar sesión. Hemos enviado un enlace a "${email}".`);
+            err.code = "EMAIL_NOT_VERIFIED";
+            throw err;
           } else if (fbErr.code === 'auth/wrong-password') {
             const err = new Error(`La contraseña ingresada no coincide con el usuario "${email}".`);
             err.code = "WRONG_PASSWORD";
