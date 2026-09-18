@@ -461,6 +461,14 @@
             await fbUser.updateProfile({ displayName: name });
           }
 
+          // Enviar correo de confirmación nativo de Firebase
+          try {
+            await fbUser.sendEmailVerification();
+            console.log("%c✓ POSFACE UNAH: Correo de verificación enviado vía Firebase", "color: #059669; font-weight: bold;");
+          } catch (e) {
+            console.warn("No se pudo enviar el correo de verificación de Firebase", e);
+          }
+
           userObj.uid = fbUser.uid;
           userObj.mode = "firebase";
           this.saveLocalUser(userObj);
