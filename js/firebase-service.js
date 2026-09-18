@@ -246,6 +246,22 @@
         // El usuario sí existe. Comprobar si la contraseña coincide.
         const matches = (knownUser.password === password || password === 'posface2026' || password === 'admin2026');
         if (matches) {
+          // --- VERIFICACIÓN DE SEGURIDAD PARA USUARIOS ELIMINADOS ---
+          if (this.isCloudActive() && dbInstance && knownUser.mode !== 'institucional' && knownUser.mode !== 'estudiante') {
+            try {
+              const snap = await dbInstance.collection('usuarios').where('email', '==', email).limit(1).get();
+              if (snap.empty) {
+                this.removeLocalUser(email);
+                if (authInstance) await authInstance.signOut();
+                const err = new Error(`La cuenta "${email}" fue eliminada de la base de datos. Acceso denegado.`);
+                err.code = "USER_DELETED_FROM_DB";
+                throw err;
+              }
+            } catch (e) {
+              // Si falla la red, permitimos el login local
+            }
+          }
+
           localStorage.setItem('posface_session_user', JSON.stringify(knownUser));
           if (this.isCloudActive() && authInstance) {
             authInstance.signInWithEmailAndPassword(email, password).catch(() => {});
@@ -265,6 +281,30 @@
         try {
           const userCredential = await authInstance.signInWithEmailAndPassword(email, password);
           const fbUser = userCredential.user;
+
+          // --- VERIFICACIÓN DE SEGURIDAD PARA USUARIOS ELIMINADOS ---
+          if (dbInstance) {
+            try {
+              const docSnap = await dbInstance.collection('usuarios').doc(fbUser.uid).get();
+              let existsInDb = docSnap.exists;
+              
+              if (!existsInDb) {
+                const emailSnap = await dbInstance.collection('usuarios').where('email', '==', email).limit(1).get();
+                existsInDb = !emailSnap.empty;
+              }
+
+              if (!existsInDb) {
+                await authInstance.signOut();
+                this.removeLocalUser(email);
+                const err = new Error(`La cuenta "${email}" ha sido eliminada de la base de datos (Firestore).`);
+                err.code = "USER_DELETED_FROM_DB";
+                throw err;
+              }
+            } catch (e) {
+              console.warn("No se pudo verificar Firestore (posible problema de red), se permite login.", e);
+            }
+          }
+
           const userObj = {
             uid: fbUser.uid,
             email: fbUser.email,
@@ -278,7 +318,9 @@
         } catch (fbErr) {
           console.warn("Firebase Auth error:", fbErr);
 
-          if (fbErr.code === 'auth/wrong-password') {
+          if (fbErr.code === 'USER_DELETED_FROM_DB') {
+            throw fbErr;
+          } else if (fbErr.code === 'auth/wrong-password') {
             const err = new Error(`La contraseña ingresada no coincide con el usuario "${email}".`);
             err.code = "WRONG_PASSWORD";
             err.email = email;
