@@ -247,25 +247,39 @@
         const matches = (knownUser.password === password || password === 'posface2026' || password === 'admin2026');
         if (matches) {
           // --- VERIFICACIÓN DE SEGURIDAD PARA USUARIOS ELIMINADOS ---
-          if (this.isCloudActive() && dbInstance && knownUser.mode !== 'institucional' && knownUser.mode !== 'estudiante') {
+          if (this.isCloudActive() && authInstance && knownUser.mode !== 'institucional' && knownUser.mode !== 'estudiante') {
             try {
-              const snap = await dbInstance.collection('usuarios').where('email', '==', email).limit(1).get();
-              if (snap.empty) {
-                this.removeLocalUser(email);
-                if (authInstance) await authInstance.signOut();
-                const err = new Error(`La cuenta "${email}" fue eliminada de la base de datos. Acceso denegado.`);
-                err.code = "USER_DELETED_FROM_DB";
-                throw err;
+              // Validar en Firebase Auth
+              const userCredential = await authInstance.signInWithEmailAndPassword(email, password);
+              
+              // Validar en Firestore
+              if (dbInstance) {
+                const docSnap = await dbInstance.collection('usuarios').doc(userCredential.user.uid).get();
+                let existsInDb = docSnap.exists;
+                if (!existsInDb) {
+                  const emailSnap = await dbInstance.collection('usuarios').where('email', '==', email).limit(1).get();
+                  existsInDb = !emailSnap.empty;
+                }
+                if (!existsInDb) {
+                  await authInstance.signOut();
+                  throw { code: 'USER_DELETED_FROM_DB' };
+                }
               }
-            } catch (e) {
-              // Si falla la red, permitimos el login local
+            } catch (err) {
+              if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-login-credentials' || err.code === 'USER_DELETED_FROM_DB') {
+                this.removeLocalUser(email);
+                const e = new Error(`La cuenta "${email}" ha sido eliminada del sistema. Acceso denegado.`);
+                e.code = "USER_DELETED";
+                throw e;
+              }
+              // Para otros errores como falta de red, se permite continuar al login local
             }
+          } else if (this.isCloudActive() && authInstance) {
+            // Para cuentas institucionales o estudiantes
+            authInstance.signInWithEmailAndPassword(email, password).catch(() => {});
           }
 
           localStorage.setItem('posface_session_user', JSON.stringify(knownUser));
-          if (this.isCloudActive() && authInstance) {
-            authInstance.signInWithEmailAndPassword(email, password).catch(() => {});
-          }
           return knownUser;
         } else {
           // La contraseña NO coincide con el usuario existente
