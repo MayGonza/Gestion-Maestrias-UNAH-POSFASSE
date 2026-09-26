@@ -312,6 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
       'dashboard': { sec: 'Principal', title: 'Panel de Control General y Admisiones' },
       'estudiantes': { sec: 'Gestión Académica', title: 'Directorio Oficial de Estudiantes POSFACE' },
       'maestrias': { sec: 'Oferta Académica', title: 'Catálogo Oficial de Posgrados POSFACE' },
+      'bitacora': { sec: 'Bitácora', title: 'Bitácora de Coordinación' }
     };
 
     if (viewNames[viewId]) {
@@ -1545,6 +1546,16 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (nameEl) nameEl.textContent = user.name || 'Secretaría Académica';
       if (roleEl) roleEl.textContent = `${user.role || 'POSFACE'} · ${user.email || 'posface@unah.edu.hn'}`;
+
+      const navBitacora = document.getElementById('nav-bitacora');
+      if (navBitacora) {
+        const roleStr = (user.role || '').toLowerCase();
+        if (roleStr.includes('coordinador general') || roleStr.includes('coordinadora general')) {
+          navBitacora.style.display = 'flex';
+        } else {
+          navBitacora.style.display = 'none';
+        }
+      }
     } else {
       body.classList.remove('logged-in');
       body.classList.add('not-logged-in');
