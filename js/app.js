@@ -598,7 +598,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const indVal = Number(est.indicePregrado) || 0;
       const indBadge = indVal >= 70
         ? `<span class="badge-indice badge-indice-ok" title="Cumple índice normativo de posgrado (&ge; 70%)">✓ ${indVal.toFixed(1)}%</span>`
-        : `<span class="badge-indice badge-indice-warn" title="Ingreso con índice menor al 70%">⚠️ ${indVal.toFixed(1)}%</span>`;
+        : `<span class="badge-indice badge-indice-danger" title="No cumple índice normativo mínimo (&lt; 70%)">✕ ${indVal.toFixed(1)}%</span>`;
 
       const cuentaDisplay = est.cuentaUNAH && est.cuentaUNAH !== 'Pendiente'
         ? `<span class="cuenta-unah-tag" title="Copiar No. de Cuenta UNAH" style="cursor: pointer;">${est.cuentaUNAH}</span>`
@@ -844,7 +844,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (ind >= 70) {
         expIndiceBadge.innerHTML = '<span style="color: #15803d; font-weight: 700;">✓ Requisito Normativo Cumplido (&ge; 70.00%)</span>';
       } else {
-        expIndiceBadge.innerHTML = '<span style="color: #b45309; font-weight: 700;">⚠️ Condicional (&lt; 70.00% Dictamen Académico)</span>';
+        expIndiceBadge.innerHTML = '<span style="color: #dc2626; font-weight: 700;">✕ No Cumple Requisito Normativo (&lt; 70.00%)</span>';
       }
     }
 
@@ -1031,6 +1031,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  const inputNuevoEstIndice = document.getElementById('nuevoEstIndicePregrado');
+  const feedbackNuevoEstIndice = document.getElementById('nuevoEstIndiceFeedback');
+  if (inputNuevoEstIndice) {
+    inputNuevoEstIndice.addEventListener('input', () => {
+      const val = parseFloat(inputNuevoEstIndice.value);
+      if (!feedbackNuevoEstIndice) return;
+      if (isNaN(val)) {
+        feedbackNuevoEstIndice.style.display = 'none';
+        inputNuevoEstIndice.style.borderColor = '';
+        return;
+      }
+      feedbackNuevoEstIndice.style.display = 'block';
+      if (val >= 70 && val <= 100) {
+        feedbackNuevoEstIndice.style.color = '#15803d';
+        feedbackNuevoEstIndice.innerHTML = `✓ Cumple requisito de índice mínimo de posgrados (&ge; 70.00%)`;
+        inputNuevoEstIndice.style.borderColor = '#15803d';
+      } else if (val < 70) {
+        feedbackNuevoEstIndice.style.color = '#dc2626';
+        feedbackNuevoEstIndice.innerHTML = `✕ No cumple requisito: El índice mínimo para inscribir es de 70.00%.`;
+        inputNuevoEstIndice.style.borderColor = '#dc2626';
+      } else {
+        feedbackNuevoEstIndice.style.color = '#dc2626';
+        feedbackNuevoEstIndice.innerHTML = `✕ El índice no puede ser superior a 100.00%.`;
+        inputNuevoEstIndice.style.borderColor = '#dc2626';
+      }
+    });
+  }
+
   if (formNuevoEstudiante) {
     formNuevoEstudiante.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -1064,7 +1092,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (indice < 70) {
-        showToast('El aspirante no cumple con el índice académico mínimo del 70% requerido para la inscripción.', 'danger');
+        showToast('No puede inscribirse: El aspirante debe cumplir con un índice académico de al menos 70.00% mínimo.', 'danger');
         return;
       }
 
@@ -1111,12 +1139,12 @@ document.addEventListener('DOMContentLoaded', () => {
       closeModal(modalNuevoEstudiante);
       formNuevoEstudiante.reset();
       if (boxNuevoEstTituloValidado) boxNuevoEstTituloValidado.style.display = 'none';
-
-      if (indice < 70) {
-        showToast(`Aspirante inscrito condicionalmente (Índice pregrado: ${indice.toFixed(1)}% <  70 % normativo)`, 'warning');
-      } else {
-        showToast(`✓ Estudiante ${nombres} ${apellidos} inscrito con éxito`, 'success');
+      if (feedbackNuevoEstIndice) {
+        feedbackNuevoEstIndice.style.display = 'none';
+        if (inputNuevoEstIndice) inputNuevoEstIndice.style.borderColor = '';
       }
+
+      showToast(`✓ Estudiante ${nombres} ${apellidos} inscrito con éxito`, 'success');
 
       // Abrir inmediatamente la Ficha Oficial de Inscripción (Expediente) del nuevo estudiante
       setTimeout(() => {

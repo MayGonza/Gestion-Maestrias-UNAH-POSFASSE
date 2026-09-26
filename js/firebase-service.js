@@ -771,6 +771,12 @@
 
     // Guardar nuevo estudiante / aspirante
     addEstudiante: async function (estudiante) {
+      // Validar requisito normativo de índice mínimo (70%)
+      if (estudiante.indicePregrado !== undefined && Number(estudiante.indicePregrado) < 70) {
+        console.error("Rechazado: El índice académico (" + estudiante.indicePregrado + "%) es inferior al 70.00% mínimo requerido.");
+        throw new Error("No puede inscribirse: El índice académico debe ser de al menos 70.00% mínimo.");
+      }
+
       // Limpiar campos no requeridos para pre-inscripción
       delete estudiante.tituloTesis;
       delete estudiante.tutorTesis;

@@ -578,14 +578,14 @@
                 Índice Académico Global de Pregrado (%) *
               </label>
               <div style="position: relative;">
-                <input type="number" step="0.01" min="60" max="100" class="form-input" id="aspIndicePregrado"
+                <input type="number" step="0.01" min="70" max="100" class="form-input" id="aspIndicePregrado"
                   placeholder="ej. 85.50" required style="padding-right: 32px;">
                 <span
                   style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-weight: 700; color: var(--text-muted);">%</span>
               </div>
               <div id="indiceFeedback" style="font-size: 0.72rem; margin-top: 4px; display: none;"></div>
               <small style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-top: 3px;">
-                Normativa de Posgrados UNAH: Admisión directa con índice <strong>&ge; 70.00%</strong>.
+                Requisito obligatorio de Posgrados UNAH: El índice académico debe ser de al menos <strong>70.00%</strong> para poder inscribirse.
               </small>
             </div>
 
@@ -819,15 +819,22 @@
         const val = parseFloat(inputIndice.value);
         if (isNaN(val)) {
           feedbackIndice.style.display = 'none';
+          inputIndice.style.borderColor = '';
           return;
         }
         feedbackIndice.style.display = 'block';
-        if (val >= 70) {
+        if (val >= 70 && val <= 100) {
           feedbackIndice.style.color = '#15803d';
-          feedbackIndice.innerHTML = `✓ Cumple requisito de admisión normativa de posgrado UNAH (&ge; 70%)`;
+          feedbackIndice.innerHTML = `✓ Cumple requisito de admisión de posgrados UNAH (&ge; 70.00%)`;
+          inputIndice.style.borderColor = '#15803d';
+        } else if (val < 70) {
+          feedbackIndice.style.color = '#dc2626';
+          feedbackIndice.innerHTML = `✕ No cumple con el requisito. El índice mínimo obligatorio para inscribirse es de 70.00%. Si no cuenta con este índice, no puede inscribirse.`;
+          inputIndice.style.borderColor = '#dc2626';
         } else {
-          feedbackIndice.style.color = '#b45309';
-          feedbackIndice.innerHTML = `⚠️ Índice inferior al 70% normativo. Su ingreso quedará sujeto a evaluación condicional de mérito por el Comité de Posgrados.`;
+          feedbackIndice.style.color = '#dc2626';
+          feedbackIndice.innerHTML = `✕ El índice no puede ser superior al 100.00%.`;
+          inputIndice.style.borderColor = '#dc2626';
         }
       });
 
@@ -915,6 +922,12 @@
           return;
         }
 
+        if (indice < 70) {
+          showPortalToast('No puede inscribirse: El índice académico debe ser de 70.00% como mínimo según la normativa de posgrados UNAH.', 'danger');
+          inputIndice.focus();
+          return;
+        }
+
         // Obtener lista actual para generar ID y comprobar duplicados
         let lista = [];
         try {
@@ -998,9 +1011,9 @@
 
         const estNormativo = document.getElementById('recEstadoNormativo');
         if (indice >= 70) {
-          estNormativo.innerHTML = `<span style="color: #15803d;">✓ Cumple requisito normativo (&ge; 70%)</span>`;
+          estNormativo.innerHTML = `<span style="color: #15803d;">✓ Cumple requisito normativo (&ge; 70.00%)</span>`;
         } else {
-          estNormativo.innerHTML = `<span style="color: #b45309;">⚠️ Sujeto a revisión de admisión (&lt; 70%)</span>`;
+          estNormativo.innerHTML = `<span style="color: #dc2626;">✕ No cumple requisito normativo (&lt; 70.00%)</span>`;
         }
         document.getElementById('recFecha').textContent = new Date().toLocaleString('es-HN');
 
