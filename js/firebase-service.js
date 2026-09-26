@@ -226,6 +226,8 @@
     login: async function (email, password) {
       email = (email || '').trim().toLowerCase();
       password = (password || '').trim();
+      
+      let userObj = null;
 
       if (!email) {
         const err = new Error("Por favor ingresa tu correo institucional UNAH.");
@@ -810,6 +812,11 @@
         window.dispatchEvent(new CustomEvent('posface_estudiante_agregado', { detail: estudiante }));
       } catch (e) {}
 
+      // Registrar en Bitácora
+      try {
+        await this.logActivity("Inscripción de Aspirante", `Se registró un nuevo aspirante: ${estudiante.nombre} (${estudiante.identidad})`);
+      } catch (e) {}
+
       return estudiante;
     },
 
@@ -834,6 +841,11 @@
           console.warn("Error actualizando en Firestore:", err);
         }
       }
+
+      // Registrar en Bitácora
+      try {
+        await this.logActivity("Actualización de Estado", `El expediente de estudiante ID: ${estId} cambió al estado: ${nuevoEstado}`);
+      } catch (e) {}
     },
 
     // Eliminar estudiante de la base de datos (Firestore y LocalStorage)
@@ -858,6 +870,11 @@
       // 3. Notificar a otras pestañas
       try {
         window.dispatchEvent(new CustomEvent('posface_estudiante_eliminado', { detail: { id: estId } }));
+      } catch (e) {}
+
+      // 4. Registrar en Bitácora
+      try {
+        await this.logActivity("Eliminación de Estudiante", `Se eliminó el expediente de estudiante ID: ${estId}`);
       } catch (e) {}
     },
 
@@ -897,6 +914,72 @@
           console.warn("Error guardando período en Firestore:", e);
         }
       }
+    },
+    // =========================================================================
+    // MÓDULO DE BITÁCORA DE ACTIVIDADES
+    // =========================================================================
+    logActivity: async function(action, details) {
+      const user = window.PosfaceAuth ? window.PosfaceAuth.getCurrentUser() : null;
+      const logEntry = {
+        id: "log_" + Date.now().toString(36),
+        timestamp: new Date().toISOString(),
+        user: user ? user.name : "Sistema",
+        email: user ? user.email : "N/A",
+        action: action,
+        details: details
+      };
+      
+      let logs = [];
+      const localLogs = localStorage.getItem('posface_bitacora');
+      if (localLogs) {
+        try {
+          logs = JSON.parse(localLogs);
+        } catch(e) {}
+      }
+      logs.unshift(logEntry);
+      
+      // Mantener solo los últimos 200 registros localmente
+      if (logs.length > 200) logs = logs.slice(0, 200);
+      localStorage.setItem('posface_bitacora', JSON.stringify(logs));
+      
+      if (this.isCloudActive()) {
+        try {
+          const db = firebase.firestore();
+          // Añadir timestamp real del servidor si es posible
+          const cloudEntry = { ...logEntry, serverTimestamp: firebase.firestore.FieldValue.serverTimestamp() };
+          await db.collection('bitacora_coordinacion').add(cloudEntry);
+        } catch(e) {
+          console.warn("Error guardando bitácora en la nube:", e);
+        }
+      }
+      return logEntry;
+    },
+    
+    fetchBitacora: async function() {
+      let logs = [];
+      const localLogs = localStorage.getItem('posface_bitacora');
+      if (localLogs) {
+        try {
+          logs = JSON.parse(localLogs);
+        } catch(e) {}
+      }
+      
+      if (this.isCloudActive()) {
+        try {
+          const db = firebase.firestore();
+          const snap = await db.collection('bitacora_coordinacion').orderBy('serverTimestamp', 'desc').limit(100).get();
+          if (!snap.empty) {
+            logs = [];
+            snap.forEach(doc => {
+              logs.push(doc.data());
+            });
+            localStorage.setItem('posface_bitacora', JSON.stringify(logs));
+          }
+        } catch(e) {
+          console.warn("Error obteniendo bitácora de la nube:", e);
+        }
+      }
+      return logs;
     },
     // =========================================================================
     // MÓDULO DE VERIFICACIÓN QR DE DOCUMENTOS

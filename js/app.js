@@ -324,6 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (viewId === 'dashboard') renderDashboard();
     if (viewId === 'estudiantes') renderEstudiantes();
     if (viewId === 'maestrias') renderMaestrias();
+    if (viewId === 'bitacora') renderBitacora();
 
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1522,6 +1523,48 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // =========================================================================
+  // RENDERIZADO DE BITÁCORA
+  // =========================================================================
+  async function renderBitacora() {
+    const tbody = document.getElementById('tbodyBitacora');
+    if (!tbody) return;
+    
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 20px;">Cargando historial de actividades...</td></tr>`;
+    
+    let logs = [];
+    if (window.PosfaceDB && window.PosfaceDB.fetchBitacora) {
+      logs = await window.PosfaceDB.fetchBitacora();
+    }
+    
+    if (!logs || logs.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 20px;">No hay actividades registradas en la bitácora.</td></tr>`;
+      return;
+    }
+    
+    tbody.innerHTML = '';
+    logs.forEach(log => {
+      const dateObj = new Date(log.timestamp);
+      const formattedDate = dateObj.toLocaleDateString('es-HN') + ' ' + dateObj.toLocaleTimeString('es-HN', { hour: '2-digit', minute: '2-digit' });
+      
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="font-size: 0.85rem; color: var(--text-muted);">${formattedDate}</td>
+        <td>
+          <div style="font-weight: 500; color: var(--unah-navy);">${log.user || 'Sistema'}</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">${log.email || ''}</div>
+        </td>
+        <td>
+          <span style="display: inline-block; padding: 4px 8px; background: rgba(0, 51, 102, 0.05); color: var(--unah-navy); border-radius: 4px; font-weight: 600; font-size: 0.85rem;">
+            ${log.action || 'Acción General'}
+          </span>
+        </td>
+        <td style="font-size: 0.85rem; color: var(--text-main);">${log.details || ''}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
   // Verificación y actualización de estado de autenticación
   function checkAuthState() {
     const user = window.PosfaceAuth ? window.PosfaceAuth.getCurrentUser() : null;
@@ -1605,6 +1648,7 @@ document.addEventListener('DOMContentLoaded', () => {
         clearLoginErrors();
         showToast(`Bienvenido(a) a POSFACE UNAH: ${user.name}`, 'success');
         checkAuthState();
+        if (window.PosfaceDB && window.PosfaceDB.logActivity) window.PosfaceDB.logActivity("Inicio de Sesión", "Usuario accedió al sistema administrativo");
         switchView('dashboard');
       } catch (err) {
         console.warn("Error de autenticación:", err);
@@ -1787,6 +1831,7 @@ document.addEventListener('DOMContentLoaded', () => {
         clearLoginErrors();
         showToast(`Bienvenido(a) a POSFACE UNAH: ${user.name}`, 'success');
         checkAuthState();
+        if (window.PosfaceDB && window.PosfaceDB.logActivity) window.PosfaceDB.logActivity("Inicio de Sesión", "Usuario ingresó mediante acceso rápido");
         switchView('dashboard');
       } catch (err) {
         showLoginAlert('danger', 'Error al acceder con cuenta demo', err.message);
@@ -1801,6 +1846,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Botón de Cerrar Sesión en Sidebar
   if (btnSidebarLogout) {
     btnSidebarLogout.addEventListener('click', async () => {
+      if (window.PosfaceDB && window.PosfaceDB.logActivity) await window.PosfaceDB.logActivity("Cierre de Sesión", "Usuario cerró su sesión en el sistema");
       await window.PosfaceAuth.logout();
       clearLoginErrors();
       showToast('Has cerrado sesión correctamente', 'info');
@@ -1941,6 +1987,7 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         await window.PosfaceAuth.changePassword(currentPwd, newPwd);
         showToast('Tu contraseña ha sido actualizada con éxito.', 'success');
+        if (window.PosfaceDB && window.PosfaceDB.logActivity) await window.PosfaceDB.logActivity("Cambio de Contraseña", "El usuario actualizó su contraseña de acceso");
         modalChangePassword.classList.remove('show');
         formChangePassword.reset();
         updateStrengthBar();

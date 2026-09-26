@@ -709,7 +709,25 @@
             </div>
           </div>
           <div class="card" style="padding: 20px;">
-            <p style="color: var(--text-muted);">El historial de la bitácora se mostrará aquí.</p>
+            <div class="table-responsive">
+              <table class="table" id="tablaBitacora">
+                <thead>
+                  <tr>
+                    <th>Fecha y Hora</th>
+                    <th>Usuario</th>
+                    <th>Acción Realizada</th>
+                    <th>Detalles</th>
+                  </tr>
+                </thead>
+                <tbody id="tbodyBitacora">
+                  <tr>
+                    <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 20px;">
+                      Cargando historial de actividades...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </section>
 
