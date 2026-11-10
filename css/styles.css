@@ -2968,3 +2968,24 @@ button.forgot-pwd-hint:hover {
     padding: 32px 20px;
   }
 }
+
+/* ==========================================================================
+   ESTILOS ADICIONALES: BITÁCORA DE COORDINACIÓN
+   ========================================================================== */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+#tablaBitacora tbody tr:hover {
+  background-color: rgba(0, 51, 102, 0.02);
+}
+
+#tablaBitacora td {
+  vertical-align: middle;
+  padding: 12px 14px;
+}

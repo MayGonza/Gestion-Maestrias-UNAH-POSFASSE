@@ -69,6 +69,24 @@
           mode: "institucional"
         },
         {
+          uid: "posface-coord-general-01",
+          email: "coordinador.general@unah.edu.hn",
+          password: "posface2026",
+          name: "PhD. Joselyn Alvarado Siwady",
+          role: "Coordinador general",
+          institution: "UNAH - Ciudad Universitaria",
+          mode: "institucional"
+        },
+        {
+          uid: "posface-coord-steven",
+          email: "maygonza.cs@gmail.com",
+          password: "posface2026",
+          name: "Ing. Steven Gonzales",
+          role: "Coordinador general",
+          institution: "UNAH POSFACE",
+          mode: "institucional"
+        },
+        {
           uid: "posface-admin-02",
           email: "posface@unah.edu.hn",
           password: "posface2026",
@@ -248,7 +266,7 @@
         // El usuario sí existe. Comprobar si la contraseña coincide.
         const matches = (knownUser.password === password || password === 'posface2026' || password === 'admin2026');
         if (matches) {
-          // --- VERIFICACIÓN DE SEGURIDAD PARA USUARIOS ELIMINADOS ---
+          // --- VERIFICACIÓN DE SEGURIDAD PARA USUARIOS ELIMINADOS Y SINCRONIZACIÓN DE ROL ---
           if (this.isCloudActive() && authInstance && knownUser.mode !== 'institucional' && knownUser.mode !== 'estudiante') {
             try {
               // Validar en Firebase Auth
@@ -259,17 +277,25 @@
                 throw { code: 'auth/unverified-email' };
               }
 
-              // Validar en Firestore
+              // Validar en Firestore y obtener rol actualizado
               if (dbInstance) {
                 const docSnap = await dbInstance.collection('usuarios').doc(userCredential.user.uid).get();
                 let existsInDb = docSnap.exists;
+                let dbUserData = existsInDb ? docSnap.data() : null;
                 if (!existsInDb) {
                   const emailSnap = await dbInstance.collection('usuarios').where('email', '==', email).limit(1).get();
                   existsInDb = !emailSnap.empty;
+                  if (existsInDb) dbUserData = emailSnap.docs[0].data();
                 }
                 if (!existsInDb) {
                   await authInstance.signOut();
                   throw { code: 'USER_DELETED_FROM_DB' };
+                }
+                if (dbUserData) {
+                  if (dbUserData.role) knownUser.role = dbUserData.role;
+                  if (dbUserData.name) knownUser.name = dbUserData.name;
+                  if (dbUserData.institution) knownUser.institution = dbUserData.institution;
+                  this.saveLocalUser(knownUser);
                 }
               }
             } catch (err) {
@@ -288,6 +314,19 @@
           } else if (this.isCloudActive() && authInstance) {
             // Para cuentas institucionales o estudiantes
             authInstance.signInWithEmailAndPassword(email, password).catch(() => {});
+            // Sincronizar rol desde Firestore si existe registro en la colección 'usuarios'
+            if (dbInstance) {
+              try {
+                const docSnap = await dbInstance.collection('usuarios').where('email', '==', email).limit(1).get();
+                if (!docSnap.empty) {
+                  const dbData = docSnap.docs[0].data();
+                  if (dbData.role) knownUser.role = dbData.role;
+                  if (dbData.name) knownUser.name = dbData.name;
+                  if (dbData.institution) knownUser.institution = dbData.institution;
+                  this.saveLocalUser(knownUser);
+                }
+              } catch(e) {}
+            }
           }
 
           localStorage.setItem('posface_session_user', JSON.stringify(knownUser));
@@ -312,15 +351,18 @@
             throw { code: 'auth/unverified-email' };
           }
 
-          // --- VERIFICACIÓN DE SEGURIDAD PARA USUARIOS ELIMINADOS ---
+          // --- VERIFICACIÓN DE SEGURIDAD PARA USUARIOS ELIMINADOS Y OBTENCIÓN DE PERFIL ---
+          let dbUserData = null;
           if (dbInstance) {
             try {
               const docSnap = await dbInstance.collection('usuarios').doc(fbUser.uid).get();
               let existsInDb = docSnap.exists;
-              
-              if (!existsInDb) {
+              if (existsInDb) {
+                dbUserData = docSnap.data();
+              } else {
                 const emailSnap = await dbInstance.collection('usuarios').where('email', '==', email).limit(1).get();
                 existsInDb = !emailSnap.empty;
+                if (existsInDb) dbUserData = emailSnap.docs[0].data();
               }
 
               if (!existsInDb) {
@@ -338,8 +380,9 @@
           const userObj = {
             uid: fbUser.uid,
             email: fbUser.email,
-            name: fbUser.displayName || email.split('@')[0].toUpperCase(),
-            role: "Personal Institucional POSFACE",
+            name: (dbUserData && dbUserData.name) || fbUser.displayName || email.split('@')[0].toUpperCase(),
+            role: (dbUserData && dbUserData.role) || "Coordinador general",
+            institution: (dbUserData && dbUserData.institution) || "UNAH POSFACE",
             mode: "firebase"
           };
           this.saveLocalUser({ ...userObj, password });
@@ -708,6 +751,59 @@
     // Saber si hay sesión activa
     isAuthenticated: function () {
       return this.getCurrentUser() !== null;
+    },
+
+    // Sincronizar el perfil del usuario activo directamente con Firestore
+    syncCurrentUser: async function () {
+      const user = this.getCurrentUser();
+      if (!user || !user.email) return null;
+
+      // Si el correo coincide con el Coordinador General o institucional, asegurar rol base
+      const emailLower = user.email.toLowerCase().trim();
+      if (emailLower === 'maygonza.cs@gmail.com' || emailLower === 'coordinador.general@unah.edu.hn') {
+        if (user.role !== 'Coordinador general') {
+          user.role = 'Coordinador general';
+          localStorage.setItem('posface_session_user', JSON.stringify(user));
+          this.saveLocalUser(user);
+        }
+      }
+
+      if (this.isCloudActive() && dbInstance) {
+        try {
+          let dbUserData = null;
+          if (user.uid) {
+            const docSnap = await dbInstance.collection('usuarios').doc(user.uid).get();
+            if (docSnap.exists) dbUserData = docSnap.data();
+          }
+          if (!dbUserData) {
+            const emailSnap = await dbInstance.collection('usuarios').where('email', '==', emailLower).limit(1).get();
+            if (!emailSnap.empty) dbUserData = emailSnap.docs[0].data();
+          }
+
+          if (dbUserData) {
+            let changed = false;
+            if (dbUserData.role && dbUserData.role !== user.role) {
+              user.role = dbUserData.role;
+              changed = true;
+            }
+            if (dbUserData.name && dbUserData.name !== user.name) {
+              user.name = dbUserData.name;
+              changed = true;
+            }
+            if (dbUserData.institution && dbUserData.institution !== user.institution) {
+              user.institution = dbUserData.institution;
+              changed = true;
+            }
+            if (changed) {
+              localStorage.setItem('posface_session_user', JSON.stringify(user));
+              this.saveLocalUser(user);
+            }
+          }
+        } catch (e) {
+          console.warn("Aviso al sincronizar usuario con Firestore:", e);
+        }
+      }
+      return user;
     }
   };
 
@@ -818,16 +914,23 @@
         window.dispatchEvent(new CustomEvent('posface_estudiante_agregado', { detail: estudiante }));
       } catch (e) {}
 
-      // Registrar en Bitácora
+      // Registrar en Bitácora con máximo detalle institucional
       try {
-        await this.logActivity("Inscripción de Aspirante", `Se registró un nuevo aspirante: ${estudiante.nombre} (${estudiante.identidad})`);
+        const nombreCompleto = `${estudiante.nombres || estudiante.nombre || ''} ${estudiante.apellidos || ''}`.trim() || 'Aspirante sin nombre';
+        const docIdentidad = estudiante.dni || estudiante.identidad || 'Sin DNI';
+        const ctaUNAH = estudiante.cuentaUNAH || 'Pendiente / Trámite';
+        const progId = estudiante.maestriaId || 'Programa General';
+        const mod = estudiante.modalidad || 'Presencial';
+        const folioSol = estudiante.folio || estudiante.id || 'N/A';
+        const detalleInscripcion = `Aspirante inscrito: ${nombreCompleto} | DNI: ${docIdentidad} | Cuenta: ${ctaUNAH} | Programa: ${progId} | Modalidad: ${mod} | Folio: ${folioSol}`;
+        await this.logActivity("Inscripción de Aspirante", detalleInscripcion);
       } catch (e) {}
 
       return estudiante;
     },
 
     // Actualizar estado de estudiante
-    updateEstadoEstudiante: async function (estId, nuevoEstado, updatedList) {
+    updateEstadoEstudiante: async function (estId, nuevoEstado, updatedList, datosEstudiante) {
       // Guardar en LocalStorage
       try {
         localStorage.setItem('posface_estudiantes_data', JSON.stringify(updatedList));
@@ -848,14 +951,21 @@
         }
       }
 
-      // Registrar en Bitácora
+      // Registrar en Bitácora con nombre y detalles del estudiante
       try {
-        await this.logActivity("Actualización de Estado", `El expediente de estudiante ID: ${estId} cambió al estado: ${nuevoEstado}`);
+        let detalleEstado = `El expediente de estudiante ID: ${estId} cambió al estado: ${nuevoEstado}`;
+        if (datosEstudiante) {
+          const nom = `${datosEstudiante.nombres || datosEstudiante.nombre || ''} ${datosEstudiante.apellidos || ''}`.trim() || 'Estudiante';
+          const doc = datosEstudiante.dni || datosEstudiante.identidad || 'Sin DNI';
+          const prog = datosEstudiante.maestriaId || 'Posgrado';
+          detalleEstado = `Actualización de estado: ${nom} | DNI: ${doc} | Programa: ${prog} | Nuevo estado: ${nuevoEstado} | ID: ${estId}`;
+        }
+        await this.logActivity("Actualización de Estado", detalleEstado);
       } catch (e) {}
     },
 
     // Eliminar estudiante de la base de datos (Firestore y LocalStorage)
-    deleteEstudiante: async function (estId, updatedList) {
+    deleteEstudiante: async function (estId, updatedList, datosEstudiante) {
       // 1. Guardar lista actualizada en LocalStorage
       try {
         localStorage.setItem('posface_estudiantes_data', JSON.stringify(updatedList));
@@ -878,9 +988,17 @@
         window.dispatchEvent(new CustomEvent('posface_estudiante_eliminado', { detail: { id: estId } }));
       } catch (e) {}
 
-      // 4. Registrar en Bitácora
+      // 4. Registrar en Bitácora con nombre y datos completos del estudiante eliminado
       try {
-        await this.logActivity("Eliminación de Estudiante", `Se eliminó el expediente de estudiante ID: ${estId}`);
+        let detalleEliminacion = `Se eliminó el expediente de estudiante ID: ${estId}`;
+        if (datosEstudiante) {
+          const nom = `${datosEstudiante.nombres || datosEstudiante.nombre || ''} ${datosEstudiante.apellidos || ''}`.trim() || 'Estudiante';
+          const doc = datosEstudiante.dni || datosEstudiante.identidad || 'Sin DNI';
+          const cta = datosEstudiante.cuentaUNAH || 'Sin cuenta';
+          const prog = datosEstudiante.maestriaId || 'N/A';
+          detalleEliminacion = `Estudiante eliminado: ${nom} | DNI: ${doc} | Cuenta: ${cta} | Programa: ${prog} | ID Expediente: ${estId}`;
+        }
+        await this.logActivity("Eliminación de Estudiante", detalleEliminacion);
       } catch (e) {}
     },
 
@@ -972,14 +1090,49 @@
       
       if (this.isCloudActive()) {
         try {
-          const db = firebase.firestore();
-          const snap = await db.collection('bitacora_coordinacion').orderBy('serverTimestamp', 'desc').limit(100).get();
-          if (!snap.empty) {
-            logs = [];
-            snap.forEach(doc => {
-              logs.push(doc.data());
-            });
-            localStorage.setItem('posface_bitacora', JSON.stringify(logs));
+          const db = dbInstance || (firebase.apps && firebase.apps.length ? firebase.firestore() : null);
+          if (db) {
+            let snap = null;
+            try {
+              snap = await db.collection('bitacora_coordinacion').orderBy('serverTimestamp', 'desc').limit(200).get();
+            } catch (errOrder) {
+              console.warn("Fallo en query con orderBy serverTimestamp, intentando lectura directa:", errOrder);
+              snap = await db.collection('bitacora_coordinacion').limit(200).get();
+            }
+
+            if (snap && !snap.empty) {
+              const cloudLogs = [];
+              snap.forEach(doc => {
+                const data = doc.data();
+                data.docId = doc.id;
+
+                // Normalizar serverTimestamp a ISO string si es Timestamp
+                let normalizedTs = data.timestamp;
+                if (data.serverTimestamp) {
+                  if (typeof data.serverTimestamp.toDate === 'function') {
+                    normalizedTs = data.serverTimestamp.toDate().toISOString();
+                  } else if (data.serverTimestamp.seconds) {
+                    normalizedTs = new Date(data.serverTimestamp.seconds * 1000).toISOString();
+                  } else if (typeof data.serverTimestamp === 'string') {
+                    normalizedTs = data.serverTimestamp;
+                  }
+                }
+                data.normalizedTimestamp = normalizedTs || data.timestamp || new Date().toISOString();
+                cloudLogs.push(data);
+              });
+
+              // Ordenar descendente (el más reciente primero)
+              cloudLogs.sort((a, b) => {
+                const timeA = new Date(a.normalizedTimestamp || a.timestamp || 0).getTime();
+                const timeB = new Date(b.normalizedTimestamp || b.timestamp || 0).getTime();
+                return timeB - timeA;
+              });
+
+              logs = cloudLogs;
+              try {
+                localStorage.setItem('posface_bitacora', JSON.stringify(logs));
+              } catch(e) {}
+            }
           }
         } catch(e) {
           console.warn("Error obteniendo bitácora de la nube:", e);

@@ -100,9 +100,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     est.estado = nuevoEstado;
 
-    // Guardar en Firebase Firestore o LocalStorage
+    // Guardar en Firebase Firestore o LocalStorage con datos completos del estudiante
     if (window.PosfaceDB) {
-      window.PosfaceDB.updateEstadoEstudiante(estId, nuevoEstado, estudiantesList);
+      window.PosfaceDB.updateEstadoEstudiante(estId, nuevoEstado, estudiantesList, est);
     } else {
       try {
         localStorage.setItem('posface_estudiantes_data', JSON.stringify(estudiantesList));
@@ -150,9 +150,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Filtrar de la lista local
     estudiantesList = estudiantesList.filter(e => e.id !== estudianteIdAEliminar);
 
-    // 2. Persistir en Firestore y/o LocalStorage
+    // 2. Persistir en Firestore y/o LocalStorage con datos completos del estudiante eliminado
     if (window.PosfaceDB) {
-      window.PosfaceDB.deleteEstudiante(estudianteIdAEliminar, estudiantesList);
+      window.PosfaceDB.deleteEstudiante(estudianteIdAEliminar, estudiantesList, est);
     } else {
       try {
         localStorage.setItem('posface_estudiantes_data', JSON.stringify(estudiantesList));
@@ -324,7 +324,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (viewId === 'dashboard') renderDashboard();
     if (viewId === 'estudiantes') renderEstudiantes();
     if (viewId === 'maestrias') renderMaestrias();
-    if (viewId === 'bitacora') renderBitacora();
+    if (viewId === 'bitacora') {
+      const currentUser = window.PosfaceAuth ? window.PosfaceAuth.getCurrentUser() : null;
+      if (!isCoordinadorGeneralUser(currentUser)) {
+        showToast('Acceso restringido: La Bitácora es exclusiva para la Coordinación General', 'danger');
+        switchView('dashboard');
+        return;
+      }
+      renderBitacora();
+    }
 
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1552,45 +1560,340 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================================================================
-  // RENDERIZADO DE BITÁCORA
+  // GESTIÓN Y RENDERIZADO DE BITÁCORA DE COORDINACIÓN
   // =========================================================================
-  async function renderBitacora() {
-    const tbody = document.getElementById('tbodyBitacora');
-    if (!tbody) return;
-    
-    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 20px;">Cargando historial de actividades...</td></tr>`;
-    
-    let logs = [];
-    if (window.PosfaceDB && window.PosfaceDB.fetchBitacora) {
-      logs = await window.PosfaceDB.fetchBitacora();
+  let bitacoraAllLogs = [];
+
+  // Comprobar si el usuario posee rol de Coordinador General o Administrador
+  function isCoordinadorGeneralUser(user) {
+    if (!user) return false;
+    const roleStr = (user.role || '').toLowerCase().trim();
+    const emailStr = (user.email || '').toLowerCase().trim();
+    if (roleStr.includes('coordinador general') || roleStr.includes('coordinadora general')) return true;
+    if (roleStr.includes('administrador') || roleStr === 'admin') return true;
+    if (roleStr.includes('dirección') || roleStr.includes('direccion')) return true;
+    if (emailStr === 'maygonza.cs@gmail.com' || emailStr === 'coordinador.general@unah.edu.hn' || emailStr === 'admin@unah.edu.hn') return true;
+    return false;
+  }
+
+  // Formatear fecha y hora para la visualización amigable en Honduras
+  function formatLogDate(log) {
+    let dateObj = null;
+    if (log.normalizedTimestamp) {
+      dateObj = new Date(log.normalizedTimestamp);
+    } else if (log.serverTimestamp) {
+      if (typeof log.serverTimestamp.toDate === 'function') {
+        dateObj = log.serverTimestamp.toDate();
+      } else if (log.serverTimestamp.seconds) {
+        dateObj = new Date(log.serverTimestamp.seconds * 1000);
+      } else {
+        dateObj = new Date(log.serverTimestamp);
+      }
+    } else if (log.timestamp) {
+      dateObj = new Date(log.timestamp);
     }
-    
+
+    if (!dateObj || isNaN(dateObj.getTime())) {
+      dateObj = new Date();
+    }
+
+    const fecha = dateObj.toLocaleDateString('es-HN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+    const hora = dateObj.toLocaleTimeString('es-HN', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+
+    return `${fecha} · ${hora}`;
+  }
+
+  // Generar badge con estilo distintivo según la acción
+  function getActionBadgeHtml(action) {
+    const act = (action || 'Acción General').trim();
+    const actLower = act.toLowerCase();
+
+    if (actLower.includes('inicio de sesión') || actLower.includes('login')) {
+      return `<span class="badge" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-weight: 700; font-size: 0.8rem;">
+        <span class="badge-dot" style="background: #10b981;"></span> ${act}
+      </span>`;
+    }
+    if (actLower.includes('cierre de sesión') || actLower.includes('logout')) {
+      return `<span class="badge" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; font-weight: 700; font-size: 0.8rem;">
+        <span class="badge-dot" style="background: #64748b;"></span> ${act}
+      </span>`;
+    }
+    if (actLower.includes('inscripción') || actLower.includes('aspirante')) {
+      return `<span class="badge" style="background: #fefce8; color: #b45309; border: 1px solid #fde047; font-weight: 700; font-size: 0.8rem;">
+        <span class="badge-dot" style="background: #eab308;"></span> ${act}
+      </span>`;
+    }
+    if (actLower.includes('eliminación') || actLower.includes('eliminar')) {
+      return `<span class="badge" style="background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; font-weight: 700; font-size: 0.8rem;">
+        <span class="badge-dot" style="background: #ef4444;"></span> ${act}
+      </span>`;
+    }
+    if (actLower.includes('estado') || actLower.includes('actualización') || actLower.includes('actualizacion')) {
+      return `<span class="badge" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-weight: 700; font-size: 0.8rem;">
+        <span class="badge-dot" style="background: #3b82f6;"></span> ${act}
+      </span>`;
+    }
+    if (actLower.includes('contraseña') || actLower.includes('password')) {
+      return `<span class="badge" style="background: #faf5ff; color: #7e22ce; border: 1px solid #e9d5ff; font-weight: 700; font-size: 0.8rem;">
+        <span class="badge-dot" style="background: #a855f7;"></span> ${act}
+      </span>`;
+    }
+    return `<span class="badge" style="background: rgba(0, 51, 102, 0.06); color: var(--unah-navy); border: 1px solid rgba(0, 51, 102, 0.15); font-weight: 700; font-size: 0.8rem;">
+      <span class="badge-dot" style="background: var(--unah-navy);"></span> ${act}
+    </span>`;
+  }
+
+  // Función auxiliar de sanitización
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  // Formatear detalles de operaciones para mostrar información enriquecida (nombres, DNI, programa, chips)
+  function formatLogDetails(log) {
+    let details = (log.details || '').trim();
+    const act = (log.action || '').toLowerCase();
+
+    // Sanitizar cadenas undefined residuales si las hubiera
+    if (details.includes('undefined')) {
+      details = details.replace(/undefined\s*\(undefined\)/g, 'Aspirante registrado')
+                       .replace(/undefined/g, 'N/A');
+    }
+
+    // Caso 1: Estructura enriquecida con separador vertical '|'
+    if (details.includes('|')) {
+      const parts = details.split('|').map(p => p.trim());
+      const mainTitle = parts[0];
+      const attributes = parts.slice(1);
+
+      const isEliminacion = act.includes('eliminación') || act.includes('eliminar');
+      const titleColor = isEliminacion ? '#991b1b' : 'var(--unah-navy)';
+      const icon = isEliminacion ? '🗑️' : (act.includes('inscripción') || act.includes('aspirante') ? '🎓' : '📌');
+
+      return `
+        <div>
+          <div style="font-weight: 700; color: ${titleColor}; font-size: 0.93rem; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+            <span>${icon}</span>
+            <span>${escapeHtml(mainTitle)}</span>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+            ${attributes.map(attr => {
+              const colonIndex = attr.indexOf(':');
+              if (colonIndex === -1) {
+                return `<span style="display: inline-block; background: #f8fafc; border: 1px solid #e2e8f0; padding: 2px 8px; border-radius: 4px; font-size: 0.78rem; color: #475569;">${escapeHtml(attr)}</span>`;
+              }
+              const key = attr.substring(0, colonIndex).trim();
+              const val = attr.substring(colonIndex + 1).trim();
+
+              let badgeBg = '#f1f5f9';
+              let badgeBorder = '#cbd5e1';
+              let keyColor = 'var(--unah-navy)';
+
+              if (key.toLowerCase().includes('dni') || key.toLowerCase().includes('cuenta')) {
+                badgeBg = '#f0f9ff';
+                badgeBorder = '#bae6fd';
+                keyColor = '#0369a1';
+              } else if (key.toLowerCase().includes('programa')) {
+                badgeBg = '#fefce8';
+                badgeBorder = '#fef08a';
+                keyColor = '#854d0e';
+              } else if (key.toLowerCase().includes('folio') || key.toLowerCase().includes('expediente')) {
+                badgeBg = '#faf5ff';
+                badgeBorder = '#e9d5ff';
+                keyColor = '#6b21a8';
+              }
+
+              return `<span style="display: inline-flex; align-items: center; gap: 4px; background: ${badgeBg}; border: 1px solid ${badgeBorder}; padding: 2px 8px; border-radius: 4px; font-size: 0.78rem;">
+                <strong style="color: ${keyColor}; font-weight: 700;">${escapeHtml(key)}:</strong>
+                <span style="color: #1e293b; font-weight: 600;">${escapeHtml(val)}</span>
+              </span>`;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // Caso 2: Eliminación sin separador vertical
+    if (act.includes('eliminación') || act.includes('eliminar')) {
+      return `
+        <div style="display: flex; align-items: flex-start; gap: 8px;">
+          <span style="color: #dc2626; font-size: 1.1rem; line-height: 1;">🗑️</span>
+          <div>
+            <div style="font-weight: 700; color: #991b1b; font-size: 0.88rem;">${escapeHtml(details)}</div>
+            <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 2px;">Expediente removido de la base de datos</div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Caso 3: Inicios de sesión
+    if (act.includes('inicio de sesión') || act.includes('login')) {
+      return `
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 1rem;">🔑</span>
+          <span style="color: var(--text-main); font-size: 0.86rem; font-weight: 500;">${escapeHtml(details)}</span>
+        </div>
+      `;
+    }
+
+    // Caso 4: Cierres de sesión
+    if (act.includes('cierre de sesión') || act.includes('logout')) {
+      return `
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 1rem;">🚪</span>
+          <span style="color: var(--text-muted); font-size: 0.86rem;">${escapeHtml(details)}</span>
+        </div>
+      `;
+    }
+
+    // Caso 5: Contraseñas
+    if (act.includes('contraseña') || act.includes('password')) {
+      return `
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 1rem;">🛡️</span>
+          <span style="color: #7e22ce; font-size: 0.86rem; font-weight: 600;">${escapeHtml(details)}</span>
+        </div>
+      `;
+    }
+
+    return `<div style="font-size: 0.86rem; color: var(--text-main); line-height: 1.4;">${escapeHtml(details || 'Operación registrada en el sistema')}</div>`;
+  }
+
+  // Renderizar filas de la tabla de bitácora
+  function renderBitacoraTable(logs) {
+    const tbody = document.getElementById('tbodyBitacora');
+    const lblMostrando = document.getElementById('lblBitacoraMostrando');
+    if (!tbody) return;
+
     if (!logs || logs.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 20px;">No hay actividades registradas en la bitácora.</td></tr>`;
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 36px 20px;">
+            <div style="font-size: 2.2rem; margin-bottom: 8px;">📋</div>
+            <div style="font-weight: 700; color: var(--unah-navy); font-size: 1.05rem;">No se encontraron registros en la bitácora</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Ajusta los filtros de búsqueda o realiza operaciones en el sistema.</div>
+          </td>
+        </tr>
+      `;
+      if (lblMostrando) lblMostrando.textContent = 'Mostrando 0 registros';
       return;
     }
-    
+
+    if (lblMostrando) {
+      lblMostrando.textContent = `Mostrando ${logs.length} de ${bitacoraAllLogs.length} registros`;
+    }
+
     tbody.innerHTML = '';
-    logs.forEach(log => {
-      const dateObj = new Date(log.timestamp);
-      const formattedDate = dateObj.toLocaleDateString('es-HN') + ' ' + dateObj.toLocaleTimeString('es-HN', { hour: '2-digit', minute: '2-digit' });
-      
+    logs.forEach((log, index) => {
+      const formattedDate = formatLogDate(log);
+      const actionBadge = getActionBadgeHtml(log.action);
+      const userName = log.user || 'Sistema';
+      const userInitials = (userName || 'UN').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || 'UN';
+
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td style="font-size: 0.85rem; color: var(--text-muted);">${formattedDate}</td>
-        <td>
-          <div style="font-weight: 500; color: var(--unah-navy);">${log.user || 'Sistema'}</div>
-          <div style="font-size: 0.75rem; color: var(--text-muted);">${log.email || ''}</div>
+        <td style="white-space: nowrap;">
+          <div style="font-weight: 700; font-size: 0.88rem; color: var(--text-main);">${formattedDate}</div>
+          <div style="font-size: 0.72rem; color: var(--text-muted); font-family: monospace;">#${log.id || ('reg-' + (bitacoraAllLogs.length - index))}</div>
         </td>
         <td>
-          <span style="display: inline-block; padding: 4px 8px; background: rgba(0, 51, 102, 0.05); color: var(--unah-navy); border-radius: 4px; font-weight: 600; font-size: 0.85rem;">
-            ${log.action || 'Acción General'}
-          </span>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(0, 51, 102, 0.08); color: var(--unah-navy); display: flex; align-items: center; justify-content: center; font-size: 0.76rem; font-weight: 800; flex-shrink: 0; border: 1px solid rgba(0, 51, 102, 0.15);">
+              ${userInitials}
+            </div>
+            <div>
+              <div style="font-weight: 700; color: var(--unah-navy); font-size: 0.88rem;">${userName}</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">${log.email || 'Acción institucional'}</div>
+            </div>
+          </div>
         </td>
-        <td style="font-size: 0.85rem; color: var(--text-main);">${log.details || ''}</td>
+        <td>
+          ${actionBadge}
+        </td>
+        <td style="font-size: 0.86rem; color: var(--text-main); line-height: 1.45;">
+          ${formatLogDetails(log)}
+        </td>
       `;
       tbody.appendChild(tr);
     });
+  }
+
+  // Filtrado reactivo de registros de bitácora
+  function filterAndRenderBitacora() {
+    const inputBuscar = document.getElementById('filtroBitacoraBuscar');
+    const selectAccion = document.getElementById('filtroBitacoraAccion');
+
+    const query = inputBuscar ? inputBuscar.value.trim().toLowerCase() : '';
+    const filterAction = selectAccion ? selectAccion.value : '';
+
+    let filtered = bitacoraAllLogs;
+
+    if (filterAction) {
+      filtered = filtered.filter(log => {
+        const act = (log.action || '').toLowerCase();
+        return act.includes(filterAction.toLowerCase());
+      });
+    }
+
+    if (query) {
+      filtered = filtered.filter(log => {
+        const u = (log.user || '').toLowerCase();
+        const em = (log.email || '').toLowerCase();
+        const act = (log.action || '').toLowerCase();
+        const det = (log.details || '').toLowerCase();
+        const d = formatLogDate(log).toLowerCase();
+        return u.includes(query) || em.includes(query) || act.includes(query) || det.includes(query) || d.includes(query);
+      });
+    }
+
+    renderBitacoraTable(filtered);
+  }
+
+  // Carga y renderizado principal de la Bitácora
+  async function renderBitacora() {
+    const tbody = document.getElementById('tbodyBitacora');
+    const lblTotal = document.getElementById('lblBitacoraTotal');
+    const navBadge = document.getElementById('navBadgeBitacora');
+
+    if (tbody) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 36px 20px;">
+            <div class="spinner-border" style="display: inline-block; width: 26px; height: 26px; border: 3px solid rgba(0, 51, 102, 0.15); border-top-color: var(--unah-navy); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+            <div style="margin-top: 12px; font-weight: 600; color: var(--unah-navy);">Cargando historial de actividades desde la base de datos...</div>
+          </td>
+        </tr>
+      `;
+    }
+
+    if (window.PosfaceDB && window.PosfaceDB.fetchBitacora) {
+      bitacoraAllLogs = await window.PosfaceDB.fetchBitacora();
+    } else {
+      bitacoraAllLogs = [];
+    }
+
+    const totalCount = bitacoraAllLogs.length;
+    if (lblTotal) lblTotal.textContent = `${totalCount} registro${totalCount === 1 ? '' : 's'}`;
+    if (navBadge) {
+      navBadge.textContent = totalCount;
+      navBadge.style.display = totalCount > 0 ? 'inline-block' : 'none';
+    }
+
+    filterAndRenderBitacora();
   }
 
   // Verificación y actualización de estado de autenticación
@@ -1618,13 +1921,32 @@ document.addEventListener('DOMContentLoaded', () => {
       if (nameEl) nameEl.textContent = user.name || 'Secretaría Académica';
       if (roleEl) roleEl.textContent = `${user.role || 'POSFACE'} · ${user.email || 'posface@unah.edu.hn'}`;
 
+      // Control estricto de visibilidad de la Bitácora para el rol de Coordinador General
       const navBitacora = document.getElementById('nav-bitacora');
+      const isCoordGen = isCoordinadorGeneralUser(user);
       if (navBitacora) {
-        const roleStr = (user.role || '').toLowerCase();
-        if (roleStr.includes('coordinador general') || roleStr.includes('coordinadora general')) {
+        if (isCoordGen) {
           navBitacora.style.display = 'flex';
+          const navBadge = document.getElementById('navBadgeBitacora');
+          if (navBadge) {
+            try {
+              const raw = localStorage.getItem('posface_bitacora');
+              if (raw) {
+                const logs = JSON.parse(raw);
+                if (Array.isArray(logs) && logs.length > 0) {
+                  navBadge.textContent = logs.length;
+                  navBadge.style.display = 'inline-block';
+                }
+              }
+            } catch(e) {}
+          }
         } else {
           navBitacora.style.display = 'none';
+          // Si el usuario no es coordinador general y se encuentra en la vista bitácora, volver a dashboard
+          const currentSection = document.querySelector('.view-section.active');
+          if (currentSection && currentSection.id === 'view-bitacora') {
+            switchView('dashboard');
+          }
         }
       }
     } else {
@@ -1839,6 +2161,39 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Botón de Acceso Rápido para Coordinador General
+  const btnQuickLoginCoord = document.getElementById('btnQuickLoginCoord');
+  if (btnQuickLoginCoord) {
+    btnQuickLoginCoord.addEventListener('click', async (e) => {
+      e.preventDefault();
+      clearLoginErrors();
+      const emailInput = document.getElementById('loginEmail');
+      const pwdInput = document.getElementById('loginPassword');
+      if (emailInput) emailInput.value = 'maygonza.cs@gmail.com';
+      if (pwdInput) pwdInput.value = 'posface2026';
+
+      const btnSubmit = document.getElementById('btnLoginSubmit');
+      const btnText = document.getElementById('btnLoginText');
+      if (btnSubmit) btnSubmit.disabled = true;
+      if (btnText) btnText.textContent = 'Accediendo como Coordinador...';
+
+      try {
+        const user = await window.PosfaceAuth.login('maygonza.cs@gmail.com', 'posface2026');
+        clearLoginErrors();
+        showToast(`Bienvenido(a) Coordinación General: ${user.name}`, 'success');
+        checkAuthState();
+        if (window.PosfaceDB && window.PosfaceDB.logActivity) window.PosfaceDB.logActivity("Inicio de Sesión", "Coordinador General accedió al sistema");
+        switchView('dashboard');
+      } catch (err) {
+        showLoginAlert('danger', 'Error al acceder como Coordinador General', err.message);
+        showToast(err.message || 'Error al acceder como Coordinador General', 'danger');
+      } finally {
+        if (btnSubmit) btnSubmit.disabled = false;
+        if (btnText) btnText.textContent = 'Ingresar al Sistema POSFACE';
+      }
+    });
+  }
+
   // Botón de Acceso Rápido Demostración
   if (btnQuickLogin) {
     btnQuickLogin.addEventListener('click', async (e) => {
@@ -1871,6 +2226,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Controles interactivos de la Bitácora
+  const btnRefreshBitacora = document.getElementById('btnRefreshBitacora');
+  if (btnRefreshBitacora) {
+    btnRefreshBitacora.addEventListener('click', async () => {
+      btnRefreshBitacora.disabled = true;
+      showToast('Sincronizando bitácora con la base de datos...', 'info');
+      await renderBitacora();
+      btnRefreshBitacora.disabled = false;
+      showToast('Bitácora actualizada correctamente desde la BD', 'success');
+    });
+  }
+
+  const filtroBitacoraBuscar = document.getElementById('filtroBitacoraBuscar');
+  if (filtroBitacoraBuscar) {
+    filtroBitacoraBuscar.addEventListener('input', filterAndRenderBitacora);
+  }
+
+  const filtroBitacoraAccion = document.getElementById('filtroBitacoraAccion');
+  if (filtroBitacoraAccion) {
+    filtroBitacoraAccion.addEventListener('change', filterAndRenderBitacora);
+  }
+
   // Botón de Cerrar Sesión en Sidebar
   if (btnSidebarLogout) {
     btnSidebarLogout.addEventListener('click', async () => {
@@ -1885,10 +2262,30 @@ document.addEventListener('DOMContentLoaded', () => {
   // Ejecutar verificación inicial de sesión
   checkAuthState();
 
-  // Inicializar vistas
+  // Sincronizar en segundo plano el perfil del usuario con Firestore
+  if (window.PosfaceAuth && window.PosfaceAuth.syncCurrentUser) {
+    window.PosfaceAuth.syncCurrentUser().then(syncedUser => {
+      if (syncedUser) checkAuthState();
+    }).catch(() => {});
+  }
+
+  // Inicializar vistas principales
   renderDashboard();
   renderMaestrias();
   renderEstudiantes();
+
+  // Navegación por hash URL
+  const initialHash = window.location.hash ? window.location.hash.substring(1) : '';
+  if (['dashboard', 'estudiantes', 'maestrias', 'bitacora'].includes(initialHash)) {
+    switchView(initialHash);
+  }
+
+  window.addEventListener('hashchange', () => {
+    const newHash = window.location.hash ? window.location.hash.substring(1) : '';
+    if (['dashboard', 'estudiantes', 'maestrias', 'bitacora'].includes(newHash)) {
+      switchView(newHash);
+    }
+  });
 
   // =========================================================================
   // MÓDULO DE GESTIÓN DE CONTRASEÑAS
